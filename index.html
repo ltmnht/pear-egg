@@ -1,0 +1,2813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pear & Egg 🍐🥚 Speaking Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FFF6E9;
+    --pear:#A8CD7C;
+    --pear-dark:#5F8A3C;
+    --egg:#FFD98E;
+    --egg-dark:#E3A431;
+    --blush:#FF93A8;
+    --blush-dark:#E1546E;
+    --sky:#8FCBE8;
+    --sky-dark:#4E9BC2;
+    --ink:#4A3728;
+    --ink-soft:#8C7965;
+    --card:#FFFDF9;
+    --good:#5F8A3C;
+    --bad:#E1546E;
+    --shadow: 0 20px 44px -14px rgba(74,55,40,0.28);
+    --shadow-sm: 0 8px 18px -8px rgba(74,55,40,0.2);
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; padding:0; min-height:100%;
+    font-family:'Quicksand', sans-serif;
+    background: var(--cream);
+    color:var(--ink);
+    overflow-x:hidden;
+  }
+
+  /* ---------- ambient background blobs ---------- */
+  .bg-blob{
+    position:fixed;
+    border-radius:50%;
+    filter: blur(2px);
+    opacity:0.35;
+    z-index:0;
+    animation: drift 14s ease-in-out infinite;
+  }
+  .bg-blob.b1{ width:280px; height:280px; background:var(--pear); top:-90px; left:-90px; animation-delay:0s;}
+  .bg-blob.b2{ width:220px; height:220px; background:var(--egg); bottom:-70px; right:-60px; animation-delay:2s;}
+  .bg-blob.b3{ width:160px; height:160px; background:var(--sky); top:40%; right:-80px; animation-delay:4s;}
+  .bg-blob.b4{ width:140px; height:140px; background:var(--blush); bottom:20%; left:-70px; animation-delay:1s;}
+  @keyframes drift{
+    0%,100%{ transform: translate(0,0) scale(1); }
+    50%{ transform: translate(20px,-24px) scale(1.08); }
+  }
+
+  .deco{
+    position:fixed;
+    opacity:0.55;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.06));
+    animation: float 6s ease-in-out infinite;
+    pointer-events:none;
+    z-index:0;
+  }
+  .deco.d1{ top:6%; left:6%; font-size:34px; animation-delay:0s;}
+  .deco.d2{ top:8%; right:9%; font-size:26px; animation-delay:1.2s;}
+  .deco.d3{ bottom:6%; left:9%; font-size:24px; animation-delay:2.1s;}
+  .deco.d4{ bottom:5%; right:6%; font-size:30px; animation-delay:0.6s;}
+  @keyframes float{
+    0%,100%{ transform: translateY(0px) rotate(0deg);}
+    50%{ transform: translateY(-14px) rotate(6deg);}
+  }
+
+  .stage{
+    position:relative;
+    z-index:1;
+    min-height:100vh;
+    width:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    padding:26px 20px 44px;
+    user-select:none;
+  }
+
+  .topbar{
+    width:min(560px, 94vw);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:6px;
+  }
+  .title-block{
+    display:flex;
+    flex-direction:column;
+    gap:1px;
+  }
+  .title{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:800;
+    font-size:23px;
+    color:var(--ink);
+    letter-spacing:0.3px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .title span{ color:var(--pear-dark); }
+  .subtitle{
+    font-size:11.5px;
+    color:var(--ink-soft);
+    letter-spacing:0.6px;
+    text-transform:uppercase;
+    font-weight:600;
+  }
+
+  .sfx-toggle{
+    width:42px; height:42px;
+    border-radius:50%;
+    background:var(--card);
+    border:2px solid #F0E4D2;
+    box-shadow: 0 4px 0 #D9C9AC, var(--shadow-sm);
+    display:flex; align-items:center; justify-content:center;
+    font-size:18px;
+    cursor:pointer;
+    transition: transform 0.12s cubic-bezier(.34,1.56,.64,1), box-shadow 0.12s ease, filter 0.12s ease;
+    flex-shrink:0;
+    position:relative;
+  }
+  .sfx-toggle::before{
+    content:"";
+    position:absolute;
+    top:4px; left:8px; right:8px;
+    height:38%;
+    border-radius:50% 50% 60% 60%/70% 70% 40% 40%;
+    background:rgba(255,255,255,0.55);
+    pointer-events:none;
+  }
+  .sfx-toggle:hover{ transform: translateY(-2px) rotate(-6deg); box-shadow: 0 6px 0 #D9C9AC, var(--shadow-sm); }
+  .sfx-toggle:active{ transform: translateY(3px) rotate(0deg); box-shadow: 0 1px 0 #D9C9AC; filter: brightness(0.94); }
+
+  .progress-wrap{
+    display:flex;
+    gap:6px;
+    margin:16px 0 20px;
+    max-width:320px;
+    flex-wrap:wrap;
+    justify-content:center;
+  }
+  .dot{
+    width:8px; height:8px; border-radius:50%;
+    background:#EBDECB;
+    transition: all 0.25s ease;
+  }
+  .dot.done{ background:var(--pear-dark); }
+  .dot.current{ background:var(--blush-dark); width:20px; border-radius:5px; }
+
+  .scene{
+    position:relative;
+    width:min(560px, 94vw);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+
+  .avatar-row{
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    gap:64px;
+    height:100px;
+    margin-bottom:-8px;
+    z-index:2;
+  }
+  .avatar-wrap{ position:relative; }
+  .speech-tail{
+    position:absolute;
+    top:-8px;
+    left:50%;
+    transform:translateX(-50%) scale(0);
+    font-size:11px;
+    background:var(--ink);
+    color:#fff;
+    padding:2px 8px;
+    border-radius:8px;
+    white-space:nowrap;
+    opacity:0;
+    transition: all 0.25s ease;
+  }
+  .avatar-wrap.active .speech-tail{
+    opacity:1;
+    transform:translateX(-50%) scale(1);
+    top:-16px;
+  }
+  .avatar{
+    font-size:58px;
+    line-height:1;
+    transition: transform 0.35s cubic-bezier(.34,1.56,.64,1), filter 0.35s ease;
+    filter: grayscale(0.6) opacity(0.5);
+    transform: scale(0.9) translateY(6px);
+  }
+  .avatar.active{
+    filter: grayscale(0) opacity(1);
+    transform: scale(1.2) translateY(0);
+    animation: bounce 0.6s ease;
+  }
+  @keyframes bounce{
+    0%{ transform: scale(0.9) translateY(6px); }
+    50%{ transform: scale(1.3) translateY(-11px); }
+    100%{ transform: scale(1.2) translateY(0); }
+  }
+  .avatar.active.bump{
+    animation: avatarBump 0.32s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes avatarBump{
+    0%{   transform: scale(1.2)  rotate(0deg)   translateY(0); }
+    35%{  transform: scale(1.23) rotate(-3deg)  translateY(-2px); }
+    70%{  transform: scale(1.21) rotate(2deg)   translateY(0); }
+    100%{ transform: scale(1.2)  rotate(0deg)   translateY(0); }
+  }
+
+  /* ---------- flip card ---------- */
+  .card-perspective{
+    width:100%;
+    perspective: 1400px;
+  }
+  .card{
+    background: var(--card);
+    border-radius: 28px;
+    box-shadow: var(--shadow);
+    padding: 40px 32px 28px;
+    width:100%;
+    min-height:190px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+    cursor:pointer;
+    border: 3px solid transparent;
+    transform-style: preserve-3d;
+    transition: transform 0.44s cubic-bezier(.5,.1,.2,1), border-color 0.3s ease, background 0.4s ease;
+  }
+  .card:active{ transform: scale(0.985); }
+  .card:focus-visible{ outline: 3px solid var(--sky-dark); outline-offset: 4px; }
+  .card.flipping{ transform: rotateY(90deg); }
+  .card.pear-turn{
+    border-color: var(--pear);
+    background:
+      radial-gradient(ellipse at 15% 0%, rgba(168,205,124,0.16) 0%, transparent 55%),
+      var(--card);
+  }
+  .card.egg-turn{
+    border-color: var(--egg-dark);
+    background:
+      radial-gradient(ellipse at 15% 0%, rgba(227,164,49,0.16) 0%, transparent 55%),
+      var(--card);
+  }
+
+  .card::after{
+    content:"";
+    position:absolute;
+    top:-14px;
+    left:50%;
+    transform:translateX(-50%) rotate(45deg);
+    width:24px; height:24px;
+    background:var(--card);
+    border-left:3px solid transparent;
+    border-top:3px solid transparent;
+    z-index:1;
+  }
+  .card.pear-turn::after{ border-left-color:var(--pear); border-top-color:var(--pear); }
+  .card.egg-turn::after{ border-left-color:var(--egg-dark); border-top-color:var(--egg-dark); }
+
+  /* folded-corner flashcard effect */
+  .card-fold{
+    position:absolute;
+    top:0; right:0;
+    width:0; height:0;
+    border-style:solid;
+    border-width:0 34px 34px 0;
+    border-color:transparent #F0E4D2 transparent transparent;
+    transition: border-color 0.3s ease;
+    z-index:2;
+  }
+  .card.pear-turn .card-fold{ border-color: transparent #DCEAC7 transparent transparent; }
+  .card.egg-turn .card-fold{ border-color: transparent #FBEACB transparent transparent; }
+
+  /* decorative background quote marks */
+  .quote-glyph{
+    position:absolute;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight:700;
+    line-height:1;
+    color:var(--ink);
+    opacity:0.07;
+    pointer-events:none;
+    z-index:0;
+  }
+  .quote-open{ top:2px; left:16px; font-size:76px; }
+  .quote-close{ bottom:-26px; right:16px; font-size:76px; }
+
+  .card-tag{
+    position:absolute;
+    top:14px;
+    left:16px;
+    font-size:10.5px;
+    font-weight:700;
+    letter-spacing:0.5px;
+    color:var(--ink-soft);
+    background:#F5EEE0;
+    padding:3px 10px;
+    border-radius:999px;
+    z-index:2;
+  }
+
+  .badge-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:14px;
+    z-index:1;
+  }
+  .mini-chip{
+    width:26px; height:26px;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px;
+    background:#fff;
+    box-shadow: 0 3px 8px -3px rgba(74,55,40,0.35);
+  }
+
+  .speaker-badge{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:14px;
+    padding:5px 16px;
+    border-radius:999px;
+    letter-spacing:0.5px;
+  }
+  .speaker-badge.pear{ background:var(--pear); color:#2F4A1B; }
+  .speaker-badge.egg{ background:var(--egg); color:#6B4E10; }
+
+  .line-text{
+    font-family:'Baloo 2', sans-serif;
+    font-size:clamp(20px, 4.4vw, 28px);
+    font-weight:600;
+    line-height:1.4;
+    color:var(--ink);
+    z-index:1;
+    position:relative;
+  }
+  .line-text .word{
+    display:inline-block;
+    animation: word-bounce-in 0.45s ease-out both;
+    transition: color 0.15s ease, transform 0.15s ease;
+    border-radius:5px;
+  }
+  .line-text .word.active{
+    color: var(--blush-dark);
+    transform: translateY(-1px) scale(1.06);
+  }
+  @keyframes word-bounce-in{
+    0%{ transform: translateY(-8px); opacity:0; }
+    70%{ transform: translateY(1px); opacity:1; }
+    100%{ transform: translateY(0); opacity:1; }
+  }
+
+  /* ---------- Vietnamese translation strip ---------- */
+  /* Icons are inline SVG (not emoji) so they render identically on every
+     device/OS/browser instead of falling back to different glyphs. */
+  .vi-toggle{
+    margin-left:auto;
+    border:none;
+    background:var(--sky);
+    color:#123A4C;
+    font-family:'Quicksand', sans-serif;
+    font-size:12px;
+    font-weight:700;
+    padding:6px 12px 6px 10px;
+    border-radius:999px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:5px;
+    white-space:nowrap;
+    box-shadow: 0 3px 0 var(--sky-dark);
+    transition: transform 0.12s cubic-bezier(.34,1.56,.64,1), box-shadow 0.12s ease, background 0.2s ease, color 0.2s ease;
+  }
+  .vi-toggle:hover{ transform: translateY(-1px); }
+  .vi-toggle:active{ transform: translateY(2px); box-shadow:0 1px 0 var(--sky-dark); }
+  .vi-toggle.off{ background:#EFE6D6; color:var(--ink-soft); box-shadow:0 3px 0 #D9C9AC; }
+
+  .vi-toggle-icon{
+    position:relative;
+    width:14px; height:14px;
+    flex-shrink:0;
+  }
+  .vi-toggle-icon svg{
+    position:absolute;
+    top:0; left:0;
+    width:14px; height:14px;
+    transition: opacity 0.2s ease, transform 0.28s cubic-bezier(.34,1.56,.64,1);
+  }
+  .vi-toggle-icon .icon-eye-off{ opacity:0; transform: scale(0.5) rotate(12deg); }
+  .vi-toggle.off .icon-eye{ opacity:0; transform: scale(0.5) rotate(-12deg); }
+  .vi-toggle.off .icon-eye-off{ opacity:1; transform: scale(1) rotate(0deg); }
+
+  .line-translation{
+    margin-top:12px;
+    padding:10px 16px;
+    background:#EAF6FF;
+    border:2px dashed var(--sky-dark);
+    border-radius:16px;
+    font-family:'Quicksand', sans-serif;
+    font-weight:600;
+    font-size:clamp(14.5px, 3.6vw, 17px);
+    line-height:1.5;
+    color:#1F5A78;
+    z-index:1;
+    position:relative;
+    max-width:100%;
+    display:flex;
+    align-items:flex-start;
+    gap:8px;
+    box-sizing:border-box;
+    max-height:520px;
+    opacity:1;
+    transform: translateY(0) scale(1);
+    transform-origin: top center;
+    overflow:hidden;
+    transition:
+      max-height 0.38s cubic-bezier(.5,.1,.2,1),
+      opacity 0.24s ease,
+      transform 0.32s cubic-bezier(.5,.1,.2,1),
+      margin-top 0.32s cubic-bezier(.5,.1,.2,1),
+      padding 0.32s cubic-bezier(.5,.1,.2,1),
+      border-width 0.32s ease;
+  }
+  .line-translation.anim{
+    /* kept only for backward compatibility; entrance is now driven by the
+       transition above via JS toggling inline styles, which is far more
+       reliable across browsers than restarting a @keyframes animation. */
+  }
+  .vi-icon{
+    flex-shrink:0;
+    width:17px; height:17px;
+    margin-top:2px;
+    color:var(--sky-dark);
+  }
+  .vi-icon svg{ width:100%; height:100%; display:block; }
+  .line-translation-text{ flex:1; min-width:0; }
+  .line-translation.hidden{
+    max-height:0;
+    opacity:0;
+    transform: translateY(-6px) scale(0.97);
+    margin-top:0;
+    padding-top:0;
+    padding-bottom:0;
+    border-width:0;
+  }
+
+  .controls{
+    margin-top:20px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+  .icon-btn{
+    background:var(--card);
+    border:2px solid #F0E4D2;
+    box-shadow: 0 5px 0 #D9C9AC, var(--shadow-sm);
+    width:50px; height:50px;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:21px;
+    cursor:pointer;
+    position:relative;
+    transition: transform 0.12s cubic-bezier(.34,1.56,.64,1), box-shadow 0.12s ease, background 0.2s ease, filter 0.12s ease;
+  }
+  .icon-btn::before{
+    content:"";
+    position:absolute;
+    top:5px; left:9px; right:9px;
+    height:36%;
+    border-radius:50% 50% 60% 60%/70% 70% 40% 40%;
+    background:rgba(255,255,255,0.5);
+    pointer-events:none;
+  }
+  .icon-btn:hover{ transform: translateY(-3px) rotate(-4deg); box-shadow: 0 8px 0 #D9C9AC, var(--shadow-sm); }
+  .icon-btn:active{ transform: translateY(4px) rotate(0deg); box-shadow: 0 1px 0 #D9C9AC; filter: brightness(0.93); }
+  .icon-btn.prevnext{ background:var(--sky); border-color:var(--sky); color:#123A4C; box-shadow: 0 5px 0 var(--sky-dark), var(--shadow-sm); }
+  .icon-btn.prevnext:hover{ box-shadow: 0 8px 0 var(--sky-dark), var(--shadow-sm); }
+  .icon-btn.prevnext:active{ box-shadow: 0 1px 0 var(--sky-dark); }
+  .icon-btn.speak{ background:var(--blush); border-color:var(--blush); color:#fff; box-shadow: 0 5px 0 var(--blush-dark), var(--shadow-sm); }
+  .icon-btn.speak:hover{ box-shadow: 0 8px 0 var(--blush-dark), var(--shadow-sm); }
+  .icon-btn.speak:active{ box-shadow: 0 1px 0 var(--blush-dark); }
+
+  .hint{
+    margin-top:14px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .hint kbd{
+    background:#F0E4D2;
+    border-radius:6px;
+    padding:2px 8px;
+    font-family:'Quicksand', sans-serif;
+    font-weight:700;
+  }
+
+  .counter{
+    margin-top:10px;
+    font-size:12px;
+    color:var(--ink-soft);
+    letter-spacing:1px;
+  }
+
+  /* ---------- Welcome menu screen ---------- */
+  .menu-screen{
+    width:min(680px, 95vw);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:20px;
+    padding-top:6px;
+    position:relative;
+    z-index:1;
+  }
+  .menu-screen.hide{ display:none; }
+  .menu-greeting{ text-align:center; }
+  .menu-greeting .big-wave{
+    font-size:46px;
+    display:inline-block;
+    animation: wave 1.8s ease-in-out infinite;
+    transform-origin: 70% 70%;
+  }
+  @keyframes wave{
+    0%,60%,100%{ transform: rotate(0deg); }
+    10%{ transform: rotate(16deg); }
+    20%{ transform: rotate(-8deg); }
+    30%{ transform: rotate(16deg); }
+    40%{ transform: rotate(-4deg); }
+  }
+  .menu-greeting h1{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:800;
+    font-size:26px;
+    color:var(--ink);
+    margin:8px 0 4px;
+  }
+  .menu-greeting p{
+    color:var(--ink-soft);
+    font-size:13.5px;
+    line-height:1.5;
+    margin:0 auto;
+    max-width:360px;
+  }
+  .study-progress{
+    width:100%;
+    background:var(--card);
+    border-radius:20px;
+    border:2px solid #F0E4D2;
+    box-shadow: var(--shadow-sm);
+    padding:14px 18px;
+    margin:2px 0 6px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .study-progress-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .study-progress-label{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:13px;
+    color:var(--ink);
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .study-progress-count{
+    font-size:12px;
+    font-weight:700;
+    color:var(--pear-dark);
+    background:#EAF3DF;
+    padding:2px 10px;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+  .study-progress-track{
+    width:100%;
+    height:12px;
+    border-radius:999px;
+    background:#F0E4D2;
+    overflow:hidden;
+    position:relative;
+  }
+  .study-progress-fill{
+    height:100%;
+    border-radius:999px;
+    background:linear-gradient(90deg, var(--pear), var(--egg));
+    width:0%;
+    transition: width 0.6s cubic-bezier(.34,1.2,.64,1);
+    position:relative;
+  }
+  .study-progress-fill::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(120deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 40%);
+  }
+  .study-progress-msg{
+    font-size:11px;
+    color:var(--ink-soft);
+    font-weight:600;
+  }
+  .menu-card.completed{ border-color:var(--pear); }
+  .menu-card .menu-check{
+    position:absolute;
+    top:-6px;
+    right:-6px;
+    background:var(--pear-dark);
+    color:#fff;
+    width:20px; height:20px;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:11px;
+    box-shadow:0 2px 4px rgba(0,0,0,0.2);
+  }
+  .menu-card{ position:relative; }
+
+  .menu-section-label{
+    align-self:flex-start;
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    letter-spacing:0.8px;
+    text-transform:uppercase;
+    margin:4px 0 -8px 6px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .menu-section-label .count-chip{
+    background:#F0E4D2;
+    color:var(--ink);
+    font-size:10.5px;
+    font-weight:700;
+    letter-spacing:0.3px;
+    text-transform:none;
+    padding:2px 9px;
+    border-radius:999px;
+  }
+  .menu-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap:12px;
+    width:100%;
+    align-items:stretch;
+  }
+  .menu-card{
+    background:var(--card);
+    border-radius:20px;
+    box-shadow: var(--shadow-sm);
+    border:2px solid #F0E4D2;
+    padding:13px 16px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    cursor:pointer;
+    text-align:left;
+    transform: scale(1);
+    transition: transform 0.16s cubic-bezier(.34,1.56,.64,1), box-shadow 0.14s ease, border-color 0.2s ease;
+  }
+  .menu-card:hover{ transform: translateY(-3px) scale(1); box-shadow: var(--shadow); border-color: var(--pear); }
+  .menu-card:active{ transform: translateY(1px) scale(0.99); }
+  .menu-card:focus-visible{ outline: 3px solid var(--sky-dark); outline-offset: 3px; }
+  .menu-card.popped{
+    transform: scale(1.08);
+    box-shadow: var(--shadow);
+    border-color: var(--pear);
+    transition: transform 0.15s cubic-bezier(.34,1.7,.64,1), box-shadow 0.15s ease, border-color 0.15s ease;
+  }
+  .menu-card .menu-emoji{
+    font-size:23px;
+    width:42px; height:42px;
+    border-radius:50%;
+    background:#F5EEE0;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .menu-card .menu-info{
+    flex:1;
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+  }
+  .menu-card .menu-title{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:14px;
+    color:var(--ink);
+    line-height:1.25;
+  }
+  .menu-card .menu-desc{
+    font-size:11px;
+    color:var(--ink-soft);
+    line-height:1.4;
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+  }
+  .menu-card .menu-badge{
+    align-self:flex-start;
+    font-size:10px;
+    font-weight:700;
+    letter-spacing:0.3px;
+    padding:3px 10px;
+    border-radius:999px;
+    background:#EAF3DF;
+    color:var(--pear-dark);
+    margin-top:2px;
+  }
+  .menu-card .menu-badge.long{ background:#FDEBD6; color:var(--egg-dark); }
+  .menu-card .menu-arrow{
+    font-size:16px;
+    color:var(--ink-soft);
+    flex-shrink:0;
+  }
+
+  @media (max-width: 520px){
+    .menu-grid{ grid-template-columns: 1fr; }
+  }
+
+  /* ---------- Pronunciation practice panel ---------- */
+  .practice-panel{
+    margin-top:24px;
+    width:100%;
+    background:var(--card);
+    border-radius:24px;
+    box-shadow: var(--shadow);
+    padding:22px 24px 24px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:14px;
+    border:2px dashed #F0E4D2;
+  }
+  .practice-title{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:15px;
+    color:var(--ink);
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+
+  .mic-btn{
+    width:78px; height:78px;
+    border-radius:50%;
+    border:none;
+    background: linear-gradient(160deg, var(--blush), var(--blush-dark));
+    color:#fff;
+    font-size:30px;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    box-shadow: 0 7px 0 #B93851, 0 12px 24px -8px rgba(225,84,110,0.45);
+    transition: transform 0.12s cubic-bezier(.34,1.56,.64,1), box-shadow 0.12s ease, filter 0.12s ease;
+    position:relative;
+  }
+  .mic-btn::before{
+    content:"";
+    position:absolute;
+    top:9px; left:16px; right:16px;
+    height:34%;
+    border-radius:50% 50% 60% 60%/70% 70% 40% 40%;
+    background:rgba(255,255,255,0.35);
+    pointer-events:none;
+  }
+  .mic-btn:hover{ transform: translateY(-3px) scale(1.03); box-shadow: 0 10px 0 #B93851, 0 14px 26px -8px rgba(225,84,110,0.5); }
+  .mic-btn:active{ transform: translateY(5px) scale(0.98); box-shadow: 0 2px 0 #B93851; filter: brightness(0.95); }
+  .mic-btn.recording{
+    animation: pulse 1.1s ease-in-out infinite;
+    background: linear-gradient(160deg, #E1546E, #B93851);
+  }
+  @keyframes pulse{
+    0%{ box-shadow: 0 0 0 0 rgba(225,84,110,0.5); }
+    70%{ box-shadow: 0 0 0 18px rgba(225,84,110,0); }
+    100%{ box-shadow: 0 0 0 0 rgba(225,84,110,0); }
+  }
+
+  .wave-bars{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:3px;
+    height:20px;
+  }
+  .wave-bars .bar{
+    width:3px;
+    border-radius:2px;
+    background:#fff;
+    height:6px;
+    animation: bar-bounce 0.9s ease-in-out infinite;
+  }
+  .wave-bars .bar:nth-child(1){ animation-delay:0s; }
+  .wave-bars .bar:nth-child(2){ animation-delay:0.12s; }
+  .wave-bars .bar:nth-child(3){ animation-delay:0.24s; }
+  .wave-bars .bar:nth-child(4){ animation-delay:0.36s; }
+  .wave-bars .bar:nth-child(5){ animation-delay:0.48s; }
+  @keyframes bar-bounce{
+    0%,100%{ height:6px; }
+    50%{ height:20px; }
+  }
+
+  .mic-label{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    min-height:16px;
+  }
+
+  .result-box{
+    width:100%;
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+    animation: fadeIn 0.35s ease;
+  }
+  .result-box.show{ display:flex; }
+  @keyframes fadeIn{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+
+  .score-badge{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:800;
+    font-size:15px;
+    padding:6px 18px;
+    border-radius:999px;
+    color:#fff;
+    transition: transform 0.3s cubic-bezier(.34,1.56,.64,1);
+  }
+  .score-badge.pop{ animation: scorePop 0.4s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes scorePop{ 0%{ transform:scale(0.4); } 60%{ transform:scale(1.15); } 100%{ transform:scale(1); } }
+  .score-great{ background:var(--good); }
+  .score-ok{ background:var(--egg-dark); color:#5A3F0C; }
+  .score-retry{ background:var(--bad); }
+
+  .heard-text{
+    font-size:16px;
+    line-height:1.6;
+    text-align:center;
+    max-width:460px;
+  }
+  .heard-text .w{
+    padding:1px 3px;
+    border-radius:5px;
+  }
+  .heard-text .w.match{ background:#E1F0D2; color:#3F5F27; }
+  .heard-text .w.miss{ background:#FAE0E4; color:#A9394E; text-decoration: line-through; }
+
+  .transcript-label{
+    font-size:11.5px;
+    color:var(--ink-soft);
+    letter-spacing:0.5px;
+    text-align:center;
+  }
+
+  .stat-row{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    justify-content:center;
+  }
+  .stat-pill{
+    font-size:11.5px;
+    font-weight:700;
+    color:var(--ink);
+    background:#F5EEE0;
+    padding:5px 12px;
+    border-radius:999px;
+    display:flex;
+    align-items:center;
+    gap:4px;
+  }
+
+  .tips-box{
+    width:100%;
+    background:#FFF9EE;
+    border:1.5px solid #F3E3BE;
+    border-radius:16px;
+    padding:14px 16px;
+    text-align:left;
+  }
+  .tips-title{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:13px;
+    color:var(--ink);
+    margin-bottom:8px;
+  }
+  .tips-list{
+    margin:0;
+    padding-left:18px;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .tips-list li{
+    font-size:12.5px;
+    line-height:1.5;
+    color:var(--ink);
+  }
+  .tips-list li b{ color:var(--blush-dark); }
+
+  .playback-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:center;
+  }
+  .mini-btn{
+    font-family:'Quicksand', sans-serif;
+    font-weight:700;
+    font-size:12.5px;
+    background:#F5EEE0;
+    color:var(--ink);
+    border:none;
+    padding:9px 16px;
+    border-radius:999px;
+    cursor:pointer;
+    box-shadow: 0 4px 0 #DED0B8;
+    transition: transform 0.12s cubic-bezier(.34,1.56,.64,1), box-shadow 0.12s ease, filter 0.12s ease;
+  }
+  .mini-btn:hover{ transform: translateY(-2px); box-shadow: 0 6px 0 #DED0B8; }
+  .mini-btn:active{ transform: translateY(3px); box-shadow: 0 1px 0 #DED0B8; filter: brightness(0.95); }
+  .mini-btn.mini-sky{ background:var(--sky); color:#123A4C; box-shadow: 0 4px 0 var(--sky-dark); }
+  .mini-btn.mini-sky:hover{ box-shadow: 0 6px 0 var(--sky-dark); }
+  .mini-btn.mini-sky:active{ box-shadow: 0 1px 0 var(--sky-dark); }
+  .mini-btn.mini-blush{ background:var(--blush); color:#fff; box-shadow: 0 4px 0 var(--blush-dark); }
+  .mini-btn.mini-blush:hover{ box-shadow: 0 6px 0 var(--blush-dark); }
+  .mini-btn.mini-blush:active{ box-shadow: 0 1px 0 var(--blush-dark); }
+  .mini-btn.mini-pear{ background:var(--pear); color:#2F4A1B; box-shadow: 0 4px 0 var(--pear-dark); }
+  .mini-btn.mini-pear:hover{ box-shadow: 0 6px 0 var(--pear-dark); }
+  .mini-btn.mini-pear:active{ box-shadow: 0 1px 0 var(--pear-dark); }
+  audio.hidden-audio{ display:none; }
+
+  .support-warning{
+    font-size:12px;
+    color:var(--bad);
+    text-align:center;
+    max-width:380px;
+  }
+
+  /* ---------- Done screen ---------- */
+  .done-screen{
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    gap:16px;
+  }
+  .done-screen.show{ display:flex; }
+  .done-screen .big-emoji{ font-size:60px; }
+  .done-screen h2{
+    font-family:'Baloo 2', sans-serif;
+    margin:0;
+    font-size:26px;
+  }
+  .done-screen p{ color:var(--ink-soft); margin:0; max-width:320px; }
+  .restart-btn{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    background:var(--pear);
+    color:#2F4A1B;
+    border:none;
+    padding:13px 30px;
+    border-radius:999px;
+    font-size:15px;
+    cursor:pointer;
+    box-shadow: 0 6px 0 var(--pear-dark), 0 10px 20px -8px rgba(95,138,60,0.5);
+    transition: transform 0.12s cubic-bezier(.34,1.56,.64,1), box-shadow 0.12s ease, filter 0.12s ease;
+  }
+  .restart-btn:hover{ transform: translateY(-2px) scale(1.03); box-shadow: 0 8px 0 var(--pear-dark), 0 10px 20px -8px rgba(95,138,60,0.5); }
+  .restart-btn:active{ transform: translateY(4px) scale(0.98); box-shadow: 0 1px 0 var(--pear-dark); filter: brightness(0.95); }
+
+  /* ---------- confetti ---------- */
+  .confetti-piece{
+    position:fixed;
+    top:-20px;
+    z-index:50;
+    pointer-events:none;
+    font-size:18px;
+    will-change: transform, opacity;
+    animation-name: confetti-fall;
+    animation-timing-function: cubic-bezier(.2,.6,.4,1);
+    animation-fill-mode: forwards;
+  }
+  @keyframes confetti-fall{
+    0%{ transform: translate(0,0) rotate(0deg); opacity:1; }
+    100%{ transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); opacity:0; }
+  }
+
+  /* ---------- button press sparkles ---------- */
+  .sparkle-particle{
+    position:fixed;
+    z-index:60;
+    pointer-events:none;
+    will-change: transform, opacity;
+    animation-name: sparkle-pop;
+    animation-timing-function: cubic-bezier(.2,.7,.3,1);
+    animation-fill-mode: forwards;
+  }
+  @keyframes sparkle-pop{
+    0%{ transform: translate(-50%,-50%) scale(0.3) rotate(0deg); opacity:1; }
+    100%{ transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1) rotate(var(--rot)); opacity:0; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-blob b1"></div>
+<div class="bg-blob b2"></div>
+<div class="bg-blob b3"></div>
+<div class="bg-blob b4"></div>
+<div class="deco d1">🍐</div>
+<div class="deco d2">🥚</div>
+<div class="deco d3">🎵</div>
+<div class="deco d4">⚽️</div>
+
+<div class="stage">
+
+  <div class="topbar">
+    <div class="title-block">
+      <div class="title">Pear <span>&</span> Egg 🍐🥚</div>
+      <div class="subtitle">Speaking Practice Studio</div>
+    </div>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <div class="sfx-toggle" id="homeBtn" title="Về màn hình chọn hội thoại" style="display:none;">🏠</div>
+      <div class="sfx-toggle" id="sfxToggle" title="Toggle sound effects">🔊</div>
+    </div>
+  </div>
+
+  <div class="menu-screen" id="menuScreen">
+    <div class="menu-greeting">
+      <div class="big-wave">👋</div>
+      <h1>Xin chào bạn!</h1>
+      <p>Chọn một đoạn hội thoại bên dưới để luyện nói cùng Pear 🍐 và Egg 🥚 nhé.</p>
+    </div>
+    <div class="study-progress" id="studyProgress">
+      <div class="study-progress-top">
+        <div class="study-progress-label">📈 Tiến trình học tập</div>
+        <div class="study-progress-count" id="studyProgressCount">0/0 hoàn thành</div>
+      </div>
+      <div class="study-progress-track"><div class="study-progress-fill" id="studyProgressFill"></div></div>
+      <div class="study-progress-msg" id="studyProgressMsg">Hoàn thành một hội thoại để bắt đầu ghi nhận tiến trình nhé!</div>
+    </div>
+    <div class="menu-section-label">Hội thoại ngắn <span class="count-chip" id="countShort"></span></div>
+    <div class="menu-grid" id="menuGridShort"></div>
+    <div class="menu-section-label">Hội thoại dài <span class="count-chip" id="countLong"></span></div>
+    <div class="menu-grid" id="menuGridLong"></div>
+  </div>
+
+  <div class="practice-screen" id="practiceScreen" style="display:none; width:100%; flex-direction:column; align-items:center;">
+
+  <div class="progress-wrap" id="progressWrap"></div>
+
+  <div class="scene">
+    <div class="avatar-row">
+      <div class="avatar-wrap" id="pearWrap">
+        <div class="speech-tail">talking...</div>
+        <div class="avatar" id="pearAvatar">🍐</div>
+      </div>
+      <div class="avatar-wrap" id="eggWrap">
+        <div class="speech-tail">talking...</div>
+        <div class="avatar" id="eggAvatar">🥚</div>
+      </div>
+    </div>
+
+    <div class="card-perspective">
+      <div class="card" id="card" role="button" tabindex="0" aria-label="Tap or press space to go to the next line">
+        <div class="card-fold"></div>
+        <div class="card-tag" id="cardTag">Line 1</div>
+        <div class="quote-glyph quote-open">❝</div>
+        <div class="quote-glyph quote-close">❞</div>
+        <div id="playView">
+          <div class="badge-row">
+            <div class="mini-chip" id="miniChip">🍐</div>
+            <div class="speaker-badge" id="speakerBadge">Pear</div>
+            <button class="vi-toggle" id="viToggle" type="button" aria-pressed="true" title="Ẩn/hiện nghĩa tiếng Việt">
+              <span class="vi-toggle-icon">
+                <svg class="icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a18.5 18.5 0 0 1 5.06-5.94M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              </span>
+              <span id="viToggleLabel">Ẩn nghĩa</span>
+            </button>
+          </div>
+          <div class="line-text" id="lineText">Hi, Egg! How are you today?</div>
+          <div class="line-translation" id="lineTranslation">
+            <span class="vi-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span>
+            <span class="line-translation-text" id="lineTranslationText">Chào Trứng! Hôm nay cậu thế nào?</span>
+          </div>
+        </div>
+        <div class="done-screen" id="doneScreen">
+          <div class="big-emoji">🎉</div>
+          <h2>Great job!</h2>
+          <p>You practiced the whole conversation. Tap below to go again.</p>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
+            <button class="restart-btn" id="restartBtn">Start over 🔁</button>
+            <button class="restart-btn" id="chooseAnotherBtn" style="background:var(--sky); color:#123A4C; box-shadow: 0 6px 0 var(--sky-dark), 0 10px 20px -8px rgba(78,155,194,0.5);">Choose another 📚</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls" id="controls">
+      <div class="icon-btn prevnext" id="prevBtn" title="Previous line">⬅️</div>
+      <div class="icon-btn speak" id="speakBtn" title="Hear this line">🔊</div>
+      <div class="icon-btn prevnext" id="nextBtn" title="Next line">➡️</div>
+    </div>
+
+    <div class="hint">Tap the card <kbd>👆</kbd> or press <kbd>Space</kbd> to go to the next line</div>
+    <div class="counter" id="counter">1 / 26</div>
+
+    <!-- Pronunciation practice -->
+    <div class="practice-panel" id="practicePanel">
+      <div class="practice-title">🎤 Đến lượt bạn — hãy nói to câu này nhé</div>
+      <button class="mic-btn" id="micBtn" title="Bắt đầu ghi âm">
+        <span id="micIcon">🎙️</span>
+      </button>
+      <div class="mic-label" id="micLabel">Chạm vào mic rồi lặp lại câu phía trên</div>
+
+      <div class="result-box" id="resultBox">
+        <div class="score-badge" id="scoreBadge">—</div>
+
+        <div class="stat-row" id="statRow"></div>
+
+        <div>
+          <div class="transcript-label">MÁY NGHE ĐƯỢC</div>
+          <div class="heard-text" id="heardText"></div>
+        </div>
+
+        <div class="tips-box" id="tipsBox" style="display:none;">
+          <div class="tips-title">💡 Nhận xét &amp; lời khuyên phát âm cho câu này</div>
+          <ul class="tips-list" id="tipsList"></ul>
+        </div>
+
+        <div class="playback-row">
+          <button class="mini-btn mini-sky" id="playMineBtn">▶️ Nghe lại giọng của tôi</button>
+          <button class="mini-btn mini-blush" id="playTargetBtn">🔊 Nghe bản chuẩn</button>
+          <button class="mini-btn mini-pear" id="tryAgainBtn">🔁 Thử lại</button>
+        </div>
+        <audio class="hidden-audio" id="myAudio"></audio>
+      </div>
+
+      <div class="support-warning" id="supportWarning" style="display:none;">
+        Trình duyệt của bạn chưa hỗ trợ nhận diện giọng nói để chấm phát âm. Hãy thử dùng Chrome trên máy tính hoặc Android nhé. 🙏
+      </div>
+    </div>
+  </div>
+  </div>
+</div>
+
+<script>
+const DIALOGUE_SETS = [
+  {
+    id: 'short1',
+    length: 'short',
+    emoji: '🎮',
+    title: 'Phần 1 · Sở thích hằng ngày',
+    desc: 'Trò chuyện về sở thích, thể thao, thói quen buổi sáng và buổi tối.',
+    lines: [
+      ["Pear","Hi, Egg! How are you today?","Chào Trứng! Hôm nay cậu thế nào?"],
+      ["Egg","Hi, Pear! I'm good, thank you. How about you?","Chào Lê! Mình khỏe, cảm ơn cậu. Còn cậu thì sao?"],
+      ["Pear","I'm great! What do you usually do in your free time?","Mình khỏe lắm! Cậu thường làm gì lúc rảnh?"],
+      ["Egg","I usually listen to music and watch movies. What about you?","Mình thường nghe nhạc và xem phim. Còn cậu thì sao?"],
+      ["Pear","I like playing video games. I play games almost every evening.","Mình thích chơi game điện tử. Mình chơi game hầu như mỗi tối."],
+      ["Egg","Oh, really? What kind of games do you like?","Ồ, thật à? Cậu thích loại game nào?"],
+      ["Pear","I like adventure games and action games. They are very exciting.","Mình thích game phiêu lưu và game hành động. Chúng rất hấp dẫn."],
+      ["Egg","That sounds fun! Do you like sports?","Nghe vui đấy! Cậu có thích thể thao không?"],
+      ["Pear","Yes. I like playing football with my friends. How about you?","Có chứ. Mình thích đá bóng với bạn bè. Còn cậu thì sao?"],
+      ["Egg","I don't play sports very often, but I like walking and riding a bike.","Mình không chơi thể thao thường xuyên, nhưng mình thích đi bộ và đạp xe."],
+      ["Pear","That's nice. What time do you usually get up?","Hay đấy. Cậu thường dậy lúc mấy giờ?"],
+      ["Egg","I usually get up at 7 a.m. I have breakfast and then go to school.","Mình thường dậy lúc 7 giờ sáng. Mình ăn sáng rồi đi học."],
+      ["Pear","What do you usually eat for breakfast?","Cậu thường ăn gì vào bữa sáng?"],
+      ["Egg","I usually eat bread and fruit. Sometimes I drink milk.","Mình thường ăn bánh mì và trái cây. Thỉnh thoảng mình uống sữa."],
+      ["Pear","Do you like cooking?","Cậu có thích nấu ăn không?"],
+      ["Egg","Yes, I do! I sometimes cook dinner with my family.","Có chứ! Thỉnh thoảng mình nấu bữa tối cùng gia đình."],
+      ["Pear","That's great. What do you do in the evening?","Tuyệt đấy. Buổi tối cậu thường làm gì?"],
+      ["Egg","I usually do my homework, listen to music, and read books before bed.","Mình thường làm bài tập, nghe nhạc và đọc sách trước khi ngủ."],
+      ["Pear","What kind of music do you like?","Cậu thích loại nhạc nào?"],
+      ["Egg","I like pop music because it is relaxing. What about you?","Mình thích nhạc pop vì nó giúp thư giãn. Còn cậu thì sao?"],
+      ["Pear","I like rock music. It gives me a lot of energy.","Mình thích nhạc rock. Nó cho mình rất nhiều năng lượng."],
+      ["Egg","Do you like going out or staying at home?","Cậu thích đi chơi hay ở nhà hơn?"],
+      ["Pear","I prefer staying at home. I like playing games and watching movies.","Mình thích ở nhà hơn. Mình thích chơi game và xem phim."],
+      ["Egg","I'm different. I like going out with my friends.","Mình thì khác. Mình thích đi chơi cùng bạn bè."],
+      ["Pear","That's interesting! Maybe we can hang out together sometime.","Thú vị đấy! Có lẽ lúc nào đó chúng mình có thể đi chơi cùng nhau."],
+      ["Egg","Sure! That sounds great!","Được thôi! Nghe hay đấy!"]
+    ]
+  },
+  {
+    id: 'short2',
+    length: 'short',
+    emoji: '🍜',
+    title: 'Phần 2 · Ẩm thực Việt Nam',
+    desc: 'Nói về phở, bánh mì, đồ ăn cay và các món chè yêu thích.',
+    lines: [
+      ["Pear","Hi, Egg! What are you doing?","Chào Trứng! Cậu đang làm gì thế?"],
+      ["Egg","Hi, Pear! I'm looking at some Vietnamese food. Do you like Vietnamese food?","Chào Lê! Mình đang xem mấy món ăn Việt Nam. Cậu có thích đồ ăn Việt Nam không?"],
+      ["Pear","Yes, I do! I really like Vietnamese food. What is your favorite Vietnamese dish?","Có chứ! Mình rất thích đồ ăn Việt Nam. Món ăn Việt Nam cậu thích nhất là gì?"],
+      ["Egg","My favorite is pho. It is very delicious and easy to eat.","Món mình thích nhất là phở. Nó rất ngon và dễ ăn."],
+      ["Pear","I like pho, too. Do you prefer beef pho or chicken pho?","Mình cũng thích phở. Cậu thích phở bò hay phở gà hơn?"],
+      ["Egg","I prefer beef pho. What about you?","Mình thích phở bò hơn. Còn cậu thì sao?"],
+      ["Pear","I prefer chicken pho. I like the soft chicken and the hot soup.","Mình thích phở gà hơn. Mình thích thịt gà mềm và nước dùng nóng hổi."],
+      ["Egg","That's nice! Have you ever tried banh mi?","Hay đấy! Cậu đã từng ăn bánh mì chưa?"],
+      ["Pear","Yes! I love banh mi. I usually eat it for breakfast.","Có chứ! Mình rất thích bánh mì. Mình thường ăn nó vào bữa sáng."],
+      ["Egg","What do you put in your banh mi?","Cậu thường cho gì vào bánh mì của mình?"],
+      ["Pear","I like eggs, meat, cucumber, and vegetables. How about you?","Mình thích trứng, thịt, dưa chuột và rau. Còn cậu thì sao?"],
+      ["Egg","I like meat, pate, cucumber, and chili sauce.","Mình thích thịt, pate, dưa chuột và tương ớt."],
+      ["Pear","Do you like spicy food?","Cậu có thích đồ ăn cay không?"],
+      ["Egg","Yes, I do. I like spicy food a lot. What about you?","Có chứ. Mình rất thích đồ ăn cay. Còn cậu thì sao?"],
+      ["Pear","Not really. I can't eat very spicy food.","Không hẳn. Mình không ăn được đồ quá cay."],
+      ["Egg","What Vietnamese food don't you like?","Món ăn Việt Nam nào cậu không thích?"],
+      ["Pear","I don't really like durian because I don't like its smell. What about you?","Mình không thích sầu riêng lắm vì mình không thích mùi của nó. Còn cậu thì sao?"],
+      ["Egg","I don't like bitter melon. It tastes too bitter for me.","Mình không thích mướp đắng. Nó đắng quá đối với mình."],
+      ["Pear","Do you like Vietnamese desserts?","Cậu có thích món tráng miệng Việt Nam không?"],
+      ["Egg","Yes! I like che. It is sweet and has many different ingredients.","Có chứ! Mình thích chè. Nó ngọt và có nhiều nguyên liệu khác nhau."],
+      ["Pear","Me too! I especially like che with beans and coconut milk.","Mình cũng vậy! Mình đặc biệt thích chè đậu với nước cốt dừa."],
+      ["Egg","Vietnamese food has so many different flavors.","Đồ ăn Việt Nam có rất nhiều hương vị khác nhau."],
+      ["Pear","Yes! It can be sweet, sour, salty, spicy, and fresh.","Đúng vậy! Nó có thể ngọt, chua, mặn, cay và thanh mát."],
+      ["Egg","Maybe we should try some Vietnamese food together.","Có lẽ chúng mình nên cùng nhau thử vài món ăn Việt Nam."],
+      ["Pear","Good idea! Let's go eat pho and banh mi!","Ý hay đấy! Đi ăn phở và bánh mì thôi!"],
+      ["Egg","Sounds great! I'm hungry already!","Nghe hay đấy! Mình đói bụng rồi!"]
+    ]
+  },
+  {
+    id: 'short3',
+    length: 'short',
+    emoji: '🏖️',
+    title: 'Phần 3 · Du lịch Việt Nam',
+    desc: 'Khám phá Hạ Long, Đà Nẵng, Hội An và Hà Nội cùng Pear & Egg.',
+    lines: [
+      ["Pear","Hi, Egg! Do you like traveling?","Chào Trứng! Cậu có thích du lịch không?"],
+      ["Egg","Yes, I do! I really enjoy visiting new places. How about you?","Có chứ! Mình rất thích khám phá những nơi mới. Còn cậu thì sao?"],
+      ["Pear","Me too! What is your favorite place in Vietnam?","Mình cũng vậy! Nơi cậu thích nhất ở Việt Nam là đâu?"],
+      ["Egg","I really like Ha Long Bay. It is very beautiful.","Mình rất thích Vịnh Hạ Long. Nó rất đẹp."],
+      ["Pear","I've heard about Ha Long Bay. What can you do there?","Mình có nghe về Vịnh Hạ Long. Ở đó có thể làm gì nhỉ?"],
+      ["Egg","You can take a boat, visit caves, and enjoy the beautiful islands.","Cậu có thể đi thuyền, tham quan hang động và ngắm những hòn đảo xinh đẹp."],
+      ["Pear","That sounds great! Have you ever been there?","Nghe hay đấy! Cậu đã từng đến đó chưa?"],
+      ["Egg","Yes, I have. I went there with my family last year.","Rồi. Mình đã đi cùng gia đình năm ngoái."],
+      ["Pear","Wow! What was your favorite thing about the trip?","Ồ! Điều cậu thích nhất trong chuyến đi đó là gì?"],
+      ["Egg","I loved the boat trip. The view was amazing.","Mình thích chuyến đi thuyền. Khung cảnh rất tuyệt."],
+      ["Pear","Nice! I want to visit Da Nang. Have you ever been there?","Hay đấy! Mình muốn đến Đà Nẵng. Cậu đã từng đến đó chưa?"],
+      ["Egg","Yes! Da Nang is a great place. It has beautiful beaches and delicious food.","Rồi! Đà Nẵng là một nơi tuyệt vời. Nó có những bãi biển đẹp và đồ ăn ngon."],
+      ["Pear","I really want to visit My Khe Beach.","Mình rất muốn đến bãi biển Mỹ Khê."],
+      ["Egg","You should! The beach is clean and the water is beautiful.","Cậu nên đi! Bãi biển sạch sẽ và nước biển rất đẹp."],
+      ["Pear","What other places in Vietnam do you like?","Cậu còn thích những nơi nào khác ở Việt Nam?"],
+      ["Egg","I like Hoi An. The old town is very beautiful, especially at night.","Mình thích Hội An. Phố cổ rất đẹp, đặc biệt là vào ban đêm."],
+      ["Pear","I agree! I love the colorful lights and old houses in Hoi An.","Mình đồng ý! Mình rất thích những ánh đèn nhiều màu sắc và những ngôi nhà cổ ở Hội An."],
+      ["Egg","What about Hanoi? Do you like it?","Còn Hà Nội thì sao? Cậu có thích không?"],
+      ["Pear","Yes. I like Hanoi because it has many interesting places, like Hoan Kiem Lake and the Old Quarter.","Có. Mình thích Hà Nội vì nó có nhiều nơi thú vị, như Hồ Hoàn Kiếm và Phố Cổ."],
+      ["Egg","What do you usually do when you travel?","Cậu thường làm gì khi đi du lịch?"],
+      ["Pear","I like taking photos, trying local food, and buying souvenirs.","Mình thích chụp ảnh, thử đồ ăn địa phương và mua quà lưu niệm."],
+      ["Egg","Me too! I also like walking around and learning about local culture.","Mình cũng vậy! Mình còn thích đi dạo và tìm hiểu về văn hóa địa phương."],
+      ["Pear","There are so many beautiful places in Vietnam.","Việt Nam có rất nhiều nơi đẹp."],
+      ["Egg","Yes! We should travel around Vietnam together someday.","Đúng vậy! Lúc nào đó chúng mình nên cùng nhau đi khắp Việt Nam."],
+      ["Pear","Definitely! Where should we go first?","Chắc chắn rồi! Chúng mình nên đi đâu trước?"],
+      ["Egg","Let's go to Ha Long Bay!","Đi Vịnh Hạ Long trước đi!"],
+      ["Pear","Great idea! Let's go!","Ý hay đấy! Đi thôi!"]
+    ]
+  },
+  {
+    id: 'short4',
+    length: 'short',
+    emoji: '🧁',
+    title: 'Phần 4 · Nấu ăn & làm bánh',
+    desc: 'Chia sẻ về nấu ăn, làm bánh và những món tủ của mỗi người.',
+    lines: [
+      ["Pear","Hi, Egg! Do you like cooking?","Chào Trứng! Cậu có thích nấu ăn không?"],
+      ["Egg","Yes, I do! I really enjoy cooking. What about you?","Có chứ! Mình rất thích nấu ăn. Còn cậu thì sao?"],
+      ["Pear","I like cooking, too. But I prefer baking.","Mình cũng thích nấu ăn. Nhưng mình thích làm bánh hơn."],
+      ["Egg","Really? What do you like to bake?","Thật à? Cậu thích làm loại bánh gì?"],
+      ["Pear","I like making cakes and cookies. They are fun and easy to make.","Mình thích làm bánh kem và bánh quy. Chúng vui và dễ làm."],
+      ["Egg","That sounds nice! What is your favorite cake?","Nghe hay đấy! Loại bánh cậu thích nhất là gì?"],
+      ["Pear","My favorite is chocolate cake. What about you?","Món mình thích nhất là bánh sô-cô-la. Còn cậu thì sao?"],
+      ["Egg","I love cheesecake. It is sweet and creamy.","Mình rất thích bánh phô mai. Nó ngọt và béo ngậy."],
+      ["Pear","Do you usually cook at home?","Cậu có thường nấu ăn ở nhà không?"],
+      ["Egg","Yes. I usually cook dinner for myself and my family.","Có. Mình thường nấu bữa tối cho bản thân và gia đình."],
+      ["Pear","What can you cook?","Cậu nấu được những món gì?"],
+      ["Egg","I can cook fried rice, noodles, and soup.","Mình nấu được cơm chiên, mì và súp."],
+      ["Pear","Wow! Who taught you how to cook?","Ồ! Ai đã dạy cậu nấu ăn?"],
+      ["Egg","My mother taught me when I was young. How about you?","Mẹ mình đã dạy mình từ khi còn nhỏ. Còn cậu thì sao?"],
+      ["Pear","I learned from my mother, too. I often help her in the kitchen.","Mình cũng học từ mẹ. Mình thường giúp mẹ trong bếp."],
+      ["Egg","That's nice! Do you like making Vietnamese food?","Hay đấy! Cậu có thích làm món ăn Việt Nam không?"],
+      ["Pear","Yes! I like making spring rolls and banh xeo.","Có chứ! Mình thích làm nem cuốn và bánh xèo."],
+      ["Egg","I've never made banh xeo. Is it difficult?","Mình chưa bao giờ làm bánh xèo. Nó khó không?"],
+      ["Pear","Not really. It takes some time, but it's quite easy when you practice.","Không hẳn. Nó tốn chút thời gian, nhưng khá dễ khi cậu luyện tập."],
+      ["Egg","Maybe you can teach me sometime!","Có lẽ lúc nào đó cậu có thể dạy mình!"],
+      ["Pear","Sure! And you can teach me how to make cheesecake.","Được thôi! Và cậu có thể dạy mình cách làm bánh phô mai."],
+      ["Egg","Deal!","Đồng ý!"],
+      ["Pear","Great! Let's cook and bake together this weekend.","Tuyệt! Cuối tuần này chúng mình cùng nấu ăn và làm bánh nhé."],
+      ["Egg","Sounds delicious! I'm excited already!","Nghe hấp dẫn đấy! Mình háo hức quá rồi!"]
+    ]
+  },
+  {
+    id: 'short5',
+    length: 'short',
+    emoji: '🍉',
+    title: 'Phần 5 · Hoa quả',
+    desc: 'Nói về các loại trái cây yêu thích, vị ngọt, chua và mùa hè.',
+    lines: [
+      ["Pear","What is your favorite fruit?","Loại trái cây cậu thích nhất là gì?"],
+      ["Egg","My favorite fruit is mango. I really like its sweet taste.","Trái cây mình thích nhất là xoài. Mình rất thích vị ngọt của nó."],
+      ["Pear","Do you eat fruit every day?","Cậu có ăn trái cây mỗi ngày không?"],
+      ["Egg","Yes, I try to eat fruit every day. I usually eat it after lunch.","Có, mình cố gắng ăn trái cây mỗi ngày. Mình thường ăn sau bữa trưa."],
+      ["Pear","What other fruits do you like?","Cậu còn thích những loại trái cây nào khác?"],
+      ["Egg","I like strawberries, oranges, bananas, and watermelons.","Mình thích dâu tây, cam, chuối và dưa hấu."],
+      ["Pear","Do you like sour fruits?","Cậu có thích trái cây chua không?"],
+      ["Egg","Yes, but not too sour. I like oranges because they are sweet and a little sour.","Có, nhưng không quá chua. Mình thích cam vì nó ngọt và hơi chua."],
+      ["Pear","Is there any fruit you don't like?","Có loại trái cây nào cậu không thích không?"],
+      ["Egg","I don't really like durian because I don't like its smell.","Mình không thích sầu riêng lắm vì mình không thích mùi của nó."],
+      ["Pear","What fruit do you usually eat in the summer?","Vào mùa hè cậu thường ăn loại trái cây nào?"],
+      ["Egg","I usually eat watermelon because it is sweet and refreshing.","Mình thường ăn dưa hấu vì nó ngọt và mát."],
+      ["Pear","If you could eat only one fruit for a week, what would you choose?","Nếu cậu chỉ được ăn một loại trái cây trong một tuần, cậu sẽ chọn loại nào?"],
+      ["Egg","I would choose mango because I never get bored of it.","Mình sẽ chọn xoài vì mình không bao giờ chán nó."]
+    ]
+  },
+  {
+    id: 'short6',
+    length: 'short',
+    emoji: '🐼',
+    title: 'Phần 6 · Động vật',
+    desc: 'Chia sẻ về các loài động vật yêu thích, động vật hoang dã và sở thú.',
+    lines: [
+      ["Pear","Do you like animals?","Cậu có thích động vật không?"],
+      ["Egg","Yes, I love animals. I think they are cute and interesting.","Có, mình rất thích động vật. Mình thấy chúng dễ thương và thú vị."],
+      ["Pear","What is your favorite animal?","Con vật cậu thích nhất là gì?"],
+      ["Egg","My favorite animal is the dog. Dogs are friendly and very loyal.","Con vật mình thích nhất là chó. Chó thân thiện và rất trung thành."],
+      ["Pear","What other animals do you like?","Cậu còn thích những con vật nào khác?"],
+      ["Egg","I like cats, rabbits, pandas, and dolphins.","Mình thích mèo, thỏ, gấu trúc và cá heo."],
+      ["Pear","What animal are you afraid of?","Cậu sợ con vật nào?"],
+      ["Egg","I'm afraid of snakes. I don't like the way they move.","Mình sợ rắn. Mình không thích cách chúng di chuyển."],
+      ["Pear","Do you like wild animals?","Cậu có thích động vật hoang dã không?"],
+      ["Egg","Yes. I think wild animals are very interesting. I especially like elephants and lions.","Có. Mình thấy động vật hoang dã rất thú vị. Mình đặc biệt thích voi và sư tử."],
+      ["Pear","Have you ever seen a wild animal?","Cậu đã bao giờ nhìn thấy động vật hoang dã chưa?"],
+      ["Egg","Yes, I have seen some animals at the zoo. I saw elephants, monkeys, giraffes, and tigers.","Rồi, mình đã thấy vài con ở sở thú. Mình đã thấy voi, khỉ, hươu cao cổ và hổ."],
+      ["Pear","Which animal would you like to see in real life?","Cậu muốn thấy con vật nào ngoài đời thực?"],
+      ["Egg","I would love to see a panda. I think pandas are very cute.","Mình rất muốn thấy gấu trúc. Mình thấy gấu trúc rất dễ thương."],
+      ["Pear","Would you like to work with animals?","Cậu có muốn làm công việc liên quan đến động vật không?"],
+      ["Egg","Yes, maybe. I think being a veterinarian would be an interesting job.","Có, có lẽ vậy. Mình nghĩ làm bác sĩ thú y sẽ là một công việc thú vị."]
+    ]
+  },
+  {
+    id: 'short7',
+    length: 'short',
+    emoji: '🐶',
+    title: 'Phần 7 · Thú nuôi',
+    desc: 'Trò chuyện về thú cưng, chú chó Lucky và thói quen chăm sóc.',
+    lines: [
+      ["Pear","Do you have a pet?","Cậu có nuôi thú cưng không?"],
+      ["Egg","Yes, I have a dog. His name is Lucky.","Có, mình nuôi một chú chó. Nó tên là Lucky."],
+      ["Pear","How old is Lucky?","Lucky bao nhiêu tuổi rồi?"],
+      ["Egg","He is three years old.","Nó ba tuổi rồi."],
+      ["Pear","What does he look like?","Nó trông như thế nào?"],
+      ["Egg","He has brown and white fur. He has big eyes and a long tail.","Nó có bộ lông nâu và trắng. Nó có đôi mắt to và cái đuôi dài."],
+      ["Pear","What do you usually do with him?","Cậu thường làm gì cùng nó?"],
+      ["Egg","I usually play with him and take him for a walk in the evening.","Mình thường chơi với nó và dắt nó đi dạo vào buổi tối."],
+      ["Pear","What does Lucky like to eat?","Lucky thích ăn gì?"],
+      ["Egg","He likes meat and dog food. He also loves small snacks.","Nó thích thịt và thức ăn cho chó. Nó cũng rất thích những món ăn vặt nhỏ."],
+      ["Pear","Is he friendly?","Nó có thân thiện không?"],
+      ["Egg","Yes, he is very friendly and playful. He likes meeting new people.","Có, nó rất thân thiện và hiếu động. Nó thích gặp người mới."],
+      ["Pear","Does he ever make a mess in your house?","Nó có bao giờ làm bừa bộn trong nhà cậu không?"],
+      ["Egg","Yes! Sometimes he takes my clothes and runs around the house with them.","Có chứ! Thỉnh thoảng nó tha quần áo của mình rồi chạy khắp nhà."],
+      ["Pear","Haha! That's funny. Would you like to have another pet?","Haha! Buồn cười thật. Cậu có muốn nuôi thêm thú cưng khác không?"],
+      ["Egg","Yes. I would like to have a cat because I think cats are cute and easy to take care of.","Có. Mình muốn nuôi một con mèo vì mình thấy mèo dễ thương và dễ chăm sóc."]
+    ]
+  },
+  {
+    id: 'short8',
+    length: 'short',
+    emoji: '🛋️',
+    title: 'Phần 8 · Đồ vật trong nhà',
+    desc: 'Miêu tả phòng ngủ, phòng khách và những món đồ không thể thiếu.',
+    lines: [
+      ["Pear","What is your favorite room in your house?","Phòng cậu thích nhất trong nhà là phòng nào?"],
+      ["Egg","My favorite room is my bedroom because I can relax there.","Phòng mình thích nhất là phòng ngủ vì mình có thể thư giãn ở đó."],
+      ["Pear","What things do you have in your bedroom?","Phòng ngủ của cậu có những đồ gì?"],
+      ["Egg","I have a bed, a desk, a chair, a wardrobe, and a bookshelf.","Mình có giường, bàn học, ghế, tủ quần áo và kệ sách."],
+      ["Pear","What do you use your desk for?","Cậu dùng bàn học để làm gì?"],
+      ["Egg","I use it for studying, using my computer, and doing homework.","Mình dùng nó để học, dùng máy tính và làm bài tập."],
+      ["Pear","What is the most useful thing in your room?","Vật hữu ích nhất trong phòng cậu là gì?"],
+      ["Egg","I think my computer is the most useful thing. I use it every day.","Mình nghĩ máy tính là vật hữu ích nhất. Mình dùng nó mỗi ngày."],
+      ["Pear","Do you have a TV in your bedroom?","Phòng ngủ cậu có tivi không?"],
+      ["Egg","No, I don't. I usually watch TV in the living room.","Không có. Mình thường xem tivi ở phòng khách."],
+      ["Pear","What do you have in your living room?","Phòng khách của cậu có những gì?"],
+      ["Egg","We have a sofa, a TV, a table, and some chairs.","Nhà mình có ghế sofa, tivi, bàn và vài cái ghế."],
+      ["Pear","Do you like cleaning your room?","Cậu có thích dọn phòng không?"],
+      ["Egg","Not really! But I clean it every weekend because I like having a tidy room.","Không thích lắm! Nhưng mình dọn phòng mỗi cuối tuần vì mình thích phòng gọn gàng."],
+      ["Pear","What is one thing you can't live without?","Có thứ gì mà cậu không thể sống thiếu không?"],
+      ["Egg","Probably my phone. I use it to study, listen to music, talk to my friends, and watch videos.","Chắc là điện thoại của mình. Mình dùng nó để học, nghe nhạc, nói chuyện với bạn bè và xem video."]
+    ]
+  },
+  {
+    id: 'short9',
+    length: 'short',
+    emoji: '🧸',
+    title: 'Phần 9 · Đồ chơi',
+    desc: 'Kỷ niệm tuổi thơ với đồ chơi, gấu bông và món quà đáng nhớ.',
+    lines: [
+      ["Pear","Did you have many toys when you were a child?","Hồi nhỏ cậu có nhiều đồ chơi không?"],
+      ["Egg","Yes, I had quite a lot of toys when I was little.","Có, hồi nhỏ mình có khá nhiều đồ chơi."],
+      ["Pear","What was your favorite toy?","Món đồ chơi cậu thích nhất là gì?"],
+      ["Egg","My favorite toy was a small toy car.","Món đồ chơi mình thích nhất là một chiếc ô tô đồ chơi nhỏ."],
+      ["Pear","Why did you like it?","Vì sao cậu thích nó?"],
+      ["Egg","I liked it because I could play with it for hours. I also had several other toy cars.","Mình thích nó vì mình có thể chơi hàng giờ liền. Mình cũng có vài chiếc ô tô đồ chơi khác nữa."],
+      ["Pear","Did you have any dolls or teddy bears?","Cậu có búp bê hay gấu bông không?"],
+      ["Egg","I didn't have many dolls, but I had a big teddy bear.","Mình không có nhiều búp bê, nhưng mình có một con gấu bông to."],
+      ["Pear","Do you still have any toys now?","Bây giờ cậu vẫn còn giữ đồ chơi nào không?"],
+      ["Egg","Yes, I still have my old teddy bear. I keep it in my bedroom.","Có, mình vẫn còn giữ con gấu bông cũ. Mình để nó trong phòng ngủ."],
+      ["Pear","Do you think children should play with toys?","Cậu có nghĩ trẻ em nên chơi đồ chơi không?"],
+      ["Egg","Yes. I think toys are important because children can have fun and use their imagination.","Có. Mình nghĩ đồ chơi rất quan trọng vì trẻ em có thể vui chơi và phát huy trí tưởng tượng."],
+      ["Pear","What toy would you buy for a child?","Cậu sẽ mua đồ chơi gì cho một đứa trẻ?"],
+      ["Egg","I would buy building blocks because children can use them to make different things.","Mình sẽ mua đồ chơi xếp hình vì trẻ em có thể dùng chúng để tạo ra nhiều thứ khác nhau."],
+      ["Pear","What was the best toy you ever received?","Món đồ chơi tuyệt nhất mà cậu từng nhận được là gì?"],
+      ["Egg","It was a remote-control car. My parents gave it to me for my birthday, and I was very happy.","Đó là một chiếc ô tô điều khiển từ xa. Bố mẹ tặng mình vào sinh nhật, và mình đã rất vui."],
+      ["Pear","Would you like to buy toys again now?","Bây giờ cậu có muốn mua đồ chơi nữa không?"],
+      ["Egg","Maybe! Some toys are still fun even when you are an adult.","Có lẽ vậy! Vài món đồ chơi vẫn vui dù khi mình đã là người lớn."]
+    ]
+  },
+  {
+    id: 'short10',
+    length: 'short',
+    emoji: '👀',
+    title: 'Phần 10 · Bộ phận cơ thể',
+    desc: 'Nói về các bộ phận cơ thể và công dụng của chúng.',
+    lines: [
+      ["Pear","Can you name some parts of the body?","Cậu có thể kể tên vài bộ phận cơ thể không?"],
+      ["Egg","Sure. We have a head, eyes, ears, nose, mouth, arms, hands, legs, and feet.","Được chứ. Chúng ta có đầu, mắt, tai, mũi, miệng, cánh tay, bàn tay, chân và bàn chân."],
+      ["Pear","Which part of your body do you use to see?","Cậu dùng bộ phận nào để nhìn?"],
+      ["Egg","I use my eyes to see.","Mình dùng mắt để nhìn."],
+      ["Pear","What do you use to hear?","Cậu dùng gì để nghe?"],
+      ["Egg","I use my ears to hear.","Mình dùng tai để nghe."],
+      ["Pear","What do you use to smell?","Cậu dùng gì để ngửi?"],
+      ["Egg","I use my nose to smell.","Mình dùng mũi để ngửi."],
+      ["Pear","What do you use to walk?","Cậu dùng gì để đi bộ?"],
+      ["Egg","I use my legs and feet to walk.","Mình dùng chân và bàn chân để đi bộ."],
+      ["Pear","What do you use to hold things?","Cậu dùng gì để cầm nắm đồ vật?"],
+      ["Egg","I use my hands to hold things.","Mình dùng tay để cầm nắm đồ vật."],
+      ["Pear","Which part of your body do you like the most?","Cậu thích bộ phận nào trên cơ thể mình nhất?"],
+      ["Egg","I like my eyes the most because I can see beautiful things with them.","Mình thích đôi mắt nhất vì mình có thể ngắm nhìn những điều đẹp đẽ bằng chúng."],
+      ["Pear","Do you exercise to keep your body healthy?","Cậu có tập thể dục để giữ cơ thể khỏe mạnh không?"],
+      ["Egg","Yes. I try to exercise regularly and eat healthy food.","Có chứ. Mình cố gắng tập thể dục đều đặn và ăn uống lành mạnh."],
+      ["Pear","What do you do when you feel tired?","Cậu làm gì khi cảm thấy mệt?"],
+      ["Egg","I usually take a short break, drink some water, and get some sleep.","Mình thường nghỉ ngơi một lát, uống chút nước và ngủ một giấc."]
+    ]
+  },
+  {
+    id: 'short11',
+    length: 'short',
+    emoji: '📅',
+    title: 'Phần 11 · Ngày, tuần, tháng',
+    desc: 'Trò chuyện về các ngày trong tuần, các tháng và mùa yêu thích.',
+    lines: [
+      ["Pear","What day is it today?","Hôm nay là thứ mấy?"],
+      ["Egg","Today is Saturday.","Hôm nay là thứ Bảy."],
+      ["Pear","What day comes after Saturday?","Ngày nào đến sau thứ Bảy?"],
+      ["Egg","Sunday comes after Saturday.","Chủ Nhật đến sau thứ Bảy."],
+      ["Pear","What day comes before Saturday?","Ngày nào đến trước thứ Bảy?"],
+      ["Egg","Friday comes before Saturday.","Thứ Sáu đến trước thứ Bảy."],
+      ["Pear","What is your favorite day of the week?","Ngày nào trong tuần cậu thích nhất?"],
+      ["Egg","My favorite day is Saturday because I don't have to go to school.","Mình thích thứ Bảy nhất vì mình không phải đi học."],
+      ["Pear","How many days are there in a week?","Một tuần có bao nhiêu ngày?"],
+      ["Egg","There are seven days in a week.","Một tuần có bảy ngày."],
+      ["Pear","Can you name them?","Cậu có thể kể tên chúng không?"],
+      ["Egg","Yes. Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, and Sunday.","Được chứ. Thứ Hai, thứ Ba, thứ Tư, thứ Năm, thứ Sáu, thứ Bảy và Chủ Nhật."],
+      ["Pear","How many months are there in a year?","Một năm có bao nhiêu tháng?"],
+      ["Egg","There are twelve months in a year.","Một năm có mười hai tháng."],
+      ["Pear","What is your favorite month?","Cậu thích tháng nào nhất?"],
+      ["Egg","My favorite month is December because I like the atmosphere at the end of the year.","Mình thích tháng Mười Hai nhất vì mình thích không khí cuối năm."],
+      ["Pear","What month comes after January?","Tháng nào đến sau tháng Một?"],
+      ["Egg","February comes after January.","Tháng Hai đến sau tháng Một."],
+      ["Pear","What month comes before June?","Tháng nào đến trước tháng Sáu?"],
+      ["Egg","May comes before June.","Tháng Năm đến trước tháng Sáu."],
+      ["Pear","How many weeks are there in a year?","Một năm có bao nhiêu tuần?"],
+      ["Egg","There are about fifty-two weeks in a year.","Một năm có khoảng năm mươi hai tuần."],
+      ["Pear","What is your favorite season?","Cậu thích mùa nào nhất?"],
+      ["Egg","I like autumn because the weather is usually cool and comfortable.","Mình thích mùa thu vì thời tiết thường mát mẻ và dễ chịu."]
+    ]
+  },
+  {
+    id: 'short12',
+    length: 'short',
+    emoji: '⏰',
+    title: 'Phần 12 · Trong ngày & trong năm',
+    desc: 'Nói về giờ giấc sinh hoạt, sinh nhật và ngày lễ yêu thích.',
+    lines: [
+      ["Pear","What time do you usually wake up?","Cậu thường thức dậy lúc mấy giờ?"],
+      ["Egg","I usually wake up at seven o'clock in the morning.","Mình thường thức dậy lúc bảy giờ sáng."],
+      ["Pear","What time do you usually go to bed?","Cậu thường đi ngủ lúc mấy giờ?"],
+      ["Egg","I usually go to bed at about eleven o'clock at night.","Mình thường đi ngủ vào khoảng mười một giờ đêm."],
+      ["Pear","What do you usually do in the morning?","Cậu thường làm gì vào buổi sáng?"],
+      ["Egg","I have breakfast, get ready, and go to school.","Mình ăn sáng, chuẩn bị rồi đi học."],
+      ["Pear","What do you usually do in the afternoon?","Cậu thường làm gì vào buổi chiều?"],
+      ["Egg","I study and do my homework.","Mình học bài và làm bài tập."],
+      ["Pear","What do you do in the evening?","Cậu làm gì vào buổi tối?"],
+      ["Egg","I have dinner, listen to music, and relax.","Mình ăn tối, nghe nhạc và thư giãn."],
+      ["Pear","What is your favorite time of day?","Cậu thích thời điểm nào trong ngày nhất?"],
+      ["Egg","I like the evening because I have more free time.","Mình thích buổi tối vì mình có nhiều thời gian rảnh hơn."],
+      ["Pear","When is your birthday?","Sinh nhật cậu là khi nào?"],
+      ["Egg","My birthday is on August 15th.","Sinh nhật mình là ngày 15 tháng 8."],
+      ["Pear","What do you usually do on your birthday?","Cậu thường làm gì vào sinh nhật của mình?"],
+      ["Egg","I usually have a small party with my family and friends.","Mình thường tổ chức một bữa tiệc nhỏ cùng gia đình và bạn bè."],
+      ["Pear","What is your favorite holiday?","Cậu thích ngày lễ nào nhất?"],
+      ["Egg","My favorite holiday is Tet. I like spending time with my family and eating traditional food.","Mình thích Tết nhất. Mình thích quây quần bên gia đình và ăn những món ăn truyền thống."],
+      ["Pear","Do you like New Year?","Cậu có thích năm mới không?"],
+      ["Egg","Yes, I do. I like the new beginning and the happy atmosphere.","Có chứ. Mình thích khởi đầu mới và không khí vui vẻ."],
+      ["Pear","What would you like to do next year?","Năm sau cậu muốn làm gì?"],
+      ["Egg","I want to learn new skills, travel more, and become better at English.","Mình muốn học những kỹ năng mới, đi du lịch nhiều hơn và giỏi tiếng Anh hơn."]
+    ]
+  },
+  {
+    id: 'short13',
+    length: 'short',
+    emoji: '🔢',
+    title: 'Phần 13 · Các con số',
+    desc: 'Đếm số, hỏi tuổi, gia đình và những con số yêu thích.',
+    lines: [
+      ["Pear","How old are you?","Cậu bao nhiêu tuổi?"],
+      ["Egg","I am twenty years old.","Mình hai mươi tuổi."],
+      ["Pear","How many people are there in your family?","Gia đình cậu có bao nhiêu người?"],
+      ["Egg","There are four people in my family.","Gia đình mình có bốn người."],
+      ["Pear","How many brothers and sisters do you have?","Cậu có mấy anh chị em?"],
+      ["Egg","I have one brother and one sister.","Mình có một anh trai và một chị gái."],
+      ["Pear","What is your phone number?","Số điện thoại của cậu là gì?"],
+      ["Egg","My phone number is 0901 234 567.","Số điện thoại của mình là 0901 234 567."],
+      ["Pear","How much money do you usually spend on lunch?","Cậu thường tốn bao nhiêu tiền cho bữa trưa?"],
+      ["Egg","I usually spend about fifty thousand dong.","Mình thường tốn khoảng năm mươi nghìn đồng."],
+      ["Pear","How many hours do you study every day?","Mỗi ngày cậu học bao nhiêu tiếng?"],
+      ["Egg","I usually study for about three hours a day.","Mình thường học khoảng ba tiếng mỗi ngày."],
+      ["Pear","How many hours do you sleep?","Cậu ngủ bao nhiêu tiếng?"],
+      ["Egg","I usually sleep for about seven or eight hours.","Mình thường ngủ khoảng bảy đến tám tiếng."],
+      ["Pear","How many books do you have?","Cậu có bao nhiêu quyển sách?"],
+      ["Egg","I have about thirty books at home.","Mình có khoảng ba mươi quyển sách ở nhà."],
+      ["Pear","How many friends do you have at university?","Cậu có bao nhiêu bạn ở trường đại học?"],
+      ["Egg","I have about twenty close friends.","Mình có khoảng hai mươi người bạn thân."],
+      ["Pear","What number do you like?","Cậu thích con số nào?"],
+      ["Egg","I like the number seven.","Mình thích số bảy."],
+      ["Pear","Why do you like seven?","Vì sao cậu thích số bảy?"],
+      ["Egg","I don't know exactly. I just think seven is a lucky and beautiful number.","Mình cũng không biết chính xác. Mình chỉ nghĩ số bảy là con số may mắn và đẹp."],
+      ["Pear","Can you count from one to ten?","Cậu có thể đếm từ một đến mười không?"],
+      ["Egg","Sure! One, two, three, four, five, six, seven, eight, nine, ten.","Được chứ! Một, hai, ba, bốn, năm, sáu, bảy, tám, chín, mười."],
+      ["Pear","Great! Can you count backward from ten?","Tuyệt! Cậu có thể đếm ngược từ mười không?"],
+      ["Egg","Sure! Ten, nine, eight, seven, six, five, four, three, two, one!","Được chứ! Mười, chín, tám, bảy, sáu, năm, bốn, ba, hai, một!"]
+    ]
+  },
+  {
+    id: 'long1',
+    length: 'long',
+    emoji: '🎤',
+    title: 'Phỏng vấn 1 · Giới thiệu bản thân',
+    desc: 'Pear phỏng vấn Egg với các câu hỏi và câu trả lời dài hơn về cuộc sống.',
+    lines: [
+      ["Pear","Hi, Egg! Today I want to know more about you. Can I ask you some questions?","Chào Trứng! Hôm nay mình muốn tìm hiểu thêm về cậu. Mình hỏi cậu vài câu được không?"],
+      ["Egg","Of course! You can ask me anything.","Tất nhiên rồi! Cậu có thể hỏi mình bất cứ điều gì."],
+      ["Pear","Great! First, can you introduce yourself?","Tuyệt! Đầu tiên, cậu có thể giới thiệu bản thân không?"],
+      ["Egg","Sure. My name is Egg. I am a university student. I am a friendly and easy-going person. I enjoy spending time with my friends and family, and I also like learning new things.","Được thôi. Mình tên là Trứng. Mình là sinh viên đại học. Mình là người thân thiện và dễ gần. Mình thích dành thời gian với bạn bè và gia đình, và mình cũng thích học những điều mới."],
+      ["Pear","Where are you from?","Cậu đến từ đâu?"],
+      ["Egg","I am from Vietnam. I was born and grew up in Vietnam. I really love living here because Vietnam has beautiful places, delicious food, and a very interesting culture.","Mình đến từ Việt Nam. Mình sinh ra và lớn lên ở Việt Nam. Mình rất thích sống ở đây vì Việt Nam có nhiều nơi đẹp, đồ ăn ngon và nền văn hóa rất thú vị."],
+      ["Pear","What do you usually do in your free time?","Cậu thường làm gì lúc rảnh?"],
+      ["Egg","In my free time, I usually listen to music, watch movies, play games, or go out with my friends. Sometimes I just stay at home and relax because I need some quiet time after studying.","Lúc rảnh, mình thường nghe nhạc, xem phim, chơi game hoặc đi chơi với bạn bè. Thỉnh thoảng mình chỉ ở nhà nghỉ ngơi vì mình cần chút thời gian yên tĩnh sau khi học."],
+      ["Pear","What kind of music do you like?","Cậu thích loại nhạc nào?"],
+      ["Egg","I like pop music the most. I usually listen to music when I am studying, traveling, or doing housework. Music helps me relax and makes me feel happier.","Mình thích nhạc pop nhất. Mình thường nghe nhạc khi học bài, đi đường hoặc làm việc nhà. Âm nhạc giúp mình thư giãn và cảm thấy vui hơn."],
+      ["Pear","Do you have a favorite singer or band?","Cậu có ca sĩ hay ban nhạc yêu thích không?"],
+      ["Egg","Yes, I do. I have a few favorite singers, but I don't have only one favorite. It depends on my mood. When I feel happy, I like listening to energetic songs. When I feel tired, I prefer slow and relaxing music.","Có chứ. Mình có vài ca sĩ yêu thích, nhưng không chỉ một người duy nhất. Nó tùy vào tâm trạng của mình. Khi vui, mình thích nghe những bài sôi động. Khi mệt, mình thích nhạc chậm và thư giãn hơn."],
+      ["Pear","What about movies? Do you enjoy watching movies?","Còn phim thì sao? Cậu có thích xem phim không?"],
+      ["Egg","Yes, I really enjoy watching movies. I like comedy, action, and adventure movies. I usually watch movies at the weekend because I have more free time.","Có, mình rất thích xem phim. Mình thích phim hài, phim hành động và phim phiêu lưu. Mình thường xem phim vào cuối tuần vì lúc đó mình có nhiều thời gian rảnh hơn."],
+      ["Pear","Do you prefer watching movies at home or at the cinema?","Cậu thích xem phim ở nhà hay ở rạp hơn?"],
+      ["Egg","I prefer watching movies at home because I feel more comfortable. I can eat snacks, pause the movie, and watch it whenever I want. However, going to the cinema with friends is also fun.","Mình thích xem phim ở nhà hơn vì cảm thấy thoải mái hơn. Mình có thể ăn vặt, tạm dừng phim và xem bất cứ lúc nào mình muốn. Tuy nhiên, đi xem phim ở rạp cùng bạn bè cũng rất vui."],
+      ["Pear","What is your favorite food?","Món ăn cậu thích nhất là gì?"],
+      ["Egg","My favorite food is probably pho. I love Vietnamese food because it has many different flavors. I also really like banh mi, fried rice, and spring rolls.","Món mình thích nhất chắc là phở. Mình rất thích đồ ăn Việt Nam vì nó có nhiều hương vị khác nhau. Mình cũng rất thích bánh mì, cơm chiên và nem cuốn."],
+      ["Pear","Can you cook?","Cậu có biết nấu ăn không?"],
+      ["Egg","Yes, I can cook some simple dishes. I can make fried rice, noodles, soup, and a few Vietnamese dishes. I'm not a great cook yet, but I am trying to improve.","Có, mình nấu được vài món đơn giản. Mình nấu được cơm chiên, mì, súp và vài món ăn Việt Nam. Mình chưa nấu giỏi lắm, nhưng mình đang cố gắng cải thiện."],
+      ["Pear","Do you enjoy cooking?","Cậu có thích nấu ăn không?"],
+      ["Egg","Yes, I do. I think cooking is relaxing when I have enough time. I especially like cooking with my family because we can talk and help each other.","Có chứ. Mình thấy nấu ăn rất thư giãn khi mình có đủ thời gian. Mình đặc biệt thích nấu ăn cùng gia đình vì chúng mình có thể trò chuyện và giúp đỡ lẫn nhau."],
+      ["Pear","What about baking? Do you like making cakes?","Còn làm bánh thì sao? Cậu có thích làm bánh không?"],
+      ["Egg","Yes! I really enjoy baking. I like making cookies, cupcakes, and chocolate cakes. I think baking is interesting because I can be creative when I decorate the cakes.","Có chứ! Mình rất thích làm bánh. Mình thích làm bánh quy, bánh cupcake và bánh sô-cô-la. Mình thấy làm bánh rất thú vị vì mình có thể sáng tạo khi trang trí bánh."],
+      ["Pear","What is the best thing you have ever baked?","Món bánh tuyệt nhất cậu từng làm là gì?"],
+      ["Egg","I think it was a chocolate cake. I made it for my friend's birthday. It wasn't perfect, but my friend really liked it, so I was very happy.","Mình nghĩ đó là một chiếc bánh sô-cô-la. Mình làm nó cho sinh nhật bạn mình. Nó không hoàn hảo lắm, nhưng bạn mình rất thích, nên mình đã rất vui."],
+      ["Pear","That's nice! What do you usually do in the morning?","Hay đấy! Buổi sáng cậu thường làm gì?"],
+      ["Egg","I usually get up at around seven o'clock. First, I wash my face and brush my teeth. Then I have breakfast and get ready for school. If I have some free time, I listen to music before leaving home.","Mình thường dậy vào khoảng bảy giờ. Đầu tiên, mình rửa mặt và đánh răng. Sau đó mình ăn sáng và chuẩn bị đi học. Nếu còn thời gian rảnh, mình nghe nhạc trước khi ra khỏi nhà."],
+      ["Pear","Are you an early bird or a night owl?","Cậu là người dậy sớm hay thức khuya?"],
+      ["Egg","I think I'm more of a night owl. I usually feel more active in the evening. Sometimes I stay up late to study, watch movies, or talk to my friends.","Mình nghĩ mình thiên về kiểu người thức khuya hơn. Mình thường cảm thấy tỉnh táo hơn vào buổi tối. Thỉnh thoảng mình thức khuya để học, xem phim hoặc nói chuyện với bạn bè."],
+      ["Pear","What do you usually do at the weekend?","Cậu thường làm gì vào cuối tuần?"],
+      ["Egg","At the weekend, I usually relax after a busy week. I might meet my friends, go shopping, watch movies, or stay at home. Sometimes I also help my family with housework.","Vào cuối tuần, mình thường nghỉ ngơi sau một tuần bận rộn. Mình có thể gặp bạn bè, đi mua sắm, xem phim hoặc ở nhà. Thỉnh thoảng mình cũng giúp gia đình làm việc nhà."],
+      ["Pear","Do you like going out with your friends?","Cậu có thích đi chơi với bạn bè không?"],
+      ["Egg","Yes, I do. I enjoy going to cafes, restaurants, or shopping malls with my friends. We usually talk about school, movies, music, and funny things that happen in our lives.","Có chứ. Mình thích đi cà phê, nhà hàng hoặc trung tâm thương mại cùng bạn bè. Chúng mình thường nói về chuyện học hành, phim ảnh, âm nhạc và những chuyện buồn cười trong cuộc sống."],
+      ["Pear","Are you an outgoing person?","Cậu có phải người hướng ngoại không?"],
+      ["Egg","I think I am quite friendly, but I am not always very outgoing. I can talk easily with people I know, but I may feel a little shy when I meet someone for the first time.","Mình nghĩ mình khá thân thiện, nhưng không phải lúc nào cũng hướng ngoại. Mình nói chuyện dễ dàng với người mình quen, nhưng có thể hơi ngại khi gặp ai đó lần đầu."],
+      ["Pear","What do you think is your best personality trait?","Cậu nghĩ nét tính cách tốt nhất của mình là gì?"],
+      ["Egg","I think I am a good listener. When my friends have problems, I usually listen to them and try to help. I think being a good listener is important in a friendship.","Mình nghĩ mình là người biết lắng nghe. Khi bạn bè gặp vấn đề, mình thường lắng nghe và cố gắng giúp đỡ. Mình nghĩ biết lắng nghe rất quan trọng trong tình bạn."],
+      ["Pear","What is something you want to improve about yourself?","Có điều gì cậu muốn cải thiện ở bản thân không?"],
+      ["Egg","I want to improve my time management. Sometimes I spend too much time on my phone or watching videos, so I don't have enough time for studying. I want to have a better daily routine.","Mình muốn cải thiện khả năng quản lý thời gian. Thỉnh thoảng mình dành quá nhiều thời gian cho điện thoại hoặc xem video, nên không có đủ thời gian để học. Mình muốn có một thói quen hằng ngày tốt hơn."],
+      ["Pear","What are you studying at university?","Cậu đang học ngành gì ở trường đại học?"],
+      ["Egg","I am studying at university, and I am interested in communication and media. I think this field is interesting because I can learn about people, social media, advertising, and different ways of communicating.","Mình đang học đại học, và mình quan tâm đến truyền thông và báo chí. Mình thấy lĩnh vực này thú vị vì mình có thể tìm hiểu về con người, mạng xã hội, quảng cáo và nhiều cách giao tiếp khác nhau."],
+      ["Pear","What is your favorite subject?","Môn học cậu thích nhất là gì?"],
+      ["Egg","My favorite subjects are the ones that allow me to be creative. I enjoy making presentations, working on projects, and discussing ideas with other students.","Môn học mình thích nhất là những môn cho phép mình sáng tạo. Mình thích làm bài thuyết trình, làm dự án và thảo luận ý tưởng với các bạn khác."],
+      ["Pear","Do you prefer studying alone or with friends?","Cậu thích học một mình hay học cùng bạn bè hơn?"],
+      ["Egg","It depends. I prefer studying alone when I need to concentrate. However, when I have a group project, I enjoy working with my friends because we can share ideas and help each other.","Tùy trường hợp. Mình thích học một mình khi cần tập trung. Tuy nhiên, khi có bài tập nhóm, mình thích làm việc cùng bạn bè vì chúng mình có thể chia sẻ ý tưởng và giúp đỡ lẫn nhau."],
+      ["Pear","Do you like traveling?","Cậu có thích du lịch không?"],
+      ["Egg","Yes, I love traveling. I want to visit many places in Vietnam first. I would like to visit Ha Long Bay, Da Nang, Hoi An, and Da Lat.","Có, mình rất thích du lịch. Mình muốn khám phá nhiều nơi ở Việt Nam trước tiên. Mình muốn đến Vịnh Hạ Long, Đà Nẵng, Hội An và Đà Lạt."],
+      ["Pear","Which place do you want to visit the most?","Nơi cậu muốn đến nhất là đâu?"],
+      ["Egg","I really want to visit Da Lat. I like the cool weather, beautiful scenery, and peaceful atmosphere there. I also want to try the local food and take lots of photos.","Mình rất muốn đến Đà Lạt. Mình thích khí hậu mát mẻ, cảnh đẹp và không khí yên bình ở đó. Mình cũng muốn thử đồ ăn địa phương và chụp thật nhiều ảnh."],
+      ["Pear","If you could travel to another country, where would you go?","Nếu được đi du lịch nước ngoài, cậu sẽ đến đâu?"],
+      ["Egg","I would like to visit South Korea or Japan. I am interested in their culture, food, music, and cities. I think it would be a very interesting experience.","Mình muốn đến Hàn Quốc hoặc Nhật Bản. Mình quan tâm đến văn hóa, đồ ăn, âm nhạc và các thành phố của họ. Mình nghĩ đó sẽ là một trải nghiệm rất thú vị."],
+      ["Pear","What is one thing you really want to do in the future?","Có điều gì cậu thực sự muốn làm trong tương lai không?"],
+      ["Egg","I want to have a good career and become financially independent. I also want to travel more and experience different cultures. Most importantly, I want to have a happy and comfortable life with the people I love.","Mình muốn có một sự nghiệp tốt và tự chủ về tài chính. Mình cũng muốn đi du lịch nhiều hơn và trải nghiệm những nền văn hóa khác nhau. Quan trọng nhất, mình muốn có một cuộc sống hạnh phúc và thoải mái cùng những người mình yêu thương."],
+      ["Pear","What is your biggest goal right now?","Mục tiêu lớn nhất của cậu lúc này là gì?"],
+      ["Egg","My biggest goal right now is to do well at university. I want to improve my English, learn more useful skills, and become more confident when I communicate with other people.","Mục tiêu lớn nhất của mình lúc này là học tốt ở đại học. Mình muốn cải thiện tiếng Anh, học thêm nhiều kỹ năng hữu ích và tự tin hơn khi giao tiếp với người khác."],
+      ["Pear","Finally, if you could describe yourself in three words, what would they be?","Cuối cùng, nếu miêu tả bản thân bằng ba từ, cậu sẽ chọn những từ nào?"],
+      ["Egg","I would say friendly, curious, and creative. I like meeting people, learning new things, and trying new activities.","Mình sẽ chọn thân thiện, tò mò và sáng tạo. Mình thích gặp gỡ mọi người, học điều mới và thử những hoạt động mới."],
+      ["Pear","That's a great way to describe yourself. Thank you for answering all my questions!","Đó là cách miêu tả bản thân rất hay đấy. Cảm ơn cậu đã trả lời tất cả câu hỏi của mình!"],
+      ["Egg","You're welcome! I really enjoyed talking with you.","Không có gì! Mình thực sự rất vui khi được trò chuyện với cậu."]
+    ]
+  },
+  {
+    id: 'long2',
+    length: 'long',
+    emoji: '🎨',
+    title: 'Phỏng vấn 2 · Sở thích chi tiết',
+    desc: 'Đào sâu vào sở thích cá nhân: âm nhạc, phim ảnh, thể thao, nấu ăn và du lịch.',
+    lines: [
+      ["Pear","Hi, Egg! I want to know more about your hobbies. What do you usually do in your free time?","Chào Trứng! Mình muốn tìm hiểu thêm về sở thích của cậu. Cậu thường làm gì lúc rảnh?"],
+      ["Egg","In my free time, I usually listen to music, watch movies, play games, and sometimes go out with my friends. I like doing different things depending on my mood.","Lúc rảnh, mình thường nghe nhạc, xem phim, chơi game và thỉnh thoảng đi chơi với bạn bè. Mình thích làm nhiều việc khác nhau tùy theo tâm trạng."],
+      ["Pear","Which hobby do you enjoy the most?","Sở thích nào cậu thích nhất?"],
+      ["Egg","I think listening to music is my favorite hobby. I listen to music almost every day because it helps me relax. I usually listen to music when I study, travel, or just lie in bed.","Mình nghĩ nghe nhạc là sở thích mình thích nhất. Mình nghe nhạc hầu như mỗi ngày vì nó giúp mình thư giãn. Mình thường nghe nhạc khi học bài, đi đường hoặc chỉ đơn giản là nằm trên giường."],
+      ["Pear","What kind of music do you like?","Cậu thích loại nhạc nào?"],
+      ["Egg","I mostly like pop music. I also listen to R&B and some rock music. I don't always listen to one type of music because my music choice depends on my mood.","Mình chủ yếu thích nhạc pop. Mình cũng nghe R&B và một chút nhạc rock. Mình không chỉ nghe một loại nhạc vì lựa chọn nhạc của mình tùy vào tâm trạng."],
+      ["Pear","When do you usually listen to music?","Cậu thường nghe nhạc vào lúc nào?"],
+      ["Egg","I usually listen to music in the evening. I also listen to it when I'm doing something boring, like cleaning my room or doing homework.","Mình thường nghe nhạc vào buổi tối. Mình cũng nghe khi đang làm việc gì đó nhàm chán, như dọn phòng hay làm bài tập."],
+      ["Pear","Do you like singing?","Cậu có thích hát không?"],
+      ["Egg","Yes, but I'm not a very good singer! I sometimes sing when I'm alone or with my close friends. It's just for fun.","Có, nhưng mình không hát hay lắm! Thỉnh thoảng mình hát khi ở một mình hoặc với bạn thân. Chỉ là cho vui thôi."],
+      ["Pear","Do you play any musical instruments?","Cậu có chơi nhạc cụ nào không?"],
+      ["Egg","No, I don't. I've always wanted to learn how to play the guitar, though. Maybe I will learn it in the future.","Không, mình không chơi. Nhưng mình luôn muốn học chơi ghi-ta. Có lẽ mình sẽ học vào một ngày nào đó."],
+      ["Pear","That's interesting. What about movies? Do you like watching movies?","Thú vị đấy. Còn phim thì sao? Cậu có thích xem phim không?"],
+      ["Egg","Yes, I love watching movies. It's one of my favorite ways to relax after studying.","Có, mình rất thích xem phim. Đó là một trong những cách mình thích nhất để thư giãn sau khi học."],
+      ["Pear","What kind of movies do you usually watch?","Cậu thường xem loại phim nào?"],
+      ["Egg","I like comedy, action, horror, and adventure movies. I especially like movies that have an interesting story and unexpected endings.","Mình thích phim hài, phim hành động, phim kinh dị và phim phiêu lưu. Mình đặc biệt thích những bộ phim có cốt truyện thú vị và cái kết bất ngờ."],
+      ["Pear","Do you usually watch movies alone or with your friends?","Cậu thường xem phim một mình hay cùng bạn bè?"],
+      ["Egg","I usually watch them alone at home, but I prefer going to the cinema with my friends. Watching a funny movie together is much more enjoyable.","Mình thường xem một mình ở nhà, nhưng mình thích đi xem ở rạp cùng bạn bè hơn. Xem một bộ phim vui cùng nhau thì thú vị hơn nhiều."],
+      ["Pear","What about video games? Do you play games?","Còn game điện tử thì sao? Cậu có chơi game không?"],
+      ["Egg","Yes, I do. I sometimes play video games when I have free time. I usually play with my friends because it's more fun than playing alone.","Có chứ. Thỉnh thoảng mình chơi game điện tử khi có thời gian rảnh. Mình thường chơi cùng bạn bè vì nó vui hơn là chơi một mình."],
+      ["Pear","What kind of games do you like?","Cậu thích loại game nào?"],
+      ["Egg","I like action and adventure games. I also like games where I can play with other people. I enjoy working together with my friends and trying to win.","Mình thích game hành động và phiêu lưu. Mình cũng thích những game có thể chơi cùng người khác. Mình thích cùng bạn bè hợp sức và cố gắng giành chiến thắng."],
+      ["Pear","How many hours do you usually play?","Cậu thường chơi bao nhiêu tiếng?"],
+      ["Egg","It depends on my schedule. On school days, I usually play for about one or two hours. At the weekend, I may play longer if I don't have much homework.","Còn tùy lịch trình của mình. Vào ngày học, mình thường chơi khoảng một hoặc hai tiếng. Vào cuối tuần, mình có thể chơi lâu hơn nếu không có nhiều bài tập."],
+      ["Pear","Do you like sports?","Cậu có thích thể thao không?"],
+      ["Egg","Yes, I do. I'm not very good at sports, but I like playing football and badminton with my friends.","Có chứ. Mình chơi thể thao không giỏi lắm, nhưng mình thích chơi bóng đá và cầu lông cùng bạn bè."],
+      ["Pear","Which sport do you like the most?","Môn thể thao cậu thích nhất là gì?"],
+      ["Egg","I like badminton the most because it's easy to play and I don't need a lot of equipment. It's also a good way to exercise.","Mình thích cầu lông nhất vì nó dễ chơi và không cần nhiều dụng cụ. Nó cũng là một cách tập thể dục tốt."],
+      ["Pear","How often do you exercise?","Cậu tập thể dục thường xuyên không?"],
+      ["Egg","I try to exercise two or three times a week. Sometimes I go for a walk, play badminton, or do some simple exercises at home.","Mình cố gắng tập thể dục hai hoặc ba lần một tuần. Thỉnh thoảng mình đi bộ, chơi cầu lông hoặc tập vài bài tập đơn giản ở nhà."],
+      ["Pear","Do you have any creative hobbies?","Cậu có sở thích nào mang tính sáng tạo không?"],
+      ["Egg","Yes. I really like cooking and baking. I think they are both fun and relaxing.","Có. Mình rất thích nấu ăn và làm bánh. Mình thấy cả hai đều vui và thư giãn."],
+      ["Pear","What do you like to cook?","Cậu thích nấu món gì?"],
+      ["Egg","I like cooking simple meals such as fried rice, noodles, soup, and chicken. I don't cook complicated dishes very often.","Mình thích nấu những món đơn giản như cơm chiên, mì, súp và gà. Mình không thường nấu những món phức tạp."],
+      ["Pear","And what do you like to bake?","Còn cậu thích làm loại bánh nào?"],
+      ["Egg","I like making cookies, cupcakes, and chocolate cakes. My favorite thing to bake is chocolate cake because I love chocolate.","Mình thích làm bánh quy, bánh cupcake và bánh sô-cô-la. Món bánh mình thích làm nhất là bánh sô-cô-la vì mình rất thích sô-cô-la."],
+      ["Pear","Do you usually bake for yourself or for other people?","Cậu thường làm bánh cho bản thân hay cho người khác?"],
+      ["Egg","Usually for my family and friends. I really enjoy making cakes for birthdays or special occasions. It's nice when people enjoy something that I made.","Thường là cho gia đình và bạn bè. Mình rất thích làm bánh cho sinh nhật hoặc những dịp đặc biệt. Thật vui khi mọi người thích thứ mà mình đã làm ra."],
+      ["Pear","Have you ever made a cake for someone's birthday?","Cậu đã bao giờ làm bánh cho sinh nhật ai đó chưa?"],
+      ["Egg","Yes, I have. I once made a chocolate cake for my friend's birthday. It took me a few hours, but my friend really liked it.","Rồi. Mình từng làm một chiếc bánh sô-cô-la cho sinh nhật bạn mình. Nó mất mấy tiếng đồng hồ, nhưng bạn mình rất thích."],
+      ["Pear","Do you like reading?","Cậu có thích đọc sách không?"],
+      ["Egg","Yes, but I don't read every day. I usually read when I have a lot of free time. I like novels, short stories, and books about personal development.","Có, nhưng mình không đọc mỗi ngày. Mình thường đọc khi có nhiều thời gian rảnh. Mình thích tiểu thuyết, truyện ngắn và sách phát triển bản thân."],
+      ["Pear","Do you prefer reading books or watching movies?","Cậu thích đọc sách hay xem phim hơn?"],
+      ["Egg","I think I prefer watching movies because they are easier and faster. But books can give me more details and allow me to imagine the story myself.","Mình nghĩ mình thích xem phim hơn vì nó dễ và nhanh hơn. Nhưng sách có thể cho mình nhiều chi tiết hơn và cho phép mình tự tưởng tượng ra câu chuyện."],
+      ["Pear","What about traveling? Is traveling one of your hobbies?","Còn du lịch thì sao? Du lịch có phải là một sở thích của cậu không?"],
+      ["Egg","Yes, definitely. I really enjoy traveling because I can visit new places, try different food, and take photos. I also like learning about local culture.","Có chứ, chắc chắn rồi. Mình rất thích du lịch vì mình có thể khám phá những nơi mới, thử đồ ăn khác nhau và chụp ảnh. Mình cũng thích tìm hiểu về văn hóa địa phương."],
+      ["Pear","Who do you usually travel with?","Cậu thường đi du lịch cùng ai?"],
+      ["Egg","I usually travel with my family or close friends. Traveling with other people is more fun because we can share experiences and take photos together.","Mình thường đi du lịch cùng gia đình hoặc bạn thân. Đi du lịch cùng người khác vui hơn vì chúng mình có thể chia sẻ trải nghiệm và chụp ảnh cùng nhau."],
+      ["Pear","What is your favorite thing to do when you travel?","Điều cậu thích làm nhất khi đi du lịch là gì?"],
+      ["Egg","I like trying local food the most. I also enjoy taking photos, visiting famous places, and walking around the city.","Mình thích nhất là thử đồ ăn địa phương. Mình cũng thích chụp ảnh, tham quan những nơi nổi tiếng và đi dạo quanh thành phố."],
+      ["Pear","If you had a whole free day, how would you spend it?","Nếu có cả một ngày rảnh rỗi, cậu sẽ dùng nó như thế nào?"],
+      ["Egg","I would probably stay at home in the morning, listen to music, and watch a movie. In the afternoon, I might go out with my friends. In the evening, I would probably play games or bake something.","Chắc là buổi sáng mình sẽ ở nhà, nghe nhạc và xem phim. Buổi chiều mình có thể đi chơi cùng bạn bè. Buổi tối mình có lẽ sẽ chơi game hoặc làm bánh."],
+      ["Pear","Wow, you have a lot of hobbies! Why do you enjoy having so many hobbies?","Ồ, cậu có nhiều sở thích thật đấy! Vì sao cậu thích có nhiều sở thích như vậy?"],
+      ["Egg","I think hobbies make life more interesting. They help me relax when I'm stressed and give me something fun to do. They also help me learn new skills.","Mình nghĩ sở thích làm cho cuộc sống thú vị hơn. Chúng giúp mình thư giãn khi căng thẳng và cho mình điều gì đó vui để làm. Chúng cũng giúp mình học thêm những kỹ năng mới."],
+      ["Pear","Is there any new hobby you want to try?","Có sở thích mới nào cậu muốn thử không?"],
+      ["Egg","Yes. I want to learn photography and play the guitar. I also want to learn how to make more difficult cakes.","Có. Mình muốn học chụp ảnh và chơi ghi-ta. Mình cũng muốn học cách làm những loại bánh khó hơn."],
+      ["Pear","Which one would you like to try first?","Cậu muốn thử điều nào trước?"],
+      ["Egg","I think I want to learn photography first. I like taking pictures when I travel, so I want to learn how to take better photos.","Mình nghĩ mình muốn học chụp ảnh trước. Mình thích chụp ảnh khi đi du lịch, nên mình muốn học cách chụp ảnh đẹp hơn."],
+      ["Pear","That's great! Do you think your hobbies will change in the future?","Tuyệt đấy! Cậu có nghĩ sở thích của mình sẽ thay đổi trong tương lai không?"],
+      ["Egg","Maybe. I think some hobbies will stay the same, but I will probably discover new hobbies as I get older. I want to keep trying new things.","Có lẽ vậy. Mình nghĩ vài sở thích sẽ vẫn giữ nguyên, nhưng có lẽ mình sẽ khám phá thêm những sở thích mới khi lớn lên. Mình muốn tiếp tục thử những điều mới."],
+      ["Pear","So, if you had to choose only one hobby, which one would you choose?","Vậy nếu chỉ được chọn một sở thích duy nhất, cậu sẽ chọn gì?"],
+      ["Egg","That's a difficult question! I think I would choose listening to music because I can do it almost anywhere and at any time.","Đó là một câu hỏi khó đấy! Mình nghĩ mình sẽ chọn nghe nhạc vì mình có thể làm điều đó ở hầu như bất cứ đâu và bất cứ lúc nào."],
+      ["Pear","I understand. Music is a great hobby. Thank you for telling me so much about yourself!","Mình hiểu rồi. Âm nhạc là một sở thích tuyệt vời. Cảm ơn cậu đã kể cho mình nghe nhiều điều về bản thân!"],
+      ["Egg","You're welcome! I really enjoyed talking about my hobbies.","Không có gì! Mình thực sự rất vui khi được nói về sở thích của mình."]
+    ]
+  },
+  {
+    id: 'long3',
+    length: 'long',
+    emoji: '🔥',
+    title: 'Phỏng vấn 3 · Động lực sống',
+    desc: 'Trò chuyện sâu sắc về động lực, thất bại, mục tiêu và ý nghĩa thành công.',
+    lines: [
+      ["Pear","Hi, Egg. Today I want to ask you about something a little different. What motivates you in life?","Chào Trứng. Hôm nay mình muốn hỏi cậu về một điều hơi khác một chút. Điều gì tạo động lực cho cậu trong cuộc sống?"],
+      ["Egg","I think there are many things that motivate me. My family, my friends, my dreams, and also my desire to become a better person. When I have a goal, I feel like I have a reason to keep going.","Mình nghĩ có rất nhiều thứ tạo động lực cho mình. Gia đình, bạn bè, ước mơ, và cả mong muốn trở thành một người tốt hơn. Khi có mục tiêu, mình cảm thấy mình có lý do để tiếp tục cố gắng."],
+      ["Pear","That's interesting. What is your biggest motivation right now?","Thú vị đấy. Động lực lớn nhất của cậu lúc này là gì?"],
+      ["Egg","My biggest motivation right now is my future. I want to have a good job and a stable life. I know I need to study and work hard to achieve that, so I try not to waste too much time.","Động lực lớn nhất của mình lúc này là tương lai. Mình muốn có một công việc tốt và cuộc sống ổn định. Mình biết mình cần học tập và làm việc chăm chỉ để đạt được điều đó, nên mình cố gắng không lãng phí quá nhiều thời gian."],
+      ["Pear","Do you always feel motivated?","Cậu có luôn cảm thấy có động lực không?"],
+      ["Egg","No, definitely not. Sometimes I feel very tired or lazy. Sometimes I don't want to study or do anything. I think that is normal because nobody can feel motivated all the time.","Không, chắc chắn là không. Đôi khi mình cảm thấy rất mệt mỏi hoặc lười biếng. Đôi khi mình không muốn học hay làm gì cả. Mình nghĩ điều đó là bình thường vì không ai có thể luôn có động lực mọi lúc."],
+      ["Pear","So what do you do when you lose your motivation?","Vậy khi mất động lực thì cậu làm gì?"],
+      ["Egg","I usually take a short break first. I listen to music, watch something funny, or talk to my friends. After that, I try to remember why I started. Thinking about my goals helps me start again.","Mình thường nghỉ ngơi một chút trước. Mình nghe nhạc, xem gì đó vui, hoặc trò chuyện với bạn bè. Sau đó, mình cố nhớ lại lý do mình bắt đầu. Nghĩ về mục tiêu giúp mình bắt đầu lại."],
+      ["Pear","Do you think motivation is more important than talent?","Cậu có nghĩ động lực quan trọng hơn tài năng không?"],
+      ["Egg","I think motivation is very important. Talent can help you, but talent is not enough. If you don't work hard, your talent may not help you achieve your goals. I believe that regular effort is more important.","Mình nghĩ động lực rất quan trọng. Tài năng có thể giúp cậu, nhưng tài năng thôi thì chưa đủ. Nếu cậu không chăm chỉ, tài năng có thể sẽ không giúp cậu đạt được mục tiêu. Mình tin rằng sự cố gắng đều đặn mới là điều quan trọng hơn."],
+      ["Pear","What do you mean by regular effort?","Ý cậu là \"cố gắng đều đặn\" nghĩa là sao?"],
+      ["Egg","I mean doing something small every day instead of doing a lot only once. For example, if I want to improve my English, I don't need to study for five hours every day. I can study for thirty minutes every day and slowly improve.","Ý mình là làm một việc nhỏ mỗi ngày thay vì làm thật nhiều chỉ một lần. Ví dụ, nếu mình muốn cải thiện tiếng Anh, mình không cần học năm tiếng mỗi ngày. Mình có thể học ba mươi phút mỗi ngày và tiến bộ dần dần."],
+      ["Pear","That's a good idea. Have you ever wanted to give up on something?","Ý hay đấy. Cậu đã bao giờ muốn từ bỏ điều gì đó chưa?"],
+      ["Egg","Yes, many times. There were times when I studied very hard but didn't get the result I wanted. I felt disappointed and thought that maybe I wasn't good enough.","Có, nhiều lần rồi. Có những lúc mình học rất chăm chỉ nhưng không đạt được kết quả mình mong muốn. Mình cảm thấy thất vọng và nghĩ rằng có lẽ mình chưa đủ giỏi."],
+      ["Pear","What did you do when you felt that way?","Cậu đã làm gì khi cảm thấy như vậy?"],
+      ["Egg","At first, I wanted to stop. But then I talked to my friends and family. They told me that one bad result doesn't mean I am a failure. They encouraged me to try again.","Lúc đầu, mình muốn dừng lại. Nhưng sau đó mình đã nói chuyện với bạn bè và gia đình. Họ nói với mình rằng một kết quả tệ không có nghĩa là mình thất bại. Họ động viên mình thử lại."],
+      ["Pear","Do you think failure is important?","Cậu có nghĩ thất bại là quan trọng không?"],
+      ["Egg","Yes, I do. Failure can teach us many things. When we fail, we can see what we did wrong and learn how to do better next time.","Có chứ. Thất bại có thể dạy cho chúng ta rất nhiều điều. Khi thất bại, chúng ta có thể nhận ra mình đã sai ở đâu và học cách làm tốt hơn vào lần sau."],
+      ["Pear","Can you give me an example?","Cậu có thể cho mình một ví dụ không?"],
+      ["Egg","Sure. For example, if I get a bad grade on a test, I shouldn't just think, \"I'm stupid.\" Instead, I should ask myself why I got a bad grade. Maybe I didn't study enough, or maybe I didn't understand the lesson. Then I can change my way of studying.","Được thôi. Ví dụ, nếu mình bị điểm kém trong một bài kiểm tra, mình không nên chỉ nghĩ rằng \"mình ngu ngốc.\" Thay vào đó, mình nên tự hỏi vì sao mình bị điểm kém. Có thể là mình học chưa đủ, hoặc có thể mình chưa hiểu bài. Sau đó mình có thể thay đổi cách học của mình."],
+      ["Pear","That's true. How do you deal with pressure?","Đúng vậy. Cậu đối phó với áp lực như thế nào?"],
+      ["Egg","I try to focus on one thing at a time. When I have too many things to do, I can feel stressed. So I make a simple list and finish the most important things first.","Mình cố gắng tập trung vào từng việc một. Khi có quá nhiều việc phải làm, mình có thể cảm thấy căng thẳng. Vì vậy mình lập một danh sách đơn giản và hoàn thành những việc quan trọng nhất trước."],
+      ["Pear","Do your friends motivate you?","Bạn bè có tạo động lực cho cậu không?"],
+      ["Egg","Yes, they do. Good friends can give me energy when I feel tired. Sometimes I see my friends working hard, and that makes me want to work harder too.","Có chứ. Những người bạn tốt có thể tiếp thêm năng lượng cho mình khi mình mệt mỏi. Đôi khi thấy bạn bè chăm chỉ làm việc, điều đó khiến mình cũng muốn cố gắng hơn."],
+      ["Pear","What about your family?","Còn gia đình cậu thì sao?"],
+      ["Egg","My family is probably my biggest source of motivation. They always support me and want me to have a good future. I don't want to disappoint them, so I try my best.","Gia đình có lẽ là nguồn động lực lớn nhất của mình. Họ luôn ủng hộ mình và mong mình có một tương lai tốt đẹp. Mình không muốn làm họ thất vọng, nên mình luôn cố gắng hết sức."],
+      ["Pear","Do you think you work hard because of your family or because of yourself?","Cậu có nghĩ mình chăm chỉ vì gia đình hay vì chính bản thân mình?"],
+      ["Egg","I think both. My family gives me support, but I also have my own dreams. I want to be successful not only to make my family happy but also to be proud of myself.","Mình nghĩ là cả hai. Gia đình cho mình sự ủng hộ, nhưng mình cũng có những ước mơ của riêng mình. Mình muốn thành công không chỉ để gia đình vui mà còn để tự hào về chính mình."],
+      ["Pear","What does success mean to you?","Thành công có ý nghĩa gì với cậu?"],
+      ["Egg","For me, success isn't only about money or having a good job. Success means being happy with my life, having people I love around me, and being able to do something meaningful.","Với mình, thành công không chỉ là tiền bạc hay có một công việc tốt. Thành công nghĩa là hạnh phúc với cuộc sống của mình, có những người mình yêu thương ở bên cạnh, và có thể làm điều gì đó ý nghĩa."],
+      ["Pear","That's a nice answer. Do you think money is important?","Câu trả lời hay đấy. Cậu có nghĩ tiền bạc quan trọng không?"],
+      ["Egg","Yes, money is important because we need it for our daily life. But I don't think money is everything. If you have a lot of money but you are always unhappy, I don't think that is real success.","Có chứ, tiền bạc quan trọng vì chúng ta cần nó cho cuộc sống hằng ngày. Nhưng mình không nghĩ tiền là tất cả. Nếu cậu có rất nhiều tiền nhưng luôn không hạnh phúc, mình không nghĩ đó là thành công thực sự."],
+      ["Pear","What kind of person do you want to become?","Cậu muốn trở thành người như thế nào?"],
+      ["Egg","I want to become a confident, responsible, and kind person. I want to be someone who doesn't give up easily and who can help other people when they need me.","Mình muốn trở thành một người tự tin, có trách nhiệm và tốt bụng. Mình muốn là người không dễ dàng từ bỏ và có thể giúp đỡ người khác khi họ cần mình."],
+      ["Pear","What is one thing you want to change about yourself?","Có điều gì cậu muốn thay đổi ở bản thân không?"],
+      ["Egg","I want to stop comparing myself to other people. Sometimes I look at other people's achievements and feel like I'm not doing enough. But I know everyone has a different life and a different journey.","Mình muốn ngừng so sánh bản thân với người khác. Đôi khi mình nhìn vào thành tích của người khác và cảm thấy như mình chưa cố gắng đủ. Nhưng mình biết mỗi người có một cuộc sống và một hành trình khác nhau."],
+      ["Pear","That's a very important point. How do you feel when you see someone more successful than you?","Đó là một điểm rất quan trọng. Cậu cảm thấy thế nào khi thấy ai đó thành công hơn mình?"],
+      ["Egg","Sometimes I feel jealous or disappointed, but I try to change that feeling into motivation. Instead of thinking, \"Why are they better than me?\", I try to think, \"What can I learn from them?\"","Đôi khi mình cảm thấy ghen tị hoặc thất vọng, nhưng mình cố biến cảm giác đó thành động lực. Thay vì nghĩ \"Tại sao họ giỏi hơn mình?\", mình cố nghĩ \"Mình có thể học được gì từ họ?\""],
+      ["Pear","Do you think it is important to have goals?","Cậu có nghĩ việc có mục tiêu là quan trọng không?"],
+      ["Egg","Yes, definitely. Goals give us direction. Without goals, I think it is easy to waste time and not know what we really want.","Có chứ, chắc chắn rồi. Mục tiêu cho chúng ta phương hướng. Không có mục tiêu, mình nghĩ rất dễ lãng phí thời gian và không biết mình thực sự muốn gì."],
+      ["Pear","What are your goals for this year?","Mục tiêu của cậu trong năm nay là gì?"],
+      ["Egg","This year, I want to improve my English, get better at my studies, and learn some new skills. I also want to take better care of myself and spend more time with my family.","Năm nay, mình muốn cải thiện tiếng Anh, học tốt hơn, và học thêm vài kỹ năng mới. Mình cũng muốn chăm sóc bản thân tốt hơn và dành nhiều thời gian hơn cho gia đình."],
+      ["Pear","What about your long-term goals?","Còn mục tiêu dài hạn của cậu thì sao?"],
+      ["Egg","In the future, I want to have a good career and a comfortable life. I also want to travel to different countries and experience different cultures.","Trong tương lai, mình muốn có sự nghiệp tốt và cuộc sống thoải mái. Mình cũng muốn đi du lịch đến nhiều quốc gia khác nhau và trải nghiệm những nền văn hóa khác nhau."],
+      ["Pear","What would you say to someone who feels like they are not good enough?","Cậu sẽ nói gì với ai đó cảm thấy mình chưa đủ giỏi?"],
+      ["Egg","I would tell them not to give up on themselves. Everyone has strengths and weaknesses. You don't have to be perfect. You just need to keep learning and improving little by little.","Mình sẽ bảo họ đừng từ bỏ chính mình. Ai cũng có điểm mạnh và điểm yếu. Cậu không cần phải hoàn hảo. Cậu chỉ cần tiếp tục học hỏi và tiến bộ từng chút một."],
+      ["Pear","What would you say to someone who is afraid of failure?","Cậu sẽ nói gì với ai đó đang sợ thất bại?"],
+      ["Egg","I would say that failure is not the end. Sometimes failure is just part of the journey. If you never try because you are afraid of failing, you may never know what you can achieve.","Mình sẽ nói rằng thất bại không phải là dấu chấm hết. Đôi khi thất bại chỉ là một phần của hành trình. Nếu cậu không bao giờ thử vì sợ thất bại, cậu có thể sẽ không bao giờ biết mình có thể đạt được gì."],
+      ["Pear","Do you have a quote or a sentence that motivates you?","Cậu có câu nói nào truyền động lực cho cậu không?"],
+      ["Egg","Yes. I like the idea that \"small steps every day can lead to big results.\" It reminds me that I don't have to achieve everything immediately.","Có. Mình thích ý tưởng rằng \"những bước nhỏ mỗi ngày có thể dẫn đến kết quả lớn.\" Nó nhắc mình rằng mình không cần phải đạt được mọi thứ ngay lập tức."],
+      ["Pear","That's a good one. So, what keeps you going when life becomes difficult?","Câu đó hay đấy. Vậy điều gì giúp cậu tiếp tục khi cuộc sống trở nên khó khăn?"],
+      ["Egg","I think I remember the people I love and the future I want. I remind myself that difficult times don't last forever. If I keep moving forward, even slowly, things can get better.","Mình nghĩ mình nhớ đến những người mình yêu thương và tương lai mình mong muốn. Mình tự nhắc mình rằng những lúc khó khăn không kéo dài mãi mãi. Nếu mình cứ tiếp tục tiến về phía trước, dù chậm, mọi thứ vẫn có thể tốt hơn."],
+      ["Pear","Do you think happiness or success is more important?","Cậu nghĩ hạnh phúc hay thành công quan trọng hơn?"],
+      ["Egg","I think both are important, but happiness is more important to me. I want to be successful, but I don't want to lose my happiness while trying to become successful.","Mình nghĩ cả hai đều quan trọng, nhưng hạnh phúc quan trọng hơn với mình. Mình muốn thành công, nhưng mình không muốn đánh mất hạnh phúc của mình trong lúc cố gắng để thành công."],
+      ["Pear","Finally, what is the most important lesson you have learned about life?","Cuối cùng, bài học quan trọng nhất mà cậu học được về cuộc sống là gì?"],
+      ["Egg","I think the most important lesson is to keep going. Life isn't always easy, and sometimes things don't happen the way we want. But we can learn from our problems, become stronger, and try again. We don't have to be perfect. We just have to keep moving forward.","Mình nghĩ bài học quan trọng nhất là hãy tiếp tục cố gắng. Cuộc sống không phải lúc nào cũng dễ dàng, và đôi khi mọi thứ không diễn ra như chúng ta mong muốn. Nhưng chúng ta có thể học hỏi từ những khó khăn, trở nên mạnh mẽ hơn, và thử lại. Chúng ta không cần phải hoàn hảo. Chúng ta chỉ cần tiếp tục tiến về phía trước."],
+      ["Pear","That's a really positive way to look at life. Thank you for sharing your thoughts, Egg.","Đó là một cách nhìn cuộc sống rất tích cực. Cảm ơn Trứng đã chia sẻ suy nghĩ của mình."],
+      ["Egg","You're welcome, Pear. I really enjoyed talking about this topic.","Không có gì đâu, Lê. Mình thực sự rất thích được trò chuyện về chủ đề này."]
+    ]
+  },
+  {
+    id: 'long4',
+    length: 'long',
+    emoji: '🌠',
+    title: 'Phỏng vấn 4 · Ước mơ tương lai',
+    desc: 'Pear và Egg chia sẻ về nghề nghiệp mơ ước, trở thành giáo viên, bác sĩ và những dự định tương lai.',
+    lines: [
+      ["Pear","Hi, Egg! What do you want to be when you grow up?","Chào Trứng! Khi lớn lên cậu muốn làm nghề gì?"],
+      ["Egg","Hmm, I'm not completely sure yet, but I have some ideas. I think I want to become a doctor. What about you?","Hừm, mình chưa chắc chắn lắm, nhưng mình có vài ý tưởng. Mình nghĩ mình muốn trở thành bác sĩ. Còn cậu thì sao?"],
+      ["Pear","I want to be a teacher. I really like helping other people learn new things.","Mình muốn trở thành giáo viên. Mình rất thích giúp người khác học những điều mới."],
+      ["Egg","That's a great dream! Why do you want to be a teacher?","Đó là một ước mơ tuyệt vời! Vì sao cậu muốn trở thành giáo viên?"],
+      ["Pear","Because I have a teacher that I really like. She is kind and always helps her students. I want to be like her when I grow up.","Vì mình có một cô giáo mà mình rất thích. Cô ấy tốt bụng và luôn giúp đỡ học sinh. Mình muốn giống như cô khi lớn lên."],
+      ["Egg","That's nice. What kind of teacher do you want to be?","Hay đấy. Cậu muốn trở thành kiểu giáo viên như thế nào?"],
+      ["Pear","I want to be a fun and friendly teacher. I don't want my students to be afraid of me. I want them to feel comfortable asking questions.","Mình muốn là một giáo viên vui vẻ và thân thiện. Mình không muốn học sinh sợ mình. Mình muốn các em cảm thấy thoải mái khi đặt câu hỏi."],
+      ["Egg","I think you would be a good teacher. Why do you want to become a doctor?","Mình nghĩ cậu sẽ là một giáo viên tốt đấy. Vì sao cậu muốn trở thành bác sĩ?"],
+      ["Pear","I want to help sick people. When I was younger, I was afraid of hospitals, but I met a very kind doctor. He made me feel safe, and I thought, \"I want to help people like him.\"","Mình muốn giúp đỡ những người bị bệnh. Khi còn nhỏ, mình từng sợ bệnh viện, nhưng mình đã gặp một bác sĩ rất tốt bụng. Ông ấy khiến mình cảm thấy an toàn, và mình đã nghĩ, \"Mình muốn giúp đỡ mọi người như ông ấy.\""],
+      ["Pear","Do you want to work in a big hospital?","Cậu có muốn làm việc ở một bệnh viện lớn không?"],
+      ["Egg","Maybe. I want to work in a good hospital where I can learn many things. But I also want to help people in places where there aren't many doctors.","Có thể. Mình muốn làm việc ở một bệnh viện tốt, nơi mình có thể học được nhiều điều. Nhưng mình cũng muốn giúp đỡ mọi người ở những nơi không có nhiều bác sĩ."],
+      ["Pear","Wow, that's a big dream!","Wow, đó là một ước mơ lớn đấy!"],
+      ["Egg","Yes, but I know it will be difficult. I will have to study very hard.","Đúng vậy, nhưng mình biết nó sẽ khó khăn. Mình sẽ phải học tập thật chăm chỉ."],
+      ["Pear","What subjects do you need to study?","Cậu cần học những môn gì?"],
+      ["Egg","I need to study science, biology, chemistry, and English. I think English is also important because I may need to communicate with doctors from other countries.","Mình cần học khoa học, sinh học, hóa học và tiếng Anh. Mình nghĩ tiếng Anh cũng quan trọng vì có thể mình sẽ cần giao tiếp với các bác sĩ từ nước khác."],
+      ["Pear","Do you like studying science?","Cậu có thích học khoa học không?"],
+      ["Egg","Yes, I do. I like learning about the human body and how different things work. Sometimes science is difficult, but I find it interesting.","Có chứ. Mình thích tìm hiểu về cơ thể con người và cách các thứ hoạt động. Đôi khi khoa học khó, nhưng mình thấy nó thú vị."],
+      ["Egg","What about you? What subjects do you like?","Còn cậu thì sao? Cậu thích môn học nào?"],
+      ["Pear","I like English and literature. I enjoy reading stories and learning new words. I also like drawing and making things.","Mình thích tiếng Anh và văn học. Mình thích đọc truyện và học từ mới. Mình cũng thích vẽ và làm đồ thủ công."],
+      ["Egg","Maybe you could become an art teacher!","Có lẽ cậu có thể trở thành giáo viên mỹ thuật đấy!"],
+      ["Pear","That's possible! Actually, I would love to teach children art and English.","Cũng có thể đấy! Thật ra, mình rất muốn dạy trẻ em môn mỹ thuật và tiếng Anh."],
+      ["Egg","That sounds fun. Would you like to teach in a school or at a university?","Nghe vui đấy. Cậu muốn dạy ở trường phổ thông hay ở trường đại học?"],
+      ["Pear","I think I would like to teach at a school for children. I like being around children because they are funny and creative.","Mình nghĩ mình muốn dạy ở một trường dành cho trẻ em. Mình thích ở bên trẻ con vì chúng vui nhộn và sáng tạo."],
+      ["Egg","Do you want to work in your hometown?","Cậu có muốn làm việc ở quê nhà không?"],
+      ["Pear","Maybe at first. But I also want to travel and experience different places.","Có lẽ lúc đầu thì có. Nhưng mình cũng muốn đi du lịch và trải nghiệm những nơi khác nhau."],
+      ["Egg","Where would you like to go?","Cậu muốn đến đâu?"],
+      ["Pear","I want to visit Japan, South Korea, France, and many other countries. I want to see different cultures and try different food.","Mình muốn đến Nhật Bản, Hàn Quốc, Pháp và nhiều nước khác nữa. Mình muốn khám phá những nền văn hóa khác nhau và thử những món ăn khác nhau."],
+      ["Egg","Me too! I want to travel around the world after I become a doctor.","Mình cũng vậy! Mình muốn đi khắp thế giới sau khi trở thành bác sĩ."],
+      ["Pear","If you had enough money, where would you go first?","Nếu có đủ tiền, cậu sẽ đến đâu đầu tiên?"],
+      ["Egg","I would probably go to Japan. I really like Japanese food and culture. I also want to see Mount Fuji.","Chắc mình sẽ đến Nhật Bản trước. Mình rất thích đồ ăn và văn hóa Nhật Bản. Mình cũng muốn ngắm núi Phú Sĩ."],
+      ["Pear","That sounds amazing! I want to go there too.","Nghe tuyệt quá! Mình cũng muốn đến đó."],
+      ["Egg","Maybe we can travel together when we are adults.","Có lẽ khi trưởng thành chúng mình có thể cùng nhau đi du lịch."],
+      ["Pear","That's a great idea! We could visit different countries together.","Ý hay đấy! Chúng mình có thể cùng nhau khám phá nhiều nước khác nhau."],
+      ["Egg","Yes! But first, we need to study hard.","Đúng vậy! Nhưng trước tiên, chúng mình cần học tập chăm chỉ."],
+      ["Pear","You're right. Do you think becoming a doctor will be difficult?","Cậu nói đúng. Cậu có nghĩ việc trở thành bác sĩ sẽ khó không?"],
+      ["Egg","Yes, I think it will be very difficult. Doctors have to study for many years, and they have a lot of responsibility.","Có, mình nghĩ nó sẽ rất khó. Bác sĩ phải học rất nhiều năm, và họ có rất nhiều trách nhiệm."],
+      ["Pear","Are you afraid that you might fail?","Cậu có sợ mình sẽ thất bại không?"],
+      ["Egg","Sometimes. But I don't want to give up just because something is difficult. I can study harder and ask other people for help when I don't understand something.","Đôi khi có. Nhưng mình không muốn từ bỏ chỉ vì một việc khó khăn. Mình có thể học chăm chỉ hơn và nhờ người khác giúp đỡ khi mình không hiểu điều gì đó."],
+      ["Pear","That's a good attitude. I'm also a little afraid of failing. Sometimes I worry that I won't become a good teacher.","Thái độ đó tốt đấy. Mình cũng hơi sợ thất bại. Đôi khi mình lo rằng mình sẽ không trở thành một giáo viên tốt."],
+      ["Egg","I don't think you should worry too much. You can practice and learn from your mistakes.","Mình nghĩ cậu không cần lo lắng quá nhiều đâu. Cậu có thể luyện tập và học hỏi từ những sai lầm của mình."],
+      ["Pear","You're right. I think dreams are not only about wishing for something. We also have to work for them.","Cậu nói đúng. Mình nghĩ ước mơ không chỉ là mong muốn điều gì đó. Chúng ta còn phải nỗ lực vì nó nữa."],
+      ["Egg","Exactly! Having a dream is the first step, but we need to take many small steps to reach it.","Chính xác! Có một ước mơ chỉ là bước đầu tiên, nhưng chúng ta cần thực hiện rất nhiều bước nhỏ để đạt được nó."],
+      ["Pear","What is the first thing you want to do to achieve your dream?","Điều đầu tiên cậu muốn làm để đạt được ước mơ của mình là gì?"],
+      ["Egg","I want to improve my grades, especially in science. I also want to improve my English and learn more about medicine.","Mình muốn cải thiện điểm số, đặc biệt là môn khoa học. Mình cũng muốn cải thiện tiếng Anh và tìm hiểu thêm về y học."],
+      ["Pear","I'm going to improve my English too. I also want to practice speaking in front of people because teachers need to be confident.","Mình cũng sẽ cải thiện tiếng Anh của mình. Mình cũng muốn luyện tập nói trước đám đông vì giáo viên cần phải tự tin."],
+      ["Egg","That's true. Are you good at speaking in front of a class?","Đúng vậy. Cậu có giỏi nói trước lớp không?"],
+      ["Pear","Not really. I feel nervous when everyone looks at me. But I want to become more confident.","Không hẳn. Mình cảm thấy hồi hộp khi mọi người nhìn mình. Nhưng mình muốn trở nên tự tin hơn."],
+      ["Egg","You can practice with me!","Cậu có thể luyện tập cùng mình!"],
+      ["Pear","Really? Then I'll help you with English, and you can help me with science.","Thật à? Vậy thì mình sẽ giúp cậu với tiếng Anh, còn cậu giúp mình với khoa học."],
+      ["Egg","Deal!","Đồng ý!"],
+      ["Pear","What kind of life do you want when you become an adult?","Cậu muốn có cuộc sống như thế nào khi trưởng thành?"],
+      ["Egg","I want to have a good job, but I also want to have enough time for my family and friends. I don't want to work all the time.","Mình muốn có một công việc tốt, nhưng mình cũng muốn có đủ thời gian cho gia đình và bạn bè. Mình không muốn làm việc suốt ngày."],
+      ["Pear","I agree. I want a simple and happy life. I want to have a comfortable home, a nice family, and a job that I enjoy.","Mình đồng ý. Mình muốn một cuộc sống đơn giản và hạnh phúc. Mình muốn có một ngôi nhà thoải mái, một gia đình êm ấm, và một công việc mình yêu thích."],
+      ["Egg","Do you want to have a lot of money?","Cậu có muốn có thật nhiều tiền không?"],
+      ["Pear","Of course, money is useful, but I don't need to be very rich. I just want enough money to live comfortably and help my family.","Tất nhiên, tiền bạc thì hữu ích, nhưng mình không cần phải thật giàu có. Mình chỉ muốn có đủ tiền để sống thoải mái và giúp đỡ gia đình."],
+      ["Egg","I feel the same. I think being happy is more important than being rich.","Mình cũng cảm thấy vậy. Mình nghĩ hạnh phúc quan trọng hơn giàu có."],
+      ["Pear","What would you do if you became very successful?","Nếu trở nên rất thành công, cậu sẽ làm gì?"],
+      ["Egg","I would help my family first. Then I would donate some money to help poor people and children who need medical care.","Mình sẽ giúp đỡ gia đình trước tiên. Sau đó mình sẽ quyên góp tiền để giúp những người nghèo và trẻ em cần được chăm sóc y tế."],
+      ["Pear","That's very kind. I also want to help children who don't have good schools.","Cậu tốt bụng quá. Mình cũng muốn giúp đỡ những đứa trẻ không có trường học tốt."],
+      ["Egg","Maybe one day we can work together.","Có lẽ một ngày nào đó chúng mình có thể cùng nhau làm việc."],
+      ["Pear","Yes! You can help people with their health, and I can help children with their education.","Đúng vậy! Cậu có thể giúp mọi người về sức khỏe, còn mình có thể giúp trẻ em về giáo dục."],
+      ["Egg","That would be amazing.","Vậy thì tuyệt quá."],
+      ["Pear","Do you think our dreams will change when we grow up?","Cậu có nghĩ ước mơ của chúng mình sẽ thay đổi khi lớn lên không?"],
+      ["Egg","Maybe. We are still young, so our dreams might change. But I think that's okay. We can discover new things and find something we really love.","Có thể. Chúng mình vẫn còn trẻ, nên ước mơ có thể sẽ thay đổi. Nhưng mình nghĩ điều đó cũng ổn thôi. Chúng mình có thể khám phá những điều mới và tìm ra thứ mình thực sự yêu thích."],
+      ["Pear","I agree. Even if our dreams change, we should always try our best.","Mình đồng ý. Dù ước mơ có thay đổi, chúng mình vẫn nên luôn cố gắng hết sức."],
+      ["Egg","Exactly. And we should never be afraid to dream big.","Chính xác. Và chúng mình không bao giờ nên sợ mơ ước lớn lao."],
+      ["Pear","So, let's make a promise.","Vậy thì, hãy cùng hứa với nhau nhé."],
+      ["Egg","What promise?","Hứa gì cơ?"],
+      ["Pear","Let's promise that we will work hard for our dreams and support each other.","Hãy hứa rằng chúng mình sẽ nỗ lực vì ước mơ của mình và luôn ủng hộ nhau."],
+      ["Egg","I promise!","Mình hứa!"],
+      ["Pear","Me too! One day, I'll be a teacher.","Mình cũng vậy! Một ngày nào đó, mình sẽ trở thành giáo viên."],
+      ["Egg","And I'll be a doctor.","Còn mình sẽ trở thành bác sĩ."],
+      ["Pear","Then we'll travel around the world together!","Rồi chúng mình sẽ cùng nhau đi khắp thế giới!"],
+      ["Egg","Yes! And when we are old, we'll look back and remember this conversation.","Đúng vậy! Và khi về già, chúng mình sẽ nhìn lại và nhớ về cuộc trò chuyện này."],
+      ["Pear","Haha! I hope we really make our dreams come true.","Haha! Mình hy vọng chúng mình sẽ thực sự biến ước mơ thành hiện thực."],
+      ["Egg","We will. We just need to believe in ourselves and never give up.","Chúng mình sẽ làm được. Chúng mình chỉ cần tin vào bản thân và không bao giờ từ bỏ."],
+      ["Pear","You're right. Let's start working for our dreams today!","Cậu nói đúng. Hãy bắt đầu nỗ lực vì ước mơ của chúng mình ngay từ hôm nay!"],
+      ["Egg","Let's do it!","Bắt đầu thôi!"]
+    ]
+  }
+];
+
+let dialogue = [];
+let idx = 0;
+let isInitialRender = true;
+let currentSetId = null;
+
+/* ================= Study progress tracking (localStorage) ================= */
+const STUDY_PROGRESS_KEY = 'pearEggCompletedSets';
+function getCompletedSetIds(){
+  try{
+    const raw = localStorage.getItem(STUDY_PROGRESS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  }catch(e){ return []; }
+}
+function markSetCompleted(id){
+  if(!id) return;
+  const done = getCompletedSetIds();
+  if(!done.includes(id)){
+    done.push(id);
+    try{ localStorage.setItem(STUDY_PROGRESS_KEY, JSON.stringify(done)); }catch(e){}
+  }
+  updateStudyProgress();
+}
+function updateStudyProgress(){
+  const total = DIALOGUE_SETS.length;
+  const done = getCompletedSetIds().filter(id => DIALOGUE_SETS.some(s => s.id === id));
+  const doneCount = done.length;
+  const pct = total ? Math.round((doneCount / total) * 100) : 0;
+
+  const fillEl = document.getElementById('studyProgressFill');
+  const countEl = document.getElementById('studyProgressCount');
+  const msgEl = document.getElementById('studyProgressMsg');
+  if(fillEl) fillEl.style.width = pct + '%';
+  if(countEl) countEl.textContent = doneCount + '/' + total + ' hoàn thành';
+  if(msgEl){
+    if(doneCount === 0){
+      msgEl.textContent = 'Hoàn thành một hội thoại để bắt đầu ghi nhận tiến trình nhé!';
+    } else if(doneCount >= total){
+      msgEl.textContent = 'Tuyệt vời! Bạn đã hoàn thành tất cả hội thoại! 🎉';
+    } else {
+      msgEl.textContent = 'Cố lên! Còn ' + (total - doneCount) + ' hội thoại nữa thôi 💪';
+    }
+  }
+
+  document.querySelectorAll('.menu-card').forEach(el=>{
+    const isDone = done.includes(el.dataset.id);
+    el.classList.toggle('completed', isDone);
+    let check = el.querySelector('.menu-check');
+    if(isDone && !check){
+      check = document.createElement('div');
+      check.className = 'menu-check';
+      check.textContent = '✓';
+      el.appendChild(check);
+    } else if(!isDone && check){
+      check.remove();
+    }
+  });
+}
+
+const card = document.getElementById('card');
+const lineText = document.getElementById('lineText');
+const lineTranslation = document.getElementById('lineTranslation');
+const lineTranslationText = document.getElementById('lineTranslationText');
+const viToggle = document.getElementById('viToggle');
+const viToggleLabel = document.getElementById('viToggleLabel');
+const speakerBadge = document.getElementById('speakerBadge');
+const miniChip = document.getElementById('miniChip');
+const cardTag = document.getElementById('cardTag');
+const pearAvatar = document.getElementById('pearAvatar');
+const eggAvatar = document.getElementById('eggAvatar');
+const pearWrap = document.getElementById('pearWrap');
+const eggWrap = document.getElementById('eggWrap');
+const progressWrap = document.getElementById('progressWrap');
+const counter = document.getElementById('counter');
+const playView = document.getElementById('playView');
+const doneScreen = document.getElementById('doneScreen');
+const restartBtn = document.getElementById('restartBtn');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const speakBtn = document.getElementById('speakBtn');
+const sfxToggle = document.getElementById('sfxToggle');
+const homeBtn = document.getElementById('homeBtn');
+const menuScreen = document.getElementById('menuScreen');
+const practiceScreen = document.getElementById('practiceScreen');
+const menuGridShort = document.getElementById('menuGridShort');
+const menuGridLong = document.getElementById('menuGridLong');
+
+const practicePanel = document.getElementById('practicePanel');
+const micBtn = document.getElementById('micBtn');
+const micIcon = document.getElementById('micIcon');
+const micLabel = document.getElementById('micLabel');
+const resultBox = document.getElementById('resultBox');
+const scoreBadge = document.getElementById('scoreBadge');
+const statRow = document.getElementById('statRow');
+const heardText = document.getElementById('heardText');
+const tipsBox = document.getElementById('tipsBox');
+const tipsList = document.getElementById('tipsList');
+const playMineBtn = document.getElementById('playMineBtn');
+const playTargetBtn = document.getElementById('playTargetBtn');
+const tryAgainBtn = document.getElementById('tryAgainBtn');
+const myAudio = document.getElementById('myAudio');
+const supportWarning = document.getElementById('supportWarning');
+
+/* ================= Menu screen: build cards & handle selection ================= */
+function buildMenuCard(set){
+  const el = document.createElement('div');
+  el.className = 'menu-card';
+  el.setAttribute('role','button');
+  el.setAttribute('tabindex','0');
+  el.dataset.id = set.id;
+  const turnCount = set.lines.length;
+  const badgeClass = set.length === 'long' ? 'menu-badge long' : 'menu-badge';
+  const badgeText = set.length === 'long' ? ('Dài · ' + turnCount + ' lượt') : ('Ngắn · ' + turnCount + ' lượt');
+  el.innerHTML =
+    '<div class="menu-emoji">' + set.emoji + '</div>' +
+    '<div class="menu-info">' +
+      '<div class="menu-title">' + set.title + '</div>' +
+      '<div class="menu-desc">' + set.desc + '</div>' +
+      '<div class="' + badgeClass + '">' + badgeText + '</div>' +
+    '</div>' +
+    '<div class="menu-arrow">➜</div>';
+  el.addEventListener('click', ()=> popThenSelect(el, set.id));
+  el.addEventListener('keydown', (e)=>{
+    if(e.code === 'Enter' || e.code === 'Space'){
+      e.preventDefault();
+      popThenSelect(el, set.id);
+    }
+  });
+  addPressFX(el, 6);
+  return el;
+}
+
+// Gives a menu card a quick, bouncy "pop" (scale up then settle back via the
+// card's own CSS transition) before switching screens, so the tap always
+// feels responsive. Uses only transitions (no @keyframes restart tricks),
+// which keeps it reliable across browsers and devices.
+function popThenSelect(el, id){
+  if(el.dataset.popping === '1') return;
+  el.dataset.popping = '1';
+  el.classList.add('popped');
+  setTimeout(()=>{ el.classList.remove('popped'); }, 130);
+  setTimeout(()=>{
+    el.dataset.popping = '0';
+    selectDialogue(id);
+  }, 150);
+}
+DIALOGUE_SETS.forEach(set=>{
+  const target = set.length === 'long' ? menuGridLong : menuGridShort;
+  target.appendChild(buildMenuCard(set));
+});
+document.getElementById('countShort').textContent = DIALOGUE_SETS.filter(s=>s.length==='short').length;
+document.getElementById('countLong').textContent = DIALOGUE_SETS.filter(s=>s.length==='long').length;
+updateStudyProgress();
+
+function buildDots(){
+  progressWrap.innerHTML = '';
+  dialogue.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot';
+    d.dataset.i = i;
+    progressWrap.appendChild(d);
+  });
+}
+
+function selectDialogue(id){
+  const set = DIALOGUE_SETS.find(s => s.id === id);
+  if(!set) return;
+  ensureCtx();
+  sfx.tap();
+  dialogue = set.lines;
+  idx = 0;
+  isInitialRender = true;
+  currentSetId = set.id;
+  buildDots();
+  menuScreen.classList.add('hide');
+  practiceScreen.style.display = 'flex';
+  homeBtn.style.display = 'flex';
+  paintContent();
+}
+
+function goToMenu(){
+  ensureCtx();
+  sfx.tap();
+  if(window.speechSynthesis) window.speechSynthesis.cancel();
+  pearAvatar.classList.remove('talking','bump');
+  eggAvatar.classList.remove('talking','bump');
+  currentSpeakingAvatar = null;
+  if(recognition){ try{ recognition.abort(); }catch(e){} }
+  if(mediaRecorder && mediaRecorder.state !== 'inactive'){ try{ mediaRecorder.stop(); }catch(e){} }
+  if(micStream){ micStream.getTracks().forEach(t => t.stop()); micStream = null; }
+  practiceScreen.style.display = 'none';
+  homeBtn.style.display = 'none';
+  menuScreen.classList.remove('hide');
+}
+homeBtn.addEventListener('click', (e)=>{ e.stopPropagation(); goToMenu(); });
+
+
+/* ================= SFX (Web Audio API, no external files) ================= */
+let sfxOn = true;
+let actx = null;
+function ensureCtx(){
+  if(!actx){
+    const Ctor = window.AudioContext || window.webkitAudioContext;
+    if(Ctor) actx = new Ctor();
+  }
+  if(actx && actx.state === 'suspended') actx.resume();
+  return actx;
+}
+function tone(freq, start, dur, type='sine', peakGain=0.18){
+  const ctx = ensureCtx();
+  if(!ctx || !sfxOn) return;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, ctx.currentTime + start);
+  gain.gain.setValueAtTime(0, ctx.currentTime + start);
+  gain.gain.linearRampToValueAtTime(peakGain, ctx.currentTime + start + 0.015);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + start + dur);
+  osc.connect(gain).connect(ctx.destination);
+  osc.start(ctx.currentTime + start);
+  osc.stop(ctx.currentTime + start + dur + 0.02);
+}
+const sfx = {
+  advance(){ tone(520, 0, 0.09, 'triangle', 0.15); },
+  back(){ tone(380, 0, 0.09, 'triangle', 0.13); },
+  tap(){ tone(700, 0, 0.05, 'sine', 0.1); },
+  recordStart(){ tone(440, 0, 0.08, 'sine', 0.15); tone(660, 0.07, 0.1, 'sine', 0.15); },
+  recordStop(){ tone(520, 0, 0.07, 'sine', 0.12); },
+  great(){ tone(523,0,0.12,'triangle',0.16); tone(659,0.09,0.12,'triangle',0.16); tone(784,0.18,0.18,'triangle',0.18); },
+  ok(){ tone(494,0,0.1,'triangle',0.15); tone(587,0.09,0.15,'triangle',0.15); },
+  retry(){ tone(330,0,0.08,'sawtooth',0.12); tone(262,0.08,0.16,'sawtooth',0.12); },
+  complete(){
+    [523,659,784,1046].forEach((f,i)=> tone(f, i*0.12, 0.22, 'triangle', 0.17));
+  }
+};
+sfxToggle.addEventListener('click', ()=>{
+  sfxOn = !sfxOn;
+  sfxToggle.textContent = sfxOn ? '🔊' : '🔇';
+  if(sfxOn){ ensureCtx(); sfx.tap(); }
+});
+
+/* ================= Karaoke-style word highlight ================= */
+let karaokeSpans = [];
+let karaokeStarts = [];
+let lastKaraokeIndex = -1;
+let currentSpeakingAvatar = null;
+
+function bumpAvatar(el){
+  if(!el) return;
+  el.classList.remove('bump');
+  void el.offsetWidth; // force reflow so the animation restarts on every word
+  el.classList.add('bump');
+}
+
+function highlightWordAt(charIndex){
+  if(!karaokeStarts.length) return;
+  let found = 0;
+  for(let i=0;i<karaokeStarts.length;i++){
+    if(karaokeStarts[i] <= charIndex) found = i; else break;
+  }
+  karaokeSpans.forEach((s,i)=> s.classList.toggle('active', i === found));
+  if(found !== lastKaraokeIndex){
+    lastKaraokeIndex = found;
+    bumpAvatar(currentSpeakingAvatar);
+  }
+}
+function clearKaraoke(){
+  karaokeSpans.forEach(s => s.classList.remove('active'));
+  lastKaraokeIndex = -1;
+}
+
+let speechToken = 0;
+function speak(text){
+  try{
+    if(!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    clearKaraoke();
+    pearAvatar.classList.remove('talking','bump');
+    eggAvatar.classList.remove('talking','bump');
+
+    const speaker = (idx < dialogue.length) ? dialogue[idx][0] : null;
+    const speakingAvatar = speaker === 'Pear' ? pearAvatar : (speaker === 'Egg' ? eggAvatar : null);
+    const myToken = ++speechToken;
+
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US';
+    u.rate = 0.92;
+    u.onstart = ()=>{
+      if(myToken !== speechToken) return;
+      currentSpeakingAvatar = speakingAvatar;
+      if(speakingAvatar) speakingAvatar.classList.add('talking');
+    };
+    u.onboundary = (e)=>{
+      if(myToken !== speechToken) return;
+      if(e.name && e.name !== 'word') return; // ignore sentence-level boundaries
+      highlightWordAt(e.charIndex);
+    };
+    u.onend = ()=>{
+      if(myToken !== speechToken) return;
+      clearKaraoke();
+      if(speakingAvatar) speakingAvatar.classList.remove('talking','bump');
+      currentSpeakingAvatar = null;
+    };
+    u.onerror = ()=>{
+      if(myToken !== speechToken) return;
+      clearKaraoke();
+      if(speakingAvatar) speakingAvatar.classList.remove('talking','bump');
+      currentSpeakingAvatar = null;
+    };
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+/* ================= Playful button press sparkles ================= */
+const SPARKLE_EMOJIS = ['✨','⭐','💫','🌟'];
+function spawnSparkles(x, y, count=6){
+  for(let i=0;i<count;i++){
+    const p = document.createElement('div');
+    p.className = 'sparkle-particle';
+    p.textContent = SPARKLE_EMOJIS[Math.floor(Math.random()*SPARKLE_EMOJIS.length)];
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 26 + Math.random()*30;
+    const dx = Math.cos(angle) * dist;
+    const dy = Math.sin(angle) * dist - 10;
+    const rot = (Math.random()*2-1) * 180;
+    const dur = 0.5 + Math.random()*0.35;
+    p.style.left = x + 'px';
+    p.style.top = y + 'px';
+    p.style.fontSize = (10 + Math.random()*8) + 'px';
+    p.style.setProperty('--dx', dx + 'px');
+    p.style.setProperty('--dy', dy + 'px');
+    p.style.setProperty('--rot', rot + 'deg');
+    p.style.animationDuration = dur + 's';
+    document.body.appendChild(p);
+    setTimeout(()=> p.remove(), dur*1000 + 60);
+  }
+}
+function addPressFX(el, count){
+  if(!el) return;
+  el.addEventListener('pointerdown', ()=>{
+    const rect = el.getBoundingClientRect();
+    spawnSparkles(rect.left + rect.width/2, rect.top + rect.height/2, count || 5);
+  });
+}
+
+/* ================= Confetti ================= */
+function burstConfetti(){
+  const colors = ['🍐','🥚','🎉','✨','⭐','💛'];
+  const count = 26;
+  for(let i=0;i<count;i++){
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.textContent = colors[Math.floor(Math.random()*colors.length)];
+    const startX = window.innerWidth/2 + (Math.random()*160-80);
+    const dx = (Math.random()*2-1) * 220;
+    const dy = window.innerHeight * (0.6 + Math.random()*0.5);
+    const rot = (Math.random()*2-1) * 480;
+    const dur = 1.6 + Math.random()*0.9;
+    piece.style.left = startX + 'px';
+    piece.style.fontSize = (14 + Math.random()*14) + 'px';
+    piece.style.setProperty('--dx', dx + 'px');
+    piece.style.setProperty('--dy', dy + 'px');
+    piece.style.setProperty('--rot', rot + 'deg');
+    piece.style.animationDuration = dur + 's';
+    document.body.appendChild(piece);
+    setTimeout(()=> piece.remove(), dur*1000 + 100);
+  }
+}
+
+/* ================= Card render with flip transition ================= */
+function updateDots(activeIdx){
+  const dots = progressWrap.querySelectorAll('.dot');
+  dots.forEach((d,i)=>{
+    d.classList.remove('done','current');
+    if(i < activeIdx) d.classList.add('done');
+    else if(i === activeIdx) d.classList.add('current');
+  });
+}
+
+function setLineTextAnimated(text){
+  const words = text.split(' ');
+  karaokeStarts = [];
+  let offset = 0;
+  words.forEach(w => { karaokeStarts.push(offset); offset += w.length + 1; });
+
+  lineText.innerHTML = words.map((w, i)=>{
+    const delay = (i * 0.03).toFixed(3);
+    return '<span class="word" style="animation-delay:' + delay + 's">' + w + '</span>';
+  }).join(' ');
+
+  karaokeSpans = Array.from(lineText.querySelectorAll('.word'));
+}
+
+function paintContent(){
+  const isDone = idx >= dialogue.length;
+  resetPracticeUI();
+
+  if(isDone){
+    playView.style.display = 'none';
+    doneScreen.classList.add('show');
+    cardTag.style.display = 'none';
+    document.querySelector('.card-fold').style.display = 'none';
+    document.querySelectorAll('.quote-glyph').forEach(el => el.style.display = 'none');
+    card.classList.remove('pear-turn','egg-turn');
+    pearAvatar.classList.remove('active');
+    eggAvatar.classList.remove('active');
+    pearWrap.classList.remove('active');
+    eggWrap.classList.remove('active');
+    counter.textContent = 'Finished! ✨';
+    practicePanel.style.display = 'none';
+    updateDots(dialogue.length);
+    burstConfetti();
+    sfx.complete();
+    markSetCompleted(currentSetId);
+    return;
+  }
+  practicePanel.style.display = 'flex';
+  playView.style.display = 'flex';
+  playView.style.flexDirection = 'column';
+  playView.style.alignItems = 'center';
+  doneScreen.classList.remove('show');
+  cardTag.style.display = 'block';
+  document.querySelector('.card-fold').style.display = 'block';
+  document.querySelectorAll('.quote-glyph').forEach(el => el.style.display = 'block');
+
+  const [speaker, text, vi] = dialogue[idx];
+  speakerBadge.textContent = speaker;
+  speakerBadge.className = 'speaker-badge ' + (speaker === 'Pear' ? 'pear' : 'egg');
+  setLineTextAnimated(text);
+  lineTranslationText.textContent = vi || '';
+  pulseTranslationIn();
+  miniChip.textContent = speaker === 'Pear' ? '🍐' : '🥚';
+  cardTag.textContent = 'Line ' + (idx+1);
+
+  card.classList.remove('pear-turn','egg-turn');
+  card.classList.add(speaker === 'Pear' ? 'pear-turn' : 'egg-turn');
+
+  const pearActive = speaker === 'Pear';
+  pearAvatar.classList.toggle('active', pearActive);
+  eggAvatar.classList.toggle('active', !pearActive);
+  pearWrap.classList.toggle('active', pearActive);
+  eggWrap.classList.toggle('active', !pearActive);
+
+  counter.textContent = (idx+1) + ' / ' + dialogue.length;
+  updateDots(idx);
+
+  if(isInitialRender){
+    isInitialRender = false;
+  } else {
+    speak(text);
+  }
+}
+
+let animating = false;
+function render(withFlip){
+  if(!withFlip){ paintContent(); return; }
+  if(animating) return;
+  animating = true;
+  card.classList.add('flipping');
+  setTimeout(()=>{
+    paintContent();
+    card.classList.remove('flipping');
+    animating = false;
+  }, 220);
+}
+
+function next(){
+  if(idx < dialogue.length){
+    idx++;
+    sfx.advance();
+    render(true);
+  }
+}
+function prev(){
+  if(idx > 0){
+    idx--;
+    sfx.back();
+    render(true);
+  }
+}
+function restart(){
+  idx = 0;
+  sfx.tap();
+  render(true);
+}
+
+card.addEventListener('click', (e)=>{
+  ensureCtx();
+  if(doneScreen.classList.contains('show')) return;
+  next();
+});
+card.addEventListener('keydown', (e)=>{
+  if(e.code === 'Enter'){
+    e.preventDefault();
+    ensureCtx();
+    if(doneScreen.classList.contains('show')) return;
+    next();
+  }
+});
+/* ---------- Vietnamese translation show/hide ---------- */
+let showTranslation = true;
+try{ showTranslation = localStorage.getItem('pearEggShowVi') !== '0'; }catch(e){}
+
+function applyViState(){
+  lineTranslation.classList.toggle('hidden', !showTranslation);
+  viToggle.classList.toggle('off', !showTranslation);
+  viToggle.setAttribute('aria-pressed', showTranslation ? 'true' : 'false');
+  viToggleLabel.textContent = showTranslation ? 'Ẩn nghĩa' : 'Xem nghĩa';
+}
+applyViState();
+
+// Gives the translation box a soft "pop" every time a new line appears.
+// Implemented purely with the box's existing CSS transition (no @keyframes,
+// no classList-restart trick) so it plays reliably on every browser/device,
+// including ones where forcing a reflow to restart an animation is unreliable.
+function pulseTranslationIn(){
+  if(!showTranslation) return;
+  lineTranslation.style.transition = 'none';
+  lineTranslation.style.opacity = '0';
+  lineTranslation.style.transform = 'translateY(-5px) scale(0.97)';
+  // Reading offsetHeight forces the browser to apply the styles above
+  // immediately, before we hand control back to the transition on the next line.
+  void lineTranslation.offsetHeight;
+  requestAnimationFrame(()=>{
+    lineTranslation.style.transition = '';
+    lineTranslation.style.opacity = '';
+    lineTranslation.style.transform = '';
+  });
+}
+
+viToggle.addEventListener('click', (e)=>{
+  e.stopPropagation();
+  ensureCtx(); sfx.tap();
+  showTranslation = !showTranslation;
+  try{ localStorage.setItem('pearEggShowVi', showTranslation ? '1' : '0'); }catch(err){}
+  applyViState();
+});
+
+nextBtn.addEventListener('click',(e)=>{ e.stopPropagation(); ensureCtx(); next(); });
+prevBtn.addEventListener('click',(e)=>{ e.stopPropagation(); ensureCtx(); prev(); });
+speakBtn.addEventListener('click',(e)=>{
+  e.stopPropagation();
+  ensureCtx();
+  sfx.tap();
+  if(idx < dialogue.length) speak(dialogue[idx][1]);
+});
+restartBtn.addEventListener('click',(e)=>{ e.stopPropagation(); ensureCtx(); restart(); });
+const chooseAnotherBtn = document.getElementById('chooseAnotherBtn');
+chooseAnotherBtn.addEventListener('click',(e)=>{ e.stopPropagation(); goToMenu(); });
+
+document.addEventListener('keydown',(e)=>{
+  const tag = (document.activeElement && document.activeElement.tagName) || '';
+  if(tag === 'BUTTON') return;
+  if(e.code === 'Space'){ e.preventDefault(); ensureCtx(); next(); }
+  if(e.code === 'ArrowLeft'){ ensureCtx(); prev(); }
+  if(e.code === 'ArrowRight'){ ensureCtx(); next(); }
+});
+
+/* ================= Pronunciation practice ================= */
+
+const SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
+const speechSupported = !!SpeechRecognitionCtor;
+const mediaSupported = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+
+let recognition = null;
+let isRecording = false;
+let mediaRecorder = null;
+let recordedChunks = [];
+let myAudioURL = null;
+let micStream = null; // reused across recordings so we only ask permission once per session
+
+if(!speechSupported){
+  micBtn.style.display = 'none';
+  micLabel.style.display = 'none';
+  supportWarning.style.display = 'block';
+}
+
+function normalizeWord(w){
+  return w.toLowerCase().replace(/[.,!?'’]/g, '');
+}
+
+/* ---- Ngân hàng mẹo phát âm ----
+   Mỗi mục: [nhãn nhóm âm, lời khuyên tiếng Việt]. Nhãn dùng để tránh hiện
+   3 mẹo cùng nói về một loại lỗi (vd. 3 từ đều lỗi "th" thì chỉ hiện 1 mẹo). */
+const TIPS_DB = {
+  // ---- âm "th" (🔤) ----
+  'thank':      ['🔤','“Thank”: đặt đầu lưỡi giữa hai hàm răng, đẩy hơi ra nhẹ cho âm “th” vô thanh (θ) — đừng đọc thành “tank”.'],
+  'thanks':     ['🔤','“Thanks”: âm “th” vô thanh (θ) + “ks” cuối rõ ràng, không rút gọn thành “tanks”.'],
+  'thats':      ['🔤','“That’s”: đây là “th” hữu thanh (ð) — như tiếng rung nhẹ giữa 2 răng, không phải “d” hay “z”.'],
+  'that':       ['🔤','“That”: âm “th” hữu thanh (ð) — đầu lưỡi chạm nhẹ hai hàm răng rồi thả hơi.'],
+  'they':       ['🔤','“They”: “th” hữu thanh (ð), sau đó lướt êm sang “ey” (đây-i).'],
+  'the':        ['🔤','“The”: “th” hữu thanh (ð) rất ngắn gọn — tránh đọc thành “đơ” hay “zơ”.'],
+  'this':       ['🔤','“This”: “th” hữu thanh (ð) + âm “i” ngắn, không phải “dis” hay “zis”.'],
+  'think':      ['🔤','“Think”: “th” vô thanh (θ), khác hẳn “this/that” — hơi thoát mạnh hơn qua kẽ răng.'],
+  'something':  ['🔤','“Something”: “th” vô thanh ở đầu, trọng âm rơi vào “some” — “SUM-thing”.'],
+  'dont':       ['🔤','“Don’t”: giữ âm “t” cuối nhẹ nhưng vẫn nghe rõ, đừng nuốt mất.'],
+  'im':         ['🔤','“I’m”: nối liền thành 1 nhịp — “ime”, không tách rời như “I am” đọc chậm.'],
+  'its':        ['🔤','“It’s”: nối gọn thành 1 âm tiết — “its”, không thêm nguyên âm ở giữa.'],
+  'youre':      ['🔤','“You’re”: nối liền — “yər/yôr”, không đọc tách “you” và “are”.'],
+  'doesnt':     ['🔤','“Doesn’t”: trọng âm ở “does”, âm cuối “-n’t” nhẹ nhưng rõ — “DUZ-ənt”.'],
+  'ive':        ['🔤','“I’ve”: nối liền — “ive” (như “five” bỏ chữ f), đừng tách rời.'],
+
+  // ---- âm "r" (👅) ----
+  'really':     ['👅','“Really”: cong nhẹ đầu lưỡi ra sau vòm miệng cho âm “r” tiếng Anh, không để lưỡi chạm răng như âm “l”.'],
+  'friends':    ['👅','“Friends”: giữ cụm “fr” mượt, cong lưỡi cho “r”, và đừng bỏ mất “-ds” ở cuối.'],
+  'free':       ['👅','“Free”: cong lưỡi cho “r” ngay sau “f”, không thêm nguyên âm chen vào giữa.'],
+  'riding':     ['👅','“Riding”: chạm nhẹ đầu lưỡi (không rung như tiếng Việt) cho “r”, rồi kết thúc êm bằng “-ing”.'],
+  'reading':    ['👅','“Reading”: “r” nhẹ ở đầu, nguyên âm “ea” kéo dài — “REE-ding”.'],
+  'rock':       ['👅','“Rock”: cong lưỡi ra sau cho “r” trước khi vào âm “o” ngắn.'],
+  'prefer':     ['👅','“Prefer”: trọng âm rơi vào âm 2 — “pri-FUR”, cả 2 lần xuất hiện “r” đều cong lưỡi, không rung như “r” tiếng Việt.'],
+  'restaurant': ['👅','“Restaurant”: trọng âm ở đầu — “RES-tuh-rahnt” hoặc “RES-trahnt”, âm “r” cong nhẹ chứ không rung.'],
+  'around':     ['👅','“Around”: âm “r” cong lưỡi nhẹ ở đầu âm tiết thứ hai — “ə-ROUND”.'],
+  'travel':     ['👅','“Travel”: “tr” dính liền, lưỡi cong nhẹ cho “r”, trọng âm rơi vào âm đầu — “TRAV-əl”.'],
+  'traveling':  ['👅','“Traveling”: giống “travel” + đuôi “-ing” êm, mũi hoá ở cuối chứ không thêm “g” rõ.'],
+  'world':      ['👅','“World”: “r” cong lưỡi ngay sau “w”, rồi kết thúc bằng “-ld” rõ ràng, không bỏ “d”.'],
+  'important':  ['👅','“Important”: trọng âm rơi vào âm 2 — “im-POR-tənt”, “r” cong nhẹ, không rung.'],
+  'area':       ['👅','“Area”: 3 âm tiết — “EH-ree-ə”, “r” nhẹ ở giữa, không rung mạnh.'],
+
+  // ---- cụm phụ âm đầu từ (🔡) ----
+  'sports':     ['🔡','“Sports”: “s” chuyển thẳng sang “p” — không chèn nguyên âm ở giữa như “sa-ports”.'],
+  'school':     ['🔡','“School”: “s” nối liền vào “k”, đọc như “skool” — không có nguyên âm xen giữa.'],
+  'breakfast':  ['🔡','“Breakfast”: dính liền “br”, âm tiết 2 ngắn gọn — “BREK-fəst”.'],
+  'spring':     ['🔡','“Spring”: 3 phụ âm “spr” dính liền thành một cụm mượt, không tách rời từng âm.'],
+  'special':    ['🔡','“Special”: “sp” dính liền, trọng âm ở âm đầu — “SPESH-əl”.'],
+  'spicy':      ['🔡','“Spicy”: “sp” dính liền ngay từ đầu, không chèn nguyên âm — “SPY-see”.'],
+  'street':     ['🔡','“Street”: cụm 3 phụ âm “str” dính liền mượt mà, không tách rời.'],
+  'studying':   ['🔡','“Studying”: “st” dính liền ở đầu, đuôi “-ing” mũi hoá nhẹ ở cuối.'],
+  'stay':       ['🔡','“Stay”: “st” dính liền, không thêm nguyên âm giữa “s” và “t”.'],
+
+  // ---- âm cuối -s/-es (số nhiều, ngôi 3, sở hữu) (🔡) ----
+  'games':      ['🔡','Đừng quên âm “z” nhẹ ở cuối — đọc như “gaymz”, không phải “gaym”.'],
+  'movies':     ['🔡','Kết thúc bằng âm “z” nhẹ — “MOO-veez”, đừng bỏ mất đuôi này.'],
+  'books':       ['🔡','Kết thúc dứt khoát bằng “-ks”, đừng bỏ mất âm cuối.'],
+  'places':     ['🔡','“Places” có âm cuối là “-iz” (vì “ce” là âm rít) — “PLAY-siz”, không phải “places” đọc như tiếng Việt.'],
+  'dishes':     ['🔡','“Dishes” kết thúc bằng “-iz” vì trước đó là âm “sh” — “DISH-iz”.'],
+  'desserts':   ['🔡','“Desserts”: trọng âm ở âm 2 — “di-ZURTS”, âm cuối “-ts” rõ ràng.'],
+  'ingredients':['🔡','“Ingredients”: 4 âm tiết — “in-GREE-dee-ənts”, đừng bỏ âm cuối “-ts”.'],
+  'islands':    ['🔡','“Islands”: chữ “s” ở giữa KHÔNG phát âm (âm câm) — đọc là “EYE-lənds”, không phải “is-lands”.'],
+  'beaches':    ['🔡','“Beaches” kết thúc bằng “-iz” vì trước là âm “ch” — “BEE-chiz”.'],
+
+  // ---- đuôi "-ing" (➰) ----
+  'playing':    ['➰','“Playing”: kết thúc bằng âm mũi “ng”, không đọc thành “play-in” hay thêm “g” rõ như “play-inh-g”.'],
+  'listening':  ['➰','“Listening”: chữ “t” ở giữa gần như câm — “LIS-ning”, đuôi “-ing” mũi hoá nhẹ.'],
+  'watching':   ['➰','“Watching”: “tch” tạo âm “ch” mạnh, kết thúc êm bằng “-ing” mũi hoá.'],
+  'going':      ['➰','“Going”: 2 âm tiết rõ — “GO-ing”, đuôi “-ing” là âm mũi, không phải “gô-inh”.'],
+  'staying':    ['➰','“Staying”: nguyên âm “ay” kéo dài trước khi vào đuôi “-ing” mũi hoá.'],
+  'relaxing':   ['➰','“Relaxing”: chữ “x” đọc là “ks” — “ri-LAK-sing”, đuôi “-ing” êm.'],
+  'exciting':   ['➰','“Exciting”: chữ “x” đọc là “ks” — “ek-SY-ting”, trọng âm ở âm 2.'],
+  'cooking':    ['➰','“Cooking”: nguyên âm “oo” ngắn như trong “book”, đuôi “-ing” mũi hoá nhẹ.'],
+  'shopping':   ['➰','“Shopping”: nhân đôi phụ âm “p” khi viết nhưng chỉ đọc 1 âm “p”, đuôi “-ing” êm.'],
+  'trying':     ['➰','“Trying”: “tr” dính liền, đuôi “-ing” kết bằng âm mũi, không thêm “g” rõ.'],
+  'learning':   ['➰','“Learning”: âm “ear” kéo dài kiểu Anh-Mỹ, đuôi “-ing” mũi hoá.'],
+  'working':    ['➰','“Working”: nguyên âm “or” tròn môi, đuôi “-ing” êm ở cuối.'],
+
+  // ---- trọng âm từ nhiều âm tiết (🎯) ----
+  'usually':    ['🎯','“Usually”: trọng âm rơi vào âm đầu — “U-zhu-ə-lee”, có âm “zh” mềm ở giữa.'],
+  'interesting':['🎯','“Interesting”: trọng âm ở âm đầu — “IN-tres-ting” (thường rút còn 3 nhịp, không phải 4).'],
+  'different':  ['🎯','“Different”: trọng âm ở âm đầu — “DIF-rənt”, đừng đọc thêm âm tiết thừa.'],
+  'favorite':   ['🎯','“Favorite”: trọng âm ở âm đầu — “FAY-vrit”, thường chỉ đọc 2-3 nhịp.'],
+  'energy':     ['🎯','“Energy”: trọng âm ở âm đầu — “EN-ər-jee”, chữ “g” đọc mềm như “j”.'],
+  'family':     ['🎯','“Family”: trọng âm ở âm đầu — “FAM-lee”, thường chỉ 2 nhịp khi nói nhanh.'],
+  'homework':   ['🎯','“Homework”: 2 nhịp đều nhau, trọng âm rơi vào “home” — “HOME-work”.'],
+  'evening':    ['🎯','“Evening”: trọng âm ở âm đầu — “EEV-ning”, chỉ 2 nhịp rõ.'],
+  'adventure':  ['🎯','“Adventure”: trọng âm rơi vào âm 2 — “əd-VEN-chər”.'],
+  'delicious':  ['🎯','“Delicious”: trọng âm ở âm 2 — “di-LI-shəs”, cụm “ci” đọc là “sh”.'],
+  'beautiful':  ['🎯','“Beautiful”: trọng âm ở âm đầu — “BYOO-ti-fəl”, 3 nhịp gọn.'],
+  'especially': ['🎯','“Especially”: trọng âm ở âm 2 — “i-SPESH-ə-lee”.'],
+  'definitely': ['🎯','“Definitely”: trọng âm ở âm đầu — “DEF-i-nit-lee”, đừng đọc thành “definitely” kiểu tiếng Việt hoá.'],
+  'probably':   ['🎯','“Probably”: trọng âm ở âm đầu — “PRAH-bə-blee”, thường rút gọn còn 2-3 nhịp.'],
+  'communication':['🎯','“Communication”: trọng âm rơi vào âm áp chót — “kə-myoo-ni-KAY-shən”.'],
+  'personality':['🎯','“Personality”: trọng âm ở âm 3 — “pər-sə-NAL-i-tee”.'],
+  'experience': ['🎯','“Experience”: trọng âm ở âm 2 — “ik-SPEER-ee-əns”.'],
+  'photography':['🎯','“Photography”: trọng âm ở âm 2 — “fə-TAH-grə-fee” (khác với “photograph” trọng âm âm đầu).'],
+  'university': ['🎯','“University”: trọng âm ở âm 3 — “yoo-ni-VUR-si-tee”.'],
+  'comfortable':['🎯','“Comfortable”: trọng âm ở âm đầu, thường rút còn 3 nhịp — “KUMF-tər-bəl”.'],
+  'independent':['🎯','“Independent”: trọng âm ở âm 3 — “in-di-PEN-dənt”.'],
+  'atmosphere': ['🎯','“Atmosphere”: trọng âm ở âm đầu — “AT-məs-feer”.'],
+  'vegetables': ['🎯','“Vegetables”: chỉ đọc 3 nhịp, âm tiết giữa gần như câm — “VEJ-tə-bəlz”, không phải “ve-ge-ta-bles” đủ 4 nhịp.'],
+  'action':     ['🎯','“Action”: cụm “ti” đọc thành âm “sh” — “AK-shən”.'],
+
+  // ---- từ dễ nhầm khác ----
+  'chocolate':  ['🎯','“Chocolate”: thường chỉ đọc 2 nhịp — “CHOK-lət”, không phải 3 nhịp đầy đủ như chữ viết.'],
+  'vietnamese': ['🎯','“Vietnamese”: trọng âm rơi vào âm cuối — “vee-et-nə-MEEZ”.'],
+  'delicious ':  ['🎯','xem mục “delicious” ở trên.']
+};
+
+const GENERIC_TIPS = [
+  '🗣️ Thử nói chậm lại một chút và tách rõ từng từ, thay vì nói dính liền cả câu.',
+  '🎯 Nhấn trọng âm vào từ mang thông tin quan trọng nhất trong câu (thường là danh từ, động từ chính).',
+  '👄 Mở miệng rộng hơn một chút với nguyên âm dài như “a” trong “games” hay “i” trong “like”.',
+  '🔁 Luyện theo kiểu “nói nhại” (shadowing): bấm 🔊 nghe trước, rồi lặp lại ngay sau đó, bắt chước cả nhịp điệu.',
+  '🎵 Câu hỏi Yes/No thường lên giọng ở cuối câu; câu hỏi bắt đầu bằng What/Why/How... thường xuống giọng ở cuối.',
+  '🌬️ Hít một hơi trước khi nói cả câu dài — điều này giúp giọng đều hơi và rõ ràng hơn từ đầu đến cuối.',
+  '🔊 Đọc to hơn một chút và giữ mic gần miệng — máy sẽ nghe rõ hơn và chấm điểm chính xác hơn.',
+  '📖 Đọc theo cụm 3-4 từ một lúc thay vì từng từ rời rạc, để câu nghe tự nhiên và có ngữ điệu hơn.'
+];
+let genericTipCursor = 0;
+
+function alignWords(targetWords, heardWords){
+  const n = targetWords.length, m = heardWords.length;
+  const dp = Array.from({length:n+1}, ()=> new Array(m+1).fill(0));
+  for(let i=1;i<=n;i++){
+    for(let j=1;j<=m;j++){
+      if(normalizeWord(targetWords[i-1]) === normalizeWord(heardWords[j-1])){
+        dp[i][j] = dp[i-1][j-1] + 1;
+      } else {
+        dp[i][j] = Math.max(dp[i-1][j], dp[i][j-1]);
+      }
+    }
+  }
+  const matched = new Array(n).fill(false);
+  let i=n, j=m;
+  while(i>0 && j>0){
+    if(normalizeWord(targetWords[i-1]) === normalizeWord(heardWords[j-1])){
+      matched[i-1] = true;
+      i--; j--;
+    } else if(dp[i-1][j] >= dp[i][j-1]){
+      i--;
+    } else {
+      j--;
+    }
+  }
+  return { matched, lcsLength: dp[n][m] };
+}
+
+function setMicIdle(){
+  micIcon.textContent = '🎙️';
+}
+function setMicListening(){
+  micIcon.innerHTML = '<div class="wave-bars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>';
+}
+
+function resetPracticeUI(){
+  resultBox.classList.remove('show');
+  micLabel.textContent = 'Chạm vào mic rồi lặp lại câu phía trên';
+  micBtn.classList.remove('recording');
+  setMicIdle();
+  if(myAudioURL){ URL.revokeObjectURL(myAudioURL); myAudioURL = null; }
+  myAudio.src = '';
+  isRecording = false;
+  if(recognition){ try{ recognition.abort(); }catch(e){} }
+  if(mediaRecorder && mediaRecorder.state !== 'inactive'){ try{ mediaRecorder.stop(); }catch(e){} }
+}
+
+function scoreAndRender(heardTextRaw){
+  const target = dialogue[idx][1];
+  const targetWords = target.split(/\s+/).filter(Boolean);
+  const heardWords = heardTextRaw.split(/\s+/).filter(Boolean);
+
+  const { matched, lcsLength } = alignWords(targetWords, heardWords);
+  const pct = targetWords.length ? Math.round((lcsLength / targetWords.length) * 100) : 0;
+  const missedCount = targetWords.length - lcsLength;
+  const extraCount = Math.max(0, heardWords.length - lcsLength);
+
+  heardText.innerHTML = targetWords.map((w,i)=>{
+    const cls = matched[i] ? 'match' : 'miss';
+    return '<span class="w ' + cls + '">' + w + '</span>';
+  }).join(' ');
+
+  // ---- các chỉ số chi tiết ----
+  statRow.innerHTML =
+    '<div class="stat-pill">✅ ' + lcsLength + '/' + targetWords.length + ' từ đúng</div>' +
+    '<div class="stat-pill">🗣️ Nói ' + heardWords.length + ' từ</div>' +
+    (missedCount > 0 ? '<div class="stat-pill">🔎 ' + missedCount + ' từ cần chỉnh</div>' : '') +
+    (extraCount > 1 ? '<div class="stat-pill">➕ ' + extraCount + ' âm thừa</div>' : '');
+
+  // ---- huy hiệu điểm số ----
+  scoreBadge.classList.remove('score-great','score-ok','score-retry');
+  let msg = '';
+  if(pct >= 85){ scoreBadge.classList.add('score-great'); msg = pct + '% — Xuất sắc! 🌟'; sfx.great(); }
+  else if(pct >= 55){ scoreBadge.classList.add('score-ok'); msg = pct + '% — Khá tốt! 💪'; sfx.ok(); }
+  else { scoreBadge.classList.add('score-retry'); msg = pct + '% — Cố lên, thử lại nhé! 🐣'; sfx.retry(); }
+  scoreBadge.textContent = msg;
+  scoreBadge.classList.remove('pop'); void scoreBadge.offsetWidth; scoreBadge.classList.add('pop');
+
+  // ---- lời khuyên & nhận xét chi tiết ----
+  const tips = [];
+  const seenTags = new Set();
+
+  // 1) nhận xét tổng quan theo mức điểm
+  if(pct >= 85){
+    tips.push('🌟 Phát âm rất tốt! Hầu hết các từ đều rõ ràng và đúng nhịp — cứ giữ phong độ này nhé.');
+  } else if(pct >= 55){
+    tips.push('👍 Bạn đã nói đúng phần lớn câu, chỉ còn vài từ cần chỉnh lại để nghe tự nhiên hơn.');
+  } else {
+    tips.push('🐣 Câu này còn khá nhiều chỗ chưa khớp — đừng nản, hãy nghe lại bản chuẩn rồi thử nói chậm từng cụm một.');
+  }
+
+  // 2) nếu nói thiếu quá nhiều so với câu gốc -> ưu tiên nhắc về mic/tốc độ
+  if(heardWords.length < targetWords.length * 0.6){
+    tips.push('🎧 Máy chỉ bắt được một phần câu — hãy nói to hơn, giữ mic gần miệng, và tránh ngừng giữa chừng quá lâu.');
+    seenTags.add('🎧');
+  }
+
+  // 3) liệt kê rõ những từ cần luyện thêm (tối đa 6 từ để không quá dài)
+  const missedWords = targetWords.filter((w,i)=> !matched[i]).map(w => w.replace(/[.,!?]/g,''));
+  if(missedWords.length > 0){
+    const shown = missedWords.slice(0, 6);
+    const extra = missedWords.length - shown.length;
+    tips.push('🔍 Những từ cần luyện thêm: <b>' + shown.join(', ') + '</b>' + (extra > 0 ? ' và ' + extra + ' từ khác' : '') + '.');
+  }
+
+  // 4) mẹo phát âm cụ thể cho từng từ bị sai, ưu tiên đa dạng loại âm (không lặp cùng 1 nhóm)
+  let specificTipCount = 0;
+  for(let i=0; i<targetWords.length && specificTipCount < 3; i++){
+    if(matched[i]) continue;
+    const key = normalizeWord(targetWords[i]);
+    const entry = TIPS_DB[key];
+    if(entry && !seenTags.has(entry[0])){
+      tips.push('<b>' + targetWords[i].replace(/[.,!?]/g,'') + '</b> — ' + entry[1]);
+      seenTags.add(entry[0]);
+      specificTipCount++;
+    }
+  }
+
+  // 5) nếu vẫn còn ít gợi ý, bổ sung mẹo luyện nói chung xoay vòng
+  while(tips.length < (missedCount > 0 ? 4 : 2) && tips.length < 6){
+    tips.push(GENERIC_TIPS[genericTipCursor % GENERIC_TIPS.length]);
+    genericTipCursor++;
+  }
+
+  tipsList.innerHTML = tips.map(t => '<li>' + t + '</li>').join('');
+  tipsBox.style.display = 'block';
+
+  resultBox.classList.add('show');
+}
+
+async function startRecording(){
+  if(!speechSupported) return;
+  ensureCtx();
+  sfx.recordStart();
+  resultBox.classList.remove('show');
+  micLabel.textContent = 'Đang nghe... nói ngay đi nào 🎧';
+  micBtn.classList.add('recording');
+  setMicListening();
+  isRecording = true;
+
+  recognition = new SpeechRecognitionCtor();
+  recognition.lang = 'en-US';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  let finalTranscript = '';
+
+  recognition.onresult = (event)=>{
+    for(let i = event.resultIndex; i < event.results.length; i++){
+      if(event.results[i].isFinal){
+        finalTranscript += event.results[i][0].transcript + ' ';
+      }
+    }
+  };
+  recognition.onerror = (event)=>{
+    micLabel.textContent = event.error === 'not-allowed'
+      ? 'Trình duyệt đang chặn quyền micro 🙈 hãy cho phép rồi thử lại nhé'
+      : 'Ồ, mình chưa nghe rõ lắm. Thử lại nhé 🎙️';
+    if(mediaRecorder && mediaRecorder.state !== 'inactive'){ try{ mediaRecorder.stop(); }catch(e){} }
+  };
+  recognition.onend = ()=>{
+    isRecording = false;
+    micBtn.classList.remove('recording');
+    setMicIdle();
+    sfx.recordStop();
+    // The Web Speech API stops itself as soon as it detects silence, so we
+    // can't rely on the user tapping the mic again to stop the recording —
+    // stop it here too, otherwise "Play my voice" never gets a clip.
+    if(mediaRecorder && mediaRecorder.state !== 'inactive'){ try{ mediaRecorder.stop(); }catch(e){} }
+    if(finalTranscript.trim()){
+      micLabel.textContent = 'Chạm vào mic rồi lặp lại câu phía trên';
+      scoreAndRender(finalTranscript.trim());
+    } else if(micLabel.textContent === 'Đang nghe... nói ngay đi nào 🎧'){
+      micLabel.textContent = 'Chưa bắt được giọng bạn — chạm mic để thử lại nhé 🎙️';
+    }
+  };
+
+  if(mediaSupported){
+    try{
+      // Reuse the previously granted stream if it's still live, so the
+      // browser only has to ask for microphone permission once per session
+      // instead of on every single recording.
+      if(!micStream || micStream.getTracks().every(t => t.readyState === 'ended')){
+        micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      }
+      recordedChunks = [];
+      mediaRecorder = new MediaRecorder(micStream);
+      mediaRecorder.ondataavailable = (e)=>{ if(e.data.size > 0) recordedChunks.push(e.data); };
+      mediaRecorder.onstop = ()=>{
+        const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+        if(myAudioURL) URL.revokeObjectURL(myAudioURL);
+        myAudioURL = URL.createObjectURL(blob);
+        myAudio.src = myAudioURL;
+        // Note: we intentionally do NOT stop the stream's tracks here —
+        // keeping it open lets the next recording start instantly without
+        // a new permission prompt. It's released in goToMenu() instead.
+      };
+      mediaRecorder.start();
+    }catch(e){
+      // recording for playback failed silently; scoring still works via recognition
+    }
+  }
+
+  recognition.start();
+}
+
+function stopRecording(){
+  if(recognition){ try{ recognition.stop(); }catch(e){} }
+  if(mediaRecorder && mediaRecorder.state !== 'inactive'){ try{ mediaRecorder.stop(); }catch(e){} }
+}
+
+micBtn.addEventListener('click', (e)=>{
+  e.stopPropagation();
+  if(!speechSupported) return;
+  if(isRecording){
+    stopRecording();
+  } else {
+    startRecording();
+  }
+});
+
+playMineBtn.addEventListener('click', (e)=>{
+  e.stopPropagation();
+  ensureCtx(); sfx.tap();
+  if(myAudio.src){ myAudio.currentTime = 0; myAudio.play(); }
+  else { micLabel.textContent = 'Không có bản ghi nào — kiểm tra quyền micro nhé 🎙️'; }
+});
+playTargetBtn.addEventListener('click', (e)=>{
+  e.stopPropagation();
+  ensureCtx(); sfx.tap();
+  speak(dialogue[idx][1]);
+});
+tryAgainBtn.addEventListener('click', (e)=>{
+  e.stopPropagation();
+  ensureCtx(); sfx.tap();
+  resultBox.classList.remove('show');
+  startRecording();
+});
+
+[prevBtn, nextBtn, speakBtn, sfxToggle, homeBtn, restartBtn, chooseAnotherBtn, viToggle].forEach(b => addPressFX(b, 5));
+addPressFX(micBtn, 8);
+[playMineBtn, playTargetBtn, tryAgainBtn].forEach(b => addPressFX(b, 5));
+
+</script>
+
+</body>
+</html>
