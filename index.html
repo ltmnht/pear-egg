@@ -232,7 +232,7 @@
     min-height:190px;
     display:flex;
     flex-direction:column;
-    align-items:center;
+    align-items:stretch;
     justify-content:center;
     text-align:center;
     position:relative;
@@ -242,6 +242,14 @@
     transform-style: preserve-3d;
     transition: transform 0.44s cubic-bezier(.5,.1,.2,1), border-color 0.3s ease, background 0.4s ease;
   }
+  #playView{
+  width:100%;
+  min-width:0;
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
   .card:active{ transform: scale(0.985); }
   .card:focus-visible{ outline: 3px solid var(--sky-dark); outline-offset: 4px; }
   .card.flipping{ transform: rotateY(90deg); }
@@ -342,6 +350,12 @@
   .speaker-badge.pear{ background:var(--pear); color:#2F4A1B; }
   .speaker-badge.egg{ background:var(--egg); color:#6B4E10; }
 
+  #playView{
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
   .line-text{
     font-family:'Baloo 2', sans-serif;
     font-size:clamp(20px, 4.4vw, 28px);
@@ -350,6 +364,7 @@
     color:var(--ink);
     z-index:1;
     position:relative;
+    width:100%;
   }
   .line-text .word{
     display:inline-block;
@@ -532,12 +547,60 @@
     z-index:1;
   }
   .menu-screen.hide{ display:none; }
-  .menu-greeting{ text-align:center; }
+  .menu-greeting{
+    position:relative;
+    width:100%;
+    text-align:center;
+    padding:34px 24px 30px;
+    margin-bottom:2px;
+
+    background:linear-gradient(165deg, #FFFBF3, var(--egg) 340%);
+    border:2px solid #FCE8B8;
+    border-radius:30px;
+    overflow:hidden;
+
+    box-shadow:0 16px 34px -18px rgba(74,55,40,.28);
+  }
+  .menu-greeting::before,
+  .menu-greeting::after{
+    content:'';
+    position:absolute;
+    border-radius:50%;
+    pointer-events:none;
+  }
+  .menu-greeting::before{
+    width:170px; height:170px;
+    background:var(--pear);
+    opacity:.16;
+    top:-70px; left:-50px;
+  }
+  .menu-greeting::after{
+    width:140px; height:140px;
+    background:var(--sky);
+    opacity:.16;
+    bottom:-60px; right:-40px;
+  }
+  .greeting-mascot{
+    position:absolute;
+    font-size:30px;
+    filter: drop-shadow(0 4px 6px rgba(74,55,40,.18));
+    animation: mascotBob 3.4s ease-in-out infinite;
+  }
+  .greeting-mascot.gm-pear{ top:20px; left:18px; animation-delay:.2s; }
+  .greeting-mascot.gm-egg{ bottom:18px; right:22px; font-size:26px; animation-delay:1.1s; }
+  .greeting-mascot.gm-note{ top:26px; right:26px; font-size:20px; opacity:.85; animation-delay:.6s; }
+  .greeting-mascot.gm-star{ bottom:26px; left:26px; font-size:18px; opacity:.85; animation-delay:1.6s; }
+  @keyframes mascotBob{
+    0%,100%{ transform: translateY(0) rotate(0deg); }
+    50%{ transform: translateY(-9px) rotate(-6deg); }
+  }
   .menu-greeting .big-wave{
-    font-size:46px;
+    position:relative;
+    font-size:52px;
     display:inline-block;
     animation: wave 1.8s ease-in-out infinite;
     transform-origin: 70% 70%;
+    filter: drop-shadow(0 6px 10px rgba(74,55,40,.18));
   }
   @keyframes wave{
     0%,60%,100%{ transform: rotate(0deg); }
@@ -547,18 +610,46 @@
     40%{ transform: rotate(-4deg); }
   }
   .menu-greeting h1{
+    position:relative;
     font-family:'Baloo 2', sans-serif;
     font-weight:800;
-    font-size:26px;
-    color:var(--ink);
-    margin:8px 0 4px;
+    font-size:29px;
+    margin:10px 0 6px;
+
+    background:linear-gradient(90deg, var(--pear-dark), var(--sky-dark));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
   }
   .menu-greeting p{
+    position:relative;
     color:var(--ink-soft);
-    font-size:13.5px;
-    line-height:1.5;
+    font-size:14px;
+    line-height:1.55;
     margin:0 auto;
     max-width:360px;
+  }
+  .greeting-pills{
+    position:relative;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    margin-top:16px;
+  }
+  .greeting-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    padding:6px 13px;
+    border-radius:999px;
+    background:rgba(255,255,255,.75);
+    border:1.5px solid rgba(220,200,170,.55);
+    font-size:12px;
+    font-weight:700;
+    color:var(--ink);
+    box-shadow:0 3px 8px -4px rgba(74,55,40,.2);
   }
   .study-progress{
     width:100%;
@@ -734,6 +825,32 @@
     margin-top:2px;
   }
   .menu-card .menu-badge.long{ background:#FDEBD6; color:var(--egg-dark); }
+  .menu-card .menu-inprogress{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    margin-top:4px;
+  }
+  .menu-card .menu-inprogress-track{
+    flex:1;
+    height:6px;
+    border-radius:999px;
+    background:#F0E4D2;
+    overflow:hidden;
+  }
+  .menu-card .menu-inprogress-fill{
+    height:100%;
+    border-radius:999px;
+    background:linear-gradient(90deg, var(--sky-dark), var(--sky));
+    width:0%;
+    transition: width 0.4s ease;
+  }
+  .menu-card .menu-inprogress-pct{
+    font-size:10px;
+    font-weight:700;
+    color:var(--sky-dark);
+    white-space:nowrap;
+  }
   .menu-card .menu-arrow{
     font-size:16px;
     color:var(--ink-soft);
@@ -857,6 +974,18 @@
   .score-great{ background:var(--good); }
   .score-ok{ background:var(--egg-dark); color:#5A3F0C; }
   .score-retry{ background:var(--bad); }
+  .score-note{
+  width:100%;
+  max-width:620px;
+  margin:8px auto 0;
+  padding:8px 12px;
+  border-radius:12px;
+  background:rgba(255,255,255,.65);
+  color:#7a6b58;
+  font-size:12px;
+  line-height:1.5;
+  text-align:center;
+}
 
   .heard-text{
     font-size:16px;
@@ -958,6 +1087,79 @@
   .mini-btn.mini-pear:active{ box-shadow: 0 1px 0 var(--pear-dark); }
   audio.hidden-audio{ display:none; }
 
+  /* ---------- "Tiếp tục bài" resume modal ---------- */
+  .resume-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(74,55,40,0.45);
+    z-index:200;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  }
+  .resume-overlay.show{ display:flex; }
+  .resume-modal{
+    background:var(--card);
+    border-radius:24px;
+    box-shadow: 0 20px 40px -12px rgba(74,55,40,0.4);
+    padding:26px 24px 22px;
+    max-width:340px;
+    width:100%;
+    text-align:center;
+    animation: resumePop 0.28s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes resumePop{
+    from{ transform:scale(0.85); opacity:0; }
+    to{ transform:scale(1); opacity:1; }
+  }
+  .resume-emoji{ font-size:38px; margin-bottom:4px; }
+  .resume-title{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:17px;
+    color:var(--ink);
+    margin-bottom:4px;
+  }
+  .resume-sub{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    font-weight:600;
+    margin-bottom:12px;
+  }
+  .resume-track{
+    width:100%;
+    height:10px;
+    border-radius:999px;
+    background:#F0E4D2;
+    overflow:hidden;
+    margin-bottom:18px;
+  }
+  .resume-fill{
+    height:100%;
+    border-radius:999px;
+    background:linear-gradient(90deg, var(--sky-dark), var(--sky));
+    width:0%;
+    transition: width 0.4s ease;
+  }
+  .resume-actions{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .resume-actions .mini-btn{ padding:11px 16px; font-size:13.5px; width:100%; }
+  .resume-cancel{
+    margin-top:12px;
+    background:none;
+    border:none;
+    color:var(--ink-soft);
+    font-family:'Quicksand', sans-serif;
+    font-weight:700;
+    font-size:12px;
+    cursor:pointer;
+    text-decoration:underline;
+  }
+
   .support-warning{
     font-size:12px;
     color:var(--bad);
@@ -1029,9 +1231,705 @@
     100%{ transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1) rotate(var(--rot)); opacity:0; }
   }
 
-  @media (prefers-reduced-motion: reduce){
-    *{ animation: none !important; transition: none !important; }
+  .comparison-label{
+  margin-top: 14px;
+}
+
+.comparison-text{
+  line-height: 1.9;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(255,255,255,.75);
+  font-size: 16px;
+}
+
+.comparison-word{
+  display: inline-block;
+  margin-right: 5px;
+  padding: 2px 5px;
+  border-radius: 6px;
+}
+
+.comparison-match{
+  color: #2f7d32;
+  background: rgba(76,175,80,.12);
+}
+
+.comparison-miss{
+  color: #c62828;
+  background: rgba(244,67,54,.12);
+  text-decoration: line-through;
+}
+
+.pronunciation-focus{
+  width:100%;
+  max-width:620px;
+  padding:14px;
+  border-radius:16px;
+  background:rgba(255,248,220,.9);
+  border:1px solid rgba(190,150,50,.2);
+  box-sizing:border-box;
+}
+
+.pronunciation-focus-title{
+  font-weight:800;
+  font-size:15px;
+  margin-bottom:10px;
+}
+
+.pronunciation-focus-content{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.pronunciation-item{
+  background:rgba(255,255,255,.75);
+  border-radius:12px;
+  padding:10px 12px;
+}
+
+.pronunciation-item-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.pronunciation-listen{
+  width:34px;
+  height:34px;
+  border:0;
+  border-radius:50%;
+  background:#fff;
+  cursor:pointer;
+  box-shadow:0 2px 7px rgba(0,0,0,.08);
+  font-size:15px;
+}
+
+.pronunciation-listen:active{
+  transform:scale(.94);
+}
+
+.pronunciation-practice-btn{
+  margin-top:9px;
+  border:0;
+  border-radius:10px;
+  padding:7px 11px;
+  background:#fff;
+  cursor:pointer;
+  font-family:inherit;
+  font-size:12px;
+  font-weight:700;
+  box-shadow:0 2px 7px rgba(0,0,0,.06);
+}
+
+.pronunciation-practice-btn:active{
+  transform:scale(.96);
+}
+
+.pronunciation-result{
+  margin-top:7px;
+  font-size:12px;
+  line-height:1.5;
+}
+
+.pronunciation-word{
+  font-weight:800;
+  font-size:17px;
+}
+
+.pronunciation-ipa{
+  font-family:Arial, sans-serif;
+  font-size:14px;
+  color:#8b6a32;
+  margin-top:2px;
+}
+
+.pronunciation-focus-sound{
+  margin-top:5px;
+  font-size:13px;
+}
+
+.pronunciation-tip{
+  margin-top:5px;
+  font-size:12.5px;
+  line-height:1.5;
+  color:var(--ink-soft);
+}
+
+.chunk-practice{
+  width:100%;
+  max-width:620px;
+  box-sizing:border-box;
+  padding:14px;
+  border-radius:18px;
+  background:rgba(255,255,255,.78);
+  border:1px solid rgba(190,160,100,.18);
+}
+
+.chunk-practice-title{
+  font-size:16px;
+  font-weight:800;
+}
+
+.chunk-practice-subtitle{
+  margin-top:3px;
+  margin-bottom:12px;
+  font-size:12px;
+  color:var(--ink-soft);
+}
+
+.chunks-list{
+  display:flex;
+  flex-direction:column;
+  gap:9px;
+}
+
+.chunk-item{
+  display:flex;
+  gap:10px;
+  padding:10px;
+  border-radius:14px;
+  background:rgba(255,248,225,.7);
+}
+
+.chunk-number{
+  width:28px;
+  height:28px;
+  flex:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:50%;
+  background:var(--egg-dark);
+  color:#5A3F0C;
+  font-weight:800;
+  font-size:13px;
+}
+
+.chunk-content{
+  flex:1;
+  min-width:0;
+}
+
+.chunk-text{
+  font-weight:700;
+  font-size:15px;
+  line-height:1.5;
+}
+
+.chunk-actions{
+  display:flex;
+  gap:7px;
+  margin-top:7px;
+}
+
+.chunk-btn{
+  border:0;
+  border-radius:10px;
+  padding:6px 10px;
+  font-family:inherit;
+  font-size:12px;
+  cursor:pointer;
+  background:#fff;
+  box-shadow:0 2px 7px rgba(0,0,0,.06);
+}
+
+.chunk-btn:active{
+  transform:scale(.96);
+}
+
+.chunk-result{
+  margin-top:6px;
+  font-size:12px;
+}
+
+.pronunciation-focus-subtitle{
+  margin-top:-5px;
+  margin-bottom:11px;
+  color:var(--ink-soft);
+  font-size:12px;
+  line-height:1.5;
+}
+.practice-stats{
+  width:100%;
+  box-sizing:border-box;
+  margin:0 0 18px;
+  padding:14px;
+  background:var(--card);
+  border:2px solid #F0E4D2;
+  border-radius:20px;
+  box-shadow:var(--shadow-sm);
+}
+
+.practice-stats-title{
+  font-family:'Baloo 2', sans-serif;
+  font-weight:800;
+  font-size:14px;
+  color:var(--ink);
+  margin-bottom:10px;
+}
+
+.practice-stats-grid{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:8px;
+}
+
+.practice-stat-card{
+  min-width:0;
+  padding:10px 6px;
+  text-align:center;
+  border-radius:14px;
+  background:#FFF9EF;
+}
+
+.practice-stat-icon{
+  font-size:18px;
+  line-height:1.2;
+}
+
+.practice-stat-value{
+  margin-top:3px;
+  font-family:'Baloo 2', sans-serif;
+  font-size:20px;
+  font-weight:800;
+  color:var(--ink);
+}
+
+.practice-stat-label{
+  margin-top:1px;
+  font-size:10.5px;
+  line-height:1.3;
+  color:var(--ink-soft);
+}
+
+@media (max-width:480px){
+
+  .practice-stats-grid{
+    gap:6px;
   }
+
+  .practice-stat-card{
+    padding:9px 4px;
+  }
+
+  .practice-stat-value{
+    font-size:18px;
+  }
+
+  .practice-stat-label{
+    font-size:9.5px;
+  }
+
+}
+/* ================= Statistics on dialogue cards ================= */
+
+.menu-set-stats{
+  margin-top:8px;
+  padding:8px 9px;
+  border-radius:12px;
+  background:rgba(255,250,239,.85);
+  border:1px solid rgba(220,200,170,.35);
+}
+
+.menu-set-stats-row{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:4px;
+  font-size:11px;
+  text-align:center;
+}
+
+.menu-set-stats-row span{
+  white-space:nowrap;
+}
+
+.menu-set-stats-label{
+  margin-top:3px;
+  text-align:center;
+  font-size:9px;
+  color:var(--ink-soft);
+}
+
+.menu-set-status{
+  margin-top:6px;
+  text-align:center;
+  font-size:10.5px;
+  font-weight:800;
+}
+
+.menu-set-status.stats-none{
+  color:#8a8176;
+}
+
+.menu-set-status.stats-hard{
+  color:#b94a48;
+}
+
+.menu-set-status.stats-medium{
+  color:#a97919;
+}
+
+.menu-set-status.stats-good{
+  color:#4f8a5b;
+}
+
+@media (max-width:480px){
+
+  .menu-set-stats{
+    padding:7px 6px;
+  }
+
+  .menu-set-stats-row{
+    font-size:10px;
+  }
+
+  .menu-set-stats-label{
+    font-size:8.5px;
+  }
+
+  .menu-set-status{
+    font-size:10px;
+  }
+
+}
+/* ================= Learning level sections ================= */
+
+@keyframes levelIn{
+  from{ opacity:0; transform:translateY(16px) scale(.98); }
+  to{ opacity:1; transform:translateY(0) scale(1); }
+}
+
+.learning-level{
+  position:relative;
+  width:100%;
+  margin-top:22px;
+  padding:38px 22px 22px;
+
+  background:linear-gradient(175deg, var(--card), var(--level-tint) 260%);
+  border:2px solid var(--level-tint);
+  border-radius:28px;
+  overflow:hidden;
+
+  box-shadow:0 10px 26px -16px rgba(74,55,40,.22);
+  animation: levelIn .55s cubic-bezier(.2,.7,.3,1) both;
+  transition: box-shadow .3s ease, transform .3s ease, border-color .3s ease;
+}
+
+.learning-level::before{
+  content:'';
+  position:absolute;
+  inset:0 0 auto 0;
+  height:7px;
+  background:linear-gradient(90deg, var(--level-accent), var(--level-accent-dark));
+}
+
+.learning-level::after{
+  content:'';
+  position:absolute;
+  top:-60px; right:-60px;
+  width:150px; height:150px;
+  border-radius:50%;
+  background:var(--level-accent);
+  opacity:.10;
+  pointer-events:none;
+}
+
+.learning-level:hover{
+  box-shadow:0 16px 36px -16px rgba(74,55,40,.28);
+  border-color:var(--level-accent);
+}
+
+.learning-level.open{
+  border-color:var(--level-accent);
+  box-shadow:0 18px 42px -16px rgba(74,55,40,.3);
+}
+
+#levelBeginner{
+  --level-accent: var(--pear);
+  --level-accent-dark: var(--pear-dark);
+  --level-tint:#EAF5DC;
+  animation-delay:.02s;
+}
+#levelElementary{
+  --level-accent: var(--egg-dark);
+  --level-accent-dark:#B9791C;
+  --level-tint:#FFF1D6;
+  animation-delay:.1s;
+}
+#levelIntermediate{
+  --level-accent: var(--blush);
+  --level-accent-dark: var(--blush-dark);
+  --level-tint:#FFE6EC;
+  animation-delay:.18s;
+}
+
+.learning-level:first-child{
+  margin-top:0;
+}
+
+
+/* ---------- Level header ---------- */
+
+.level-header{
+  position:relative;
+  z-index:1;
+  padding:2px 2px 4px;
+  cursor:pointer;
+  border:none;
+  background:none;
+  width:100%;
+  text-align:left;
+  border-radius:18px;
+}
+.level-header:focus-visible{ outline: 3px solid var(--level-accent-dark); outline-offset: 3px; }
+
+.level-heading{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.level-badge-num{
+  position:absolute;
+  top:14px;
+  right:18px;
+  z-index:2;
+
+  padding:4px 12px;
+  border-radius:999px;
+
+  background:var(--level-accent);
+  color:#fff;
+
+  font-family:'Baloo 2', sans-serif;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.03em;
+
+  box-shadow:0 4px 10px -3px rgba(0,0,0,.25);
+}
+
+.level-icon{
+  flex:0 0 auto;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  width:58px;
+  height:58px;
+
+  font-size:30px;
+  line-height:1;
+
+  border-radius:20px;
+  background:var(--level-tint);
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,.7), 0 4px 10px -4px rgba(74,55,40,.15);
+
+  transition: transform .35s cubic-bezier(.34,1.56,.64,1);
+}
+.level-header:hover .level-icon{ transform: rotate(-6deg) scale(1.06); }
+
+.level-text{
+  min-width:0;
+  flex:1 1 auto;
+}
+
+.level-eyebrow{
+  font-family:'Baloo 2', sans-serif;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+  color:var(--level-accent-dark);
+  margin-bottom:2px;
+}
+
+.level-title{
+  font-family:'Baloo 2', sans-serif;
+  font-size:23px;
+  line-height:1.15;
+  font-weight:800;
+  color:var(--ink);
+}
+
+.level-description{
+  margin-top:5px;
+  max-width:720px;
+
+  font-size:13px;
+  line-height:1.5;
+  color:var(--ink-soft);
+}
+
+.level-chevron{
+  flex:0 0 auto;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  width:38px; height:38px;
+  padding:8px;
+
+  border-radius:50%;
+  background:var(--level-tint);
+  color:var(--level-accent-dark);
+
+  transition: transform 0.36s cubic-bezier(.5,.1,.2,1), background .25s ease, color .25s ease;
+}
+.level-chevron svg{ width:100%; height:100%; display:block; }
+.level-header:hover .level-chevron{ background:var(--level-accent); color:#fff; }
+.learning-level.open .level-chevron{
+  transform: rotate(180deg);
+  background:var(--level-accent);
+  color:#fff;
+}
+
+/* ---------- Collapsible level body ---------- */
+.level-body{
+  position:relative;
+  z-index:1;
+  overflow:hidden;
+  max-height:0;
+  opacity:0;
+  transition: max-height 0.42s cubic-bezier(.5,.1,.2,1), opacity 0.3s ease;
+}
+.learning-level.open .level-body{
+  opacity:1;
+}
+
+
+/* ---------- Level progress ---------- */
+
+.level-progress-card{
+  margin-top:16px;
+  margin-bottom:12px;
+  padding:12px 18px;
+
+  background:rgba(255,255,255,.88);
+  border:2px solid var(--level-tint);
+  border-radius:22px;
+
+  box-shadow:0 4px 14px rgba(100,75,45,.06);
+}
+
+.level-progress-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  margin-bottom:10px;
+
+  font-size:13px;
+  font-weight:800;
+  color:var(--ink);
+}
+
+.level-progress-count{
+  padding:4px 11px;
+
+  border-radius:999px;
+
+  background:var(--level-tint);
+  color:var(--level-accent-dark);
+
+  font-size:11px;
+  font-weight:800;
+}
+
+.level-progress-track{
+  width:100%;
+  height:12px;
+
+  overflow:hidden;
+
+  border-radius:999px;
+  background:#eee2cf;
+}
+
+.level-progress-fill{
+  width:0%;
+  height:100%;
+
+  border-radius:999px;
+
+  background:linear-gradient(90deg, var(--level-accent), var(--level-accent-dark));
+
+  transition:width .45s ease;
+}
+
+
+/* ---------- Cards ---------- */
+
+.learning-level .menu-grid{
+  position:relative;
+  z-index:1;
+  margin-top:10px;
+}
+
+
+/* ---------- Mobile ---------- */
+
+@media (max-width:600px){
+
+  .menu-greeting{
+    padding:26px 16px 22px;
+    border-radius:24px;
+  }
+  .greeting-mascot{ font-size:22px; }
+  .greeting-mascot.gm-egg{ font-size:19px; }
+  .greeting-mascot.gm-note{ font-size:16px; }
+  .greeting-mascot.gm-star{ font-size:14px; }
+  .menu-greeting .big-wave{ font-size:42px; }
+  .menu-greeting h1{ font-size:23px; }
+  .menu-greeting p{ font-size:13px; }
+  .greeting-pill{ font-size:11px; padding:5px 11px; }
+
+  .learning-level{
+    margin-top:16px;
+    padding:32px 16px 18px;
+    border-radius:24px;
+  }
+
+  .level-badge-num{
+    top:10px;
+    right:12px;
+    font-size:9px;
+    padding:3px 9px;
+  }
+
+  .level-icon{
+    width:48px;
+    height:48px;
+    font-size:24px;
+    border-radius:16px;
+  }
+
+  .level-title{
+    font-size:19px;
+  }
+
+  .level-description{
+    font-size:12px;
+  }
+
+  .level-chevron{
+    width:32px; height:32px;
+    padding:7px;
+  }
+
+  .level-progress-card{
+    padding:10px 13px;
+    border-radius:18px;
+  }
+
+  .level-progress-top{
+    font-size:12px;
+  }
+
+}
 </style>
 </head>
 <body>
@@ -1054,12 +1952,16 @@
     </div>
     <div style="display:flex; align-items:center; gap:10px;">
       <div class="sfx-toggle" id="homeBtn" title="Về màn hình chọn hội thoại" style="display:none;">🏠</div>
-      <div class="sfx-toggle" id="sfxToggle" title="Toggle sound effects">🔊</div>
+      <div class="sfx-toggle" id="sfxToggle" title="Tắt/bật âm thanh & giọng đọc AI">🔊</div>
     </div>
   </div>
 
   <div class="menu-screen" id="menuScreen">
     <div class="menu-greeting">
+      <div class="greeting-mascot gm-pear">🍐</div>
+      <div class="greeting-mascot gm-egg">🥚</div>
+      <div class="greeting-mascot gm-note">🎵</div>
+      <div class="greeting-mascot gm-star">✨</div>
       <div class="big-wave">👋</div>
       <h1>Xin chào bạn!</h1>
       <p>Chọn một đoạn hội thoại bên dưới để luyện nói cùng Pear 🍐 và Egg 🥚 nhé.</p>
@@ -1072,10 +1974,215 @@
       <div class="study-progress-track"><div class="study-progress-fill" id="studyProgressFill"></div></div>
       <div class="study-progress-msg" id="studyProgressMsg">Hoàn thành một hội thoại để bắt đầu ghi nhận tiến trình nhé!</div>
     </div>
-    <div class="menu-section-label">Hội thoại ngắn <span class="count-chip" id="countShort"></span></div>
-    <div class="menu-grid" id="menuGridShort"></div>
-    <div class="menu-section-label">Hội thoại dài <span class="count-chip" id="countLong"></span></div>
-    <div class="menu-grid" id="menuGridLong"></div>
+    <div class="practice-stats" id="practiceStats">
+
+  <div class="practice-stats-title">
+    🟡 Thống kê luyện tập
+  </div>
+
+  <div class="practice-stats-grid">
+
+    <div class="practice-stat-card">
+      <div class="practice-stat-icon">🏆</div>
+      <div class="practice-stat-value" id="bestScore">0%</div>
+      <div class="practice-stat-label">Điểm cao nhất</div>
+    </div>
+
+    <div class="practice-stat-card">
+      <div class="practice-stat-icon">📊</div>
+      <div class="practice-stat-value" id="averageScore">0%</div>
+      <div class="practice-stat-label">Điểm trung bình</div>
+    </div>
+
+    <div class="practice-stat-card">
+      <div class="practice-stat-icon">🔁</div>
+      <div class="practice-stat-value" id="practiceCount">0</div>
+      <div class="practice-stat-label">Số lần luyện</div>
+    </div>
+
+  </div>
+
+</div>
+  <!-- 🌱 FIRST STEPS -->
+<div class="learning-level" id="levelBeginner">
+
+  <div class="level-badge-num">CẤP 1</div>
+  <button class="level-header" type="button" data-level="beginner" aria-expanded="false" aria-controls="levelBodyBeginner">
+    <div class="level-heading">
+
+      <div class="level-icon">🌱</div>
+
+      <div class="level-text">
+        <div class="level-eyebrow">Mới bắt đầu</div>
+        <div class="level-title">
+          First Steps · Cơ bản
+        </div>
+
+        <div class="level-description">
+          Những chủ đề quen thuộc, từ vựng và câu nói đơn giản cho người mới bắt đầu.
+        </div>
+      </div>
+
+      <div class="level-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+
+    </div>
+  </button>
+
+  <div class="level-body" id="levelBodyBeginner">
+
+  <div class="level-progress-card">
+
+    <div class="level-progress-top">
+      <span>Tiến trình cấp độ</span>
+
+      <span
+        class="level-progress-count"
+        id="progressBeginnerCount">
+        0/0 hoàn thành
+      </span>
+    </div>
+
+    <div class="level-progress-track">
+      <div
+        class="level-progress-fill"
+        id="progressBeginnerFill">
+      </div>
+    </div>
+
+  </div>
+
+
+  <div class="menu-grid" id="menuGridShort"></div>
+
+  </div>
+
+</div>
+
+
+<!-- 🌿 ELEMENTARY -->
+<div class="learning-level" id="levelElementary">
+
+  <div class="level-badge-num">CẤP 2</div>
+  <button class="level-header" type="button" data-level="elementary" aria-expanded="false" aria-controls="levelBodyElementary">
+    <div class="level-heading">
+
+      <div class="level-icon">🌿</div>
+
+      <div class="level-text">
+        <div class="level-eyebrow">Sơ cấp</div>
+        <div class="level-title">
+          Elementary · Sơ cấp
+        </div>
+
+        <div class="level-description">
+          Luyện giao tiếp trong những tình huống quen thuộc như trường học, sở thích, mua sắm và du lịch.
+        </div>
+      </div>
+
+      <div class="level-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+
+    </div>
+  </button>
+
+  <div class="level-body" id="levelBodyElementary">
+
+  <div class="level-progress-card">
+
+    <div class="level-progress-top">
+      <span>Tiến trình cấp độ</span>
+
+      <span
+        class="level-progress-count"
+        id="progressElementaryCount">
+        0/0 hoàn thành
+      </span>
+    </div>
+
+    <div class="level-progress-track">
+      <div
+        class="level-progress-fill"
+        id="progressElementaryFill">
+      </div>
+    </div>
+
+  </div>
+
+
+  <div class="menu-grid" id="menuGridElementary"></div>
+
+  </div>
+
+</div>
+
+
+<!-- 🌳 INTERMEDIATE -->
+<div class="learning-level" id="levelIntermediate">
+
+  <div class="level-badge-num">CẤP 3</div>
+  <button class="level-header" type="button" data-level="intermediate" aria-expanded="false" aria-controls="levelBodyIntermediate">
+    <div class="level-heading">
+
+      <div class="level-icon">🌳</div>
+
+      <div class="level-text">
+        <div class="level-eyebrow">Trung cấp</div>
+        <div class="level-title">
+          Intermediate · Trung cấp
+        </div>
+
+        <div class="level-description">
+          Phỏng vấn sâu, nhiều lượt thoại: giới thiệu bản thân, sở thích chi tiết, động lực sống và ước mơ tương lai.
+        </div>
+      </div>
+
+      <div class="level-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div>
+
+    </div>
+  </button>
+
+  <div class="level-body" id="levelBodyIntermediate">
+
+  <div class="level-progress-card">
+
+    <div class="level-progress-top">
+      <span>Tiến trình cấp độ</span>
+
+      <span
+        class="level-progress-count"
+        id="progressIntermediateCount">
+        0/0 hoàn thành
+      </span>
+    </div>
+
+    <div class="level-progress-track">
+      <div
+        class="level-progress-fill"
+        id="progressIntermediateFill">
+      </div>
+    </div>
+
+  </div>
+
+
+  <div class="menu-grid" id="menuGridLong"></div>
+
+  </div>
+
+</div>
+</div>
+
+  <div class="resume-overlay" id="resumeOverlay">
+    <div class="resume-modal">
+      <div class="resume-emoji">📖</div>
+      <div class="resume-title" id="resumeTitle">Bạn đang học dở bài này</div>
+      <div class="resume-sub" id="resumeSub">Đã hoàn thành 0%</div>
+      <div class="resume-track"><div class="resume-fill" id="resumeFill"></div></div>
+      <div class="resume-actions">
+        <button class="mini-btn mini-sky" id="resumeContinueBtn">▶️ Tiếp tục bài</button>
+        <button class="mini-btn mini-blush" id="resumeRestartBtn">🔄 Bắt đầu lại từ đầu</button>
+      </div>
+      <button class="resume-cancel" id="resumeCancelBtn">Đóng</button>
+    </div>
   </div>
 
   <div class="practice-screen" id="practiceScreen" style="display:none; width:100%; flex-direction:column; align-items:center;">
@@ -1152,10 +2259,39 @@
 
         <div class="stat-row" id="statRow"></div>
 
+        <div class="score-note">
+  ℹ️ Điểm này dựa trên mức độ khớp giữa câu bạn nói và câu mẫu
+  theo kết quả nhận diện giọng nói của trình duyệt.
+  Điểm không đánh giá chính xác từng âm phát âm.
+</div>
+
         <div>
           <div class="transcript-label">MÁY NGHE ĐƯỢC</div>
           <div class="heard-text" id="heardText"></div>
+
+          <div class="transcript-label comparison-label">📝 SO VỚI CÂU MẪU</div>
+          <div class="comparison-text" id="comparisonText"></div>
         </div>
+
+        <div class="pronunciation-focus" id="pronunciationFocus" style="display:none;">
+  <div class="pronunciation-focus-title">
+    🎯 Âm cần chú ý
+  </div>
+
+  <div class="pronunciation-focus-content" id="pronunciationFocusContent"></div>
+</div>
+
+<div class="chunk-practice" id="chunkPractice" style="display:none;">
+  <div class="chunk-practice-title">
+    👄 Luyện từng cụm
+  </div>
+
+  <div class="chunk-practice-subtitle">
+    Nghe và nói từng cụm trước khi nói cả câu.
+  </div>
+
+  <div class="chunks-list" id="chunksList"></div>
+</div>
 
         <div class="tips-box" id="tipsBox" style="display:none;">
           <div class="tips-title">💡 Nhận xét &amp; lời khuyên phát âm cho câu này</div>
@@ -1182,9 +2318,10 @@
 const DIALOGUE_SETS = [
   {
     id: 'short1',
+    level: 'elementary',
     length: 'short',
     emoji: '🎮',
-    title: 'Phần 1 · Sở thích hằng ngày',
+    title: 'Sở thích hằng ngày',
     desc: 'Trò chuyện về sở thích, thể thao, thói quen buổi sáng và buổi tối.',
     lines: [
       ["Pear","Hi, Egg! How are you today?","Chào Trứng! Hôm nay cậu thế nào?"],
@@ -1217,9 +2354,10 @@ const DIALOGUE_SETS = [
   },
   {
     id: 'short2',
+    level: 'elementary',
     length: 'short',
     emoji: '🍜',
-    title: 'Phần 2 · Ẩm thực Việt Nam',
+    title: 'Ẩm thực Việt Nam',
     desc: 'Nói về phở, bánh mì, đồ ăn cay và các món chè yêu thích.',
     lines: [
       ["Pear","Hi, Egg! What are you doing?","Chào Trứng! Cậu đang làm gì thế?"],
@@ -1252,9 +2390,10 @@ const DIALOGUE_SETS = [
   },
   {
     id: 'short3',
+    level: 'elementary',
     length: 'short',
     emoji: '🏖️',
-    title: 'Phần 3 · Du lịch Việt Nam',
+    title: 'Du lịch Việt Nam',
     desc: 'Khám phá Hạ Long, Đà Nẵng, Hội An và Hà Nội cùng Pear & Egg.',
     lines: [
       ["Pear","Hi, Egg! Do you like traveling?","Chào Trứng! Cậu có thích du lịch không?"],
@@ -1288,9 +2427,10 @@ const DIALOGUE_SETS = [
   },
   {
     id: 'short4',
+    level: 'elementary',
     length: 'short',
     emoji: '🧁',
-    title: 'Phần 4 · Nấu ăn & làm bánh',
+    title: 'Nấu ăn & làm bánh',
     desc: 'Chia sẻ về nấu ăn, làm bánh và những món tủ của mỗi người.',
     lines: [
       ["Pear","Hi, Egg! Do you like cooking?","Chào Trứng! Cậu có thích nấu ăn không?"],
@@ -1321,9 +2461,10 @@ const DIALOGUE_SETS = [
   },
   {
     id: 'short5',
+    level: 'beginner',
     length: 'short',
     emoji: '🍉',
-    title: 'Phần 5 · Hoa quả',
+    title: 'Hoa quả',
     desc: 'Nói về các loại trái cây yêu thích, vị ngọt, chua và mùa hè.',
     lines: [
       ["Pear","What is your favorite fruit?","Loại trái cây cậu thích nhất là gì?"],
@@ -1344,9 +2485,10 @@ const DIALOGUE_SETS = [
   },
   {
     id: 'short6',
+    level: 'beginner',
     length: 'short',
     emoji: '🐼',
-    title: 'Phần 6 · Động vật',
+    title: 'Động vật',
     desc: 'Chia sẻ về các loài động vật yêu thích, động vật hoang dã và sở thú.',
     lines: [
       ["Pear","Do you like animals?","Cậu có thích động vật không?"],
@@ -1369,9 +2511,10 @@ const DIALOGUE_SETS = [
   },
   {
     id: 'short7',
+    level: 'beginner',
     length: 'short',
     emoji: '🐶',
-    title: 'Phần 7 · Thú nuôi',
+    title: 'Thú nuôi',
     desc: 'Trò chuyện về thú cưng, chú chó Lucky và thói quen chăm sóc.',
     lines: [
       ["Pear","Do you have a pet?","Cậu có nuôi thú cưng không?"],
@@ -1394,9 +2537,10 @@ const DIALOGUE_SETS = [
   },
   {
     id: 'short8',
+    level: 'beginner',
     length: 'short',
     emoji: '🛋️',
-    title: 'Phần 8 · Đồ vật trong nhà',
+    title: 'Đồ vật trong nhà',
     desc: 'Miêu tả phòng ngủ, phòng khách và những món đồ không thể thiếu.',
     lines: [
       ["Pear","What is your favorite room in your house?","Phòng cậu thích nhất trong nhà là phòng nào?"],
@@ -1419,9 +2563,10 @@ const DIALOGUE_SETS = [
   },
   {
     id: 'short9',
+    level: 'elementary',
     length: 'short',
     emoji: '🧸',
-    title: 'Phần 9 · Đồ chơi',
+    title: 'Đồ chơi',
     desc: 'Kỷ niệm tuổi thơ với đồ chơi, gấu bông và món quà đáng nhớ.',
     lines: [
       ["Pear","Did you have many toys when you were a child?","Hồi nhỏ cậu có nhiều đồ chơi không?"],
@@ -1446,9 +2591,10 @@ const DIALOGUE_SETS = [
   },
   {
     id: 'short10',
+    level: 'beginner',
     length: 'short',
     emoji: '👀',
-    title: 'Phần 10 · Bộ phận cơ thể',
+    title: 'Bộ phận cơ thể',
     desc: 'Nói về các bộ phận cơ thể và công dụng của chúng.',
     lines: [
       ["Pear","Can you name some parts of the body?","Cậu có thể kể tên vài bộ phận cơ thể không?"],
@@ -1473,9 +2619,10 @@ const DIALOGUE_SETS = [
   },
   {
     id: 'short11',
+    level: 'beginner',
     length: 'short',
     emoji: '📅',
-    title: 'Phần 11 · Ngày, tuần, tháng',
+    title: 'Ngày, tuần, tháng',
     desc: 'Trò chuyện về các ngày trong tuần, các tháng và mùa yêu thích.',
     lines: [
       ["Pear","What day is it today?","Hôm nay là thứ mấy?"],
@@ -1506,9 +2653,10 @@ const DIALOGUE_SETS = [
   },
   {
     id: 'short12',
+    level: 'beginner',
     length: 'short',
     emoji: '⏰',
-    title: 'Phần 12 · Trong ngày & trong năm',
+    title: 'Trong ngày & trong năm',
     desc: 'Nói về giờ giấc sinh hoạt, sinh nhật và ngày lễ yêu thích.',
     lines: [
       ["Pear","What time do you usually wake up?","Cậu thường thức dậy lúc mấy giờ?"],
@@ -1537,9 +2685,10 @@ const DIALOGUE_SETS = [
   },
   {
     id: 'short13',
+    level: 'beginner',
     length: 'short',
     emoji: '🔢',
-    title: 'Phần 13 · Các con số',
+    title: 'Các con số',
     desc: 'Đếm số, hỏi tuổi, gia đình và những con số yêu thích.',
     lines: [
       ["Pear","How old are you?","Cậu bao nhiêu tuổi?"],
@@ -1572,9 +2721,10 @@ const DIALOGUE_SETS = [
   },
   {
     id: 'long1',
+    level: 'intermediate',
     length: 'long',
     emoji: '🎤',
-    title: 'Phỏng vấn 1 · Giới thiệu bản thân',
+    title: 'Giới thiệu bản thân',
     desc: 'Pear phỏng vấn Egg với các câu hỏi và câu trả lời dài hơn về cuộc sống.',
     lines: [
       ["Pear","Hi, Egg! Today I want to know more about you. Can I ask you some questions?","Chào Trứng! Hôm nay mình muốn tìm hiểu thêm về cậu. Mình hỏi cậu vài câu được không?"],
@@ -1641,9 +2791,10 @@ const DIALOGUE_SETS = [
   },
   {
     id: 'long2',
+    level: 'intermediate',
     length: 'long',
     emoji: '🎨',
-    title: 'Phỏng vấn 2 · Sở thích chi tiết',
+    title: 'Sở thích chi tiết',
     desc: 'Đào sâu vào sở thích cá nhân: âm nhạc, phim ảnh, thể thao, nấu ăn và du lịch.',
     lines: [
       ["Pear","Hi, Egg! I want to know more about your hobbies. What do you usually do in your free time?","Chào Trứng! Mình muốn tìm hiểu thêm về sở thích của cậu. Cậu thường làm gì lúc rảnh?"],
@@ -1714,9 +2865,10 @@ const DIALOGUE_SETS = [
   },
   {
     id: 'long3',
+    level: 'intermediate',
     length: 'long',
     emoji: '🔥',
-    title: 'Phỏng vấn 3 · Động lực sống',
+    title: 'Động lực sống',
     desc: 'Trò chuyện sâu sắc về động lực, thất bại, mục tiêu và ý nghĩa thành công.',
     lines: [
       ["Pear","Hi, Egg. Today I want to ask you about something a little different. What motivates you in life?","Chào Trứng. Hôm nay mình muốn hỏi cậu về một điều hơi khác một chút. Điều gì tạo động lực cho cậu trong cuộc sống?"],
@@ -1781,9 +2933,10 @@ const DIALOGUE_SETS = [
   },
   {
     id: 'long4',
+    level: 'intermediate',
     length: 'long',
     emoji: '🌠',
-    title: 'Phỏng vấn 4 · Ước mơ tương lai',
+    title: 'Ước mơ tương lai',
     desc: 'Pear và Egg chia sẻ về nghề nghiệp mơ ước, trở thành giáo viên, bác sĩ và những dự định tương lai.',
     lines: [
       ["Pear","Hi, Egg! What do you want to be when you grow up?","Chào Trứng! Khi lớn lên cậu muốn làm nghề gì?"],
@@ -1873,6 +3026,314 @@ let idx = 0;
 let isInitialRender = true;
 let currentSetId = null;
 
+/* ================= Practice statistics ================= */
+
+const PRACTICE_STATS_KEY = 'pearEggPracticeStats';
+
+function getPracticeStats(){
+
+  try{
+
+    const raw = localStorage.getItem(PRACTICE_STATS_KEY);
+
+    if(raw){
+      const data = JSON.parse(raw);
+
+      return {
+        scores: Array.isArray(data.scores)
+          ? data.scores
+          : []
+      };
+    }
+
+  }catch(e){}
+
+  return {
+    scores:[]
+  };
+}
+
+
+function savePracticeStats(stats){
+
+  try{
+
+    // Giới hạn dữ liệu để localStorage không phình quá lớn
+    if(stats.scores.length > 5000){
+      stats.scores = stats.scores.slice(-5000);
+    }
+
+    localStorage.setItem(
+      PRACTICE_STATS_KEY,
+      JSON.stringify(stats)
+    );
+
+  }catch(e){}
+
+}
+
+
+function recordPracticeScore(score){
+
+  const stats = getPracticeStats();
+
+  stats.scores.push(Math.round(score));
+
+  savePracticeStats(stats);
+
+  updatePracticeStats();
+
+}
+
+
+function updatePracticeStats(){
+
+  const stats = getPracticeStats();
+  const scores = stats.scores;
+
+  const bestEl =
+    document.getElementById('bestScore');
+
+  const averageEl =
+    document.getElementById('averageScore');
+
+  const countEl =
+    document.getElementById('practiceCount');
+
+
+  if(scores.length === 0){
+
+    if(bestEl) bestEl.textContent = '0%';
+    if(averageEl) averageEl.textContent = '0%';
+    if(countEl) countEl.textContent = '0';
+
+    return;
+  }
+
+
+  const best =
+    Math.max(...scores);
+
+  const total =
+    scores.reduce(
+      (sum, score) => sum + score,
+      0
+    );
+
+  const average =
+    Math.round(total / scores.length);
+
+
+  if(bestEl){
+    bestEl.textContent = best + '%';
+  }
+
+  if(averageEl){
+    averageEl.textContent = average + '%';
+  }
+
+  if(countEl){
+    countEl.textContent = scores.length;
+  }
+
+}
+/* ================= Practice statistics by dialogue ================= */
+
+const PRACTICE_SET_STATS_KEY = 'pearEggPracticeStatsBySet';
+
+function getPracticeSetStats(){
+
+  try{
+
+    const raw = localStorage.getItem(PRACTICE_SET_STATS_KEY);
+
+    if(raw){
+      const data = JSON.parse(raw);
+
+      if(data && typeof data === 'object'){
+        return data;
+      }
+    }
+
+  }catch(e){}
+
+  return {};
+}
+
+
+function savePracticeSetStats(stats){
+
+  try{
+
+    localStorage.setItem(
+      PRACTICE_SET_STATS_KEY,
+      JSON.stringify(stats)
+    );
+
+  }catch(e){}
+
+}
+
+
+function recordPracticeScoreForSet(score, setId){
+
+  if(!setId) return;
+
+  const stats = getPracticeSetStats();
+
+  if(!stats[setId]){
+    stats[setId] = {
+      scores:[]
+    };
+  }
+
+  stats[setId].scores.push(Math.round(score));
+
+  // Không để dữ liệu của một chủ đề vượt quá 5000 lần
+  if(stats[setId].scores.length > 5000){
+    stats[setId].scores =
+      stats[setId].scores.slice(-5000);
+  }
+
+  savePracticeSetStats(stats);
+
+  updateAllDialogueStats();
+}
+
+
+function getDialogueStats(setId){
+
+  const stats = getPracticeSetStats();
+
+  const scores =
+    stats[setId] &&
+    Array.isArray(stats[setId].scores)
+      ? stats[setId].scores
+      : [];
+
+  if(scores.length === 0){
+
+    return {
+      best:null,
+      average:null,
+      count:0
+    };
+
+  }
+
+  const best = Math.max(...scores);
+
+  const total =
+    scores.reduce(
+      (sum, score) => sum + score,
+      0
+    );
+
+  const average =
+    Math.round(total / scores.length);
+
+  return {
+    best,
+    average,
+    count:scores.length
+  };
+
+}
+
+
+function getDialogueDifficulty(average){
+
+  if(average === null){
+    return {
+      className:'stats-none',
+      icon:'⚪',
+      text:'Chưa luyện'
+    };
+  }
+
+  if(average < 70){
+    return {
+      className:'stats-hard',
+      icon:'🔴',
+      text:'Cần tập trung'
+    };
+  }
+
+  if(average < 85){
+    return {
+      className:'stats-medium',
+      icon:'🟡',
+      text:'Nên luyện thêm'
+    };
+  }
+
+  return {
+    className:'stats-good',
+    icon:'🟢',
+    text:'Đã khá tốt'
+  };
+
+}
+
+
+function updateDialogueStats(setId){
+
+  const stats = getDialogueStats(setId);
+
+  const bestEl =
+    document.getElementById('set-best-' + setId);
+
+  const averageEl =
+    document.getElementById('set-average-' + setId);
+
+  const countEl =
+    document.getElementById('set-count-' + setId);
+
+  const statusEl =
+    document.getElementById('set-status-' + setId);
+
+
+  if(bestEl){
+    bestEl.textContent =
+      stats.best === null
+        ? '—'
+        : stats.best + '%';
+  }
+
+  if(averageEl){
+    averageEl.textContent =
+      stats.average === null
+        ? '—'
+        : stats.average + '%';
+  }
+
+  if(countEl){
+    countEl.textContent = stats.count;
+  }
+
+  if(statusEl){
+
+    const difficulty =
+      getDialogueDifficulty(stats.average);
+
+    statusEl.className =
+      'menu-set-status ' + difficulty.className;
+
+    statusEl.textContent =
+      difficulty.icon + ' ' + difficulty.text;
+
+  }
+
+}
+
+
+function updateAllDialogueStats(){
+
+  DIALOGUE_SETS.forEach(set => {
+    updateDialogueStats(set.id);
+  });
+
+}
 /* ================= Study progress tracking (localStorage) ================= */
 const STUDY_PROGRESS_KEY = 'pearEggCompletedSets';
 function getCompletedSetIds(){
@@ -1889,6 +3350,7 @@ function markSetCompleted(id){
     try{ localStorage.setItem(STUDY_PROGRESS_KEY, JSON.stringify(done)); }catch(e){}
   }
   updateStudyProgress();
+  updateLevelProgress();
 }
 function updateStudyProgress(){
   const total = DIALOGUE_SETS.length;
@@ -1924,6 +3386,186 @@ function updateStudyProgress(){
       check.remove();
     }
   });
+
+  refreshInProgressBadges();
+}
+function updateLevelProgress(){
+
+  const levels = [
+    {
+      key: 'beginner',
+      countId: 'progressBeginnerCount',
+      fillId: 'progressBeginnerFill'
+    },
+    {
+      key: 'elementary',
+      countId: 'progressElementaryCount',
+      fillId: 'progressElementaryFill'
+    },
+    {
+      key: 'intermediate',
+      countId: 'progressIntermediateCount',
+      fillId: 'progressIntermediateFill'
+    }
+  ];
+
+  const completed = getCompletedSetIds();
+
+  levels.forEach(level => {
+
+    const sets = DIALOGUE_SETS.filter(
+      set => set.level === level.key
+    );
+
+    const total = sets.length;
+
+    const completedCount = sets.filter(
+      set => completed.includes(set.id)
+    ).length;
+
+    const countEl =
+      document.getElementById(level.countId);
+
+    const fillEl =
+      document.getElementById(level.fillId);
+
+    if(countEl){
+      countEl.textContent =
+        completedCount + '/' +
+        total +
+        ' hoàn thành';
+    }
+
+    if(fillEl){
+
+      const percent =
+        total > 0
+          ? Math.round((completedCount / total) * 100)
+          : 0;
+
+      fillEl.style.width =
+        percent + '%';
+    }
+
+  });
+
+}
+function updateLevelProgress(){
+
+  const levels = [
+    {
+      key:'beginner',
+      countId:'progressBeginnerCount',
+      fillId:'progressBeginnerFill'
+    },
+    {
+      key:'elementary',
+      countId:'progressElementaryCount',
+      fillId:'progressElementaryFill'
+    },
+    {
+      key:'intermediate',
+      countId:'progressIntermediateCount',
+      fillId:'progressIntermediateFill'
+    }
+  ];
+
+
+  const completed =
+    getCompletedSetIds();
+
+
+  levels.forEach(level => {
+
+    const sets =
+      DIALOGUE_SETS.filter(
+        set => set.level === level.key
+      );
+
+    const total = sets.length;
+
+    const completedCount =
+      sets.filter(
+        set => completed.includes(set.id)
+      ).length;
+
+
+    const countEl =
+      document.getElementById(level.countId);
+
+    const fillEl =
+      document.getElementById(level.fillId);
+
+
+    if(countEl){
+
+      countEl.textContent =
+        completedCount + '/' +
+        total +
+        ' hoàn thành';
+
+    }
+
+
+    if(fillEl){
+
+      const percent =
+        total > 0
+          ? (completedCount / total) * 100
+          : 0;
+
+      fillEl.style.width =
+        percent + '%';
+
+    }
+
+  });
+
+}
+
+/* ---- Tiến trình dở dang (khi thoát giữa chừng một hội thoại) ---- */
+const IN_PROGRESS_KEY = 'pearEggInProgress';
+function getInProgressMap(){
+  try{
+    const raw = localStorage.getItem(IN_PROGRESS_KEY);
+    return raw ? JSON.parse(raw) : {};
+  }catch(e){ return {}; }
+}
+function saveInProgress(id, currentIdx, total){
+  if(!id || !total) return;
+  // Only persist once the learner has moved past the very first line —
+  // simply opening a dialogue (idx starts at 0) shouldn't overwrite or
+  // erase progress saved from an earlier attempt at the same dialogue.
+  if(currentIdx <= 0) return;
+  const map = getInProgressMap();
+  map[id] = { idx: currentIdx, total: total };
+  try{ localStorage.setItem(IN_PROGRESS_KEY, JSON.stringify(map)); }catch(e){}
+}
+function clearInProgress(id){
+  const map = getInProgressMap();
+  if(map[id]){
+    delete map[id];
+    try{ localStorage.setItem(IN_PROGRESS_KEY, JSON.stringify(map)); }catch(e){}
+  }
+}
+function refreshInProgressBadges(){
+  const map = getInProgressMap();
+  const completed = getCompletedSetIds();
+  document.querySelectorAll('.menu-card').forEach(el=>{
+    const id = el.dataset.id;
+    const wrap = document.getElementById('inprogress-' + id);
+    if(!wrap) return;
+    const entry = map[id];
+    // Never show a "dở dang" badge alongside the finished checkmark.
+    if(entry && entry.total && !completed.includes(id)){
+      const pct = Math.min(100, Math.round((entry.idx / entry.total) * 100));
+      wrap.style.display = 'flex';
+      wrap.querySelector('.menu-inprogress-fill').style.width = pct + '%';
+      wrap.querySelector('.menu-inprogress-pct').textContent = pct + '% dở dang';
+    } else {
+      wrap.style.display = 'none';
+    }
+  });
 }
 
 const card = document.getElementById('card');
@@ -1952,6 +3594,7 @@ const homeBtn = document.getElementById('homeBtn');
 const menuScreen = document.getElementById('menuScreen');
 const practiceScreen = document.getElementById('practiceScreen');
 const menuGridShort = document.getElementById('menuGridShort');
+const menuGridElementary = document.getElementById('menuGridElementary');
 const menuGridLong = document.getElementById('menuGridLong');
 
 const practicePanel = document.getElementById('practicePanel');
@@ -1962,7 +3605,12 @@ const resultBox = document.getElementById('resultBox');
 const scoreBadge = document.getElementById('scoreBadge');
 const statRow = document.getElementById('statRow');
 const heardText = document.getElementById('heardText');
+const comparisonText = document.getElementById('comparisonText');
+const pronunciationFocus = document.getElementById('pronunciationFocus');
+const pronunciationFocusContent = document.getElementById('pronunciationFocusContent');
 const tipsBox = document.getElementById('tipsBox');
+const chunkPractice = document.getElementById('chunkPractice');
+const chunksList = document.getElementById('chunksList');
 const tipsList = document.getElementById('tipsList');
 const playMineBtn = document.getElementById('playMineBtn');
 const playTargetBtn = document.getElementById('playTargetBtn');
@@ -1986,6 +3634,31 @@ function buildMenuCard(set){
       '<div class="menu-title">' + set.title + '</div>' +
       '<div class="menu-desc">' + set.desc + '</div>' +
       '<div class="' + badgeClass + '">' + badgeText + '</div>' +
+      '<div class="menu-set-stats">' +
+
+  '<div class="menu-set-stats-row">' +
+
+    '<span>🏆 <b id="set-best-' + set.id + '">—</b></span>' +
+
+    '<span>📊 <b id="set-average-' + set.id + '">—</b></span>' +
+
+    '<span>🔁 <b id="set-count-' + set.id + '">0</b></span>' +
+
+  '</div>' +
+
+  '<div class="menu-set-stats-label">' +
+    'Cao nhất · Trung bình · Lần luyện' +
+  '</div>' +
+
+  '<div class="menu-set-status stats-none" id="set-status-' + set.id + '">' +
+    '⚪ Chưa luyện' +
+  '</div>' +
+
+'</div>' +
+      '<div class="menu-inprogress" id="inprogress-' + set.id + '" style="display:none;">' +
+        '<div class="menu-inprogress-track"><div class="menu-inprogress-fill"></div></div>' +
+        '<span class="menu-inprogress-pct"></span>' +
+      '</div>' +
     '</div>' +
     '<div class="menu-arrow">➜</div>';
   el.addEventListener('click', ()=> popThenSelect(el, set.id));
@@ -2014,12 +3687,82 @@ function popThenSelect(el, id){
   }, 150);
 }
 DIALOGUE_SETS.forEach(set=>{
-  const target = set.length === 'long' ? menuGridLong : menuGridShort;
+
+  let target;
+
+  if(set.level === 'beginner'){
+    target = menuGridShort;
+  }
+  else if(set.level === 'elementary'){
+    target = menuGridElementary;
+  }
+  else if(set.level === 'intermediate'){
+    target = menuGridLong;
+  }
+  else{
+    target = menuGridShort;
+  }
+
   target.appendChild(buildMenuCard(set));
+
 });
-document.getElementById('countShort').textContent = DIALOGUE_SETS.filter(s=>s.length==='short').length;
-document.getElementById('countLong').textContent = DIALOGUE_SETS.filter(s=>s.length==='long').length;
+
 updateStudyProgress();
+updateLevelProgress();
+
+/* ================= Level accordion (expand/collapse on click) ================= */
+// Each level starts collapsed; tapping its header reveals the dialogues
+// inside it. Uses a max-height transition (not @keyframes) so it stays
+// smooth and reliable across browsers/devices.
+function setLevelOpen(header, open){
+  const level = header.closest('.learning-level');
+  const body = document.getElementById(header.getAttribute('aria-controls'));
+  if(!level || !body) return;
+
+  if(open){
+    level.classList.add('open');
+    header.setAttribute('aria-expanded','true');
+    body.style.maxHeight = body.scrollHeight + 'px';
+    const onEnd = (e)=>{
+      if(e.propertyName !== 'max-height') return;
+      body.removeEventListener('transitionend', onEnd);
+      // Once fully open, stop pinning a fixed pixel height so the content
+      // can still grow/shrink naturally (e.g. on window resize).
+      if(level.classList.contains('open')) body.style.maxHeight = 'none';
+    };
+    body.addEventListener('transitionend', onEnd);
+  } else {
+    // If height is currently 'none' (fully open), pin it to a concrete pixel
+    // value first so the browser has a real starting point to transition from.
+    if(!body.style.maxHeight || body.style.maxHeight === 'none'){
+      body.style.maxHeight = body.scrollHeight + 'px';
+      void body.offsetHeight;
+    }
+    requestAnimationFrame(()=>{
+      level.classList.remove('open');
+      header.setAttribute('aria-expanded','false');
+      body.style.maxHeight = '0px';
+    });
+  }
+}
+
+document.querySelectorAll('.level-header').forEach(header=>{
+  header.addEventListener('click', ()=>{
+    ensureCtx(); sfx.tap();
+    const level = header.closest('.learning-level');
+    const isOpen = level.classList.contains('open');
+    setLevelOpen(header, !isOpen);
+  });
+});
+
+// Expands the level that a given dialogue set belongs to (used when jumping
+// back to the menu so the learner immediately sees where they landed).
+function expandLevelFor(levelKey){
+  const header = document.querySelector('.level-header[data-level="' + levelKey + '"]');
+  if(header) setLevelOpen(header, true);
+}
+updatePracticeStats();
+updateAllDialogueStats();
 
 function buildDots(){
   progressWrap.innerHTML = '';
@@ -2036,8 +3779,23 @@ function selectDialogue(id){
   if(!set) return;
   ensureCtx();
   sfx.tap();
+
+  // If this dialogue was left unfinished before, ask the learner whether to
+  // pick up where they left off or start fresh, instead of silently
+  // restarting from line 1.
+  const map = getInProgressMap();
+  const entry = map[id];
+  if(entry && entry.idx > 0 && entry.idx < entry.total){
+    openResumeModal(set, entry);
+    return;
+  }
+
+  launchDialogue(set, 0);
+}
+
+function launchDialogue(set, startIdx){
   dialogue = set.lines;
-  idx = 0;
+  idx = startIdx || 0;
   isInitialRender = true;
   currentSetId = set.id;
   buildDots();
@@ -2046,6 +3804,59 @@ function selectDialogue(id){
   homeBtn.style.display = 'flex';
   paintContent();
 }
+
+/* ---- "Tiếp tục bài" resume modal ---- */
+const resumeOverlay = document.getElementById('resumeOverlay');
+const resumeTitle = document.getElementById('resumeTitle');
+const resumeSub = document.getElementById('resumeSub');
+const resumeFill = document.getElementById('resumeFill');
+const resumeContinueBtn = document.getElementById('resumeContinueBtn');
+const resumeRestartBtn = document.getElementById('resumeRestartBtn');
+const resumeCancelBtn = document.getElementById('resumeCancelBtn');
+let pendingResumeSet = null;
+let pendingResumeEntry = null;
+
+function openResumeModal(set, entry){
+  pendingResumeSet = set;
+  pendingResumeEntry = entry;
+  const pct = Math.min(100, Math.round((entry.idx / entry.total) * 100));
+  resumeTitle.textContent = set.title;
+  resumeSub.textContent = 'Đã học ' + entry.idx + '/' + entry.total + ' lượt thoại (' + pct + '%)';
+  resumeFill.style.width = pct + '%';
+  resumeOverlay.classList.add('show');
+}
+function closeResumeModal(){
+  resumeOverlay.classList.remove('show');
+  pendingResumeSet = null;
+  pendingResumeEntry = null;
+}
+resumeContinueBtn.addEventListener('click', (e)=>{
+  e.stopPropagation();
+  ensureCtx(); sfx.tap();
+  if(pendingResumeSet && pendingResumeEntry){
+    const set = pendingResumeSet, startIdx = pendingResumeEntry.idx;
+    closeResumeModal();
+    launchDialogue(set, startIdx);
+  }
+});
+resumeRestartBtn.addEventListener('click', (e)=>{
+  e.stopPropagation();
+  ensureCtx(); sfx.tap();
+  if(pendingResumeSet){
+    const set = pendingResumeSet;
+    clearInProgress(set.id);
+    closeResumeModal();
+    launchDialogue(set, 0);
+  }
+});
+resumeCancelBtn.addEventListener('click', (e)=>{
+  e.stopPropagation();
+  ensureCtx(); sfx.tap();
+  closeResumeModal();
+});
+resumeOverlay.addEventListener('click', (e)=>{
+  if(e.target === resumeOverlay){ ensureCtx(); sfx.tap(); closeResumeModal(); }
+});
 
 function goToMenu(){
   ensureCtx();
@@ -2060,6 +3871,11 @@ function goToMenu(){
   practiceScreen.style.display = 'none';
   homeBtn.style.display = 'none';
   menuScreen.classList.remove('hide');
+  refreshInProgressBadges();
+  if(currentSetId){
+    const set = DIALOGUE_SETS.find(s => s.id === currentSetId);
+    if(set && set.level) expandLevelFor(set.level);
+  }
 }
 homeBtn.addEventListener('click', (e)=>{ e.stopPropagation(); goToMenu(); });
 
@@ -2072,9 +3888,58 @@ function ensureCtx(){
     const Ctor = window.AudioContext || window.webkitAudioContext;
     if(Ctor) actx = new Ctor();
   }
-  if(actx && actx.state === 'suspended') actx.resume();
+  if(actx && actx.state !== 'running'){
+    // iOS Safari/Chrome can leave the context "suspended" even after resume()
+    // is called once, so just fire-and-retry rather than assuming it worked.
+    actx.resume().catch(()=>{});
+  }
   return actx;
 }
+
+/* ---- iOS Safari & Chrome-on-iOS lock WebAudio + SpeechSynthesis behind a
+   real user gesture much more strictly than desktop/Android. A plain
+   resume() often silently fails there. Playing one silent buffer and
+   speaking one empty utterance inside the very first tap/touch fully
+   unlocks both APIs for the rest of the session. ---- */
+let audioUnlockedIOS = false;
+function unlockAudioForIOS(){
+  if(audioUnlockedIOS) return;
+  audioUnlockedIOS = true;
+  try{
+    const ctx = ensureCtx();
+    if(ctx){
+      const buffer = ctx.createBuffer(1, 1, 22050);
+      const src = ctx.createBufferSource();
+      src.buffer = buffer;
+      src.connect(ctx.destination);
+      if(src.start) src.start(0); else if(src.noteOn) src.noteOn(0);
+    }
+  }catch(e){}
+  try{
+    if('speechSynthesis' in window){
+      const warm = new SpeechSynthesisUtterance(' ');
+      warm.volume = 0;
+      window.speechSynthesis.speak(warm);
+      window.speechSynthesis.cancel();
+    }
+  }catch(e){}
+}
+document.addEventListener('touchend', unlockAudioForIOS, {passive:true});
+document.addEventListener('click', unlockAudioForIOS);
+
+/* ---- Some iOS builds populate the voice list asynchronously after the
+   page loads, so the very first speak() call can go out with no voice
+   selected and produce no sound. Cache the list once it's ready and pick
+   an English voice explicitly instead of relying on the default. ---- */
+let cachedVoices = [];
+function refreshVoices(){
+  if('speechSynthesis' in window) cachedVoices = window.speechSynthesis.getVoices();
+}
+if('speechSynthesis' in window){
+  refreshVoices();
+  window.speechSynthesis.onvoiceschanged = refreshVoices;
+}
+
 function tone(freq, start, dur, type='sine', peakGain=0.18){
   const ctx = ensureCtx();
   if(!ctx || !sfxOn) return;
@@ -2106,6 +3971,7 @@ sfxToggle.addEventListener('click', ()=>{
   sfxOn = !sfxOn;
   sfxToggle.textContent = sfxOn ? '🔊' : '🔇';
   if(sfxOn){ ensureCtx(); sfx.tap(); }
+  else if(window.speechSynthesis){ window.speechSynthesis.cancel(); }
 });
 
 /* ================= Karaoke-style word highlight ================= */
@@ -2141,6 +4007,7 @@ function clearKaraoke(){
 let speechToken = 0;
 function speak(text){
   try{
+    if(!sfxOn) return;
     if(!('speechSynthesis' in window)) return;
     window.speechSynthesis.cancel();
     clearKaraoke();
@@ -2154,6 +4021,10 @@ function speak(text){
     const u = new SpeechSynthesisUtterance(text);
     u.lang = 'en-US';
     u.rate = 0.92;
+    if(cachedVoices.length){
+      const v = cachedVoices.find(v => v.lang === 'en-US') || cachedVoices.find(v => v.lang && v.lang.startsWith('en'));
+      if(v) u.voice = v;
+    }
     u.onstart = ()=>{
       if(myToken !== speechToken) return;
       currentSpeakingAvatar = speakingAvatar;
@@ -2280,6 +4151,7 @@ function paintContent(){
     updateDots(dialogue.length);
     burstConfetti();
     sfx.complete();
+    clearInProgress(currentSetId);
     markSetCompleted(currentSetId);
     return;
   }
@@ -2292,11 +4164,14 @@ function paintContent(){
   document.querySelector('.card-fold').style.display = 'block';
   document.querySelectorAll('.quote-glyph').forEach(el => el.style.display = 'block');
 
+  saveInProgress(currentSetId, idx, dialogue.length);
+
   const [speaker, text, vi] = dialogue[idx];
   speakerBadge.textContent = speaker;
   speakerBadge.className = 'speaker-badge ' + (speaker === 'Pear' ? 'pear' : 'egg');
   setLineTextAnimated(text);
   lineTranslationText.textContent = vi || '';
+  renderChunkPractice(text);
   pulseTranslationIn();
   miniChip.textContent = speaker === 'Pear' ? '🍐' : '🥚';
   cardTag.textContent = 'Line ' + (idx+1);
@@ -2430,10 +4305,21 @@ document.addEventListener('keydown',(e)=>{
 const SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
 const speechSupported = !!SpeechRecognitionCtor;
 const mediaSupported = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+// Android Chrome shares one exclusive microphone channel between getUserMedia()
+// and the built-in SpeechRecognition engine. Keeping a second getUserMedia
+// stream open (as we do below, purely so the user can play back their own
+// voice) makes SpeechRecognition silently return zero results on most Android
+// devices, and also makes Android switch the whole page's audio output into
+// "voice call" mode, which mutes the Web Audio sound effects too. So on
+// Android we skip the extra getUserMedia/MediaRecorder capture entirely and
+// rely only on SpeechRecognition — this fixes both the "recording doesn't
+// work" and "no sound effects" symptoms on Android at the same time.
+const isAndroid = /Android/i.test(navigator.userAgent);
 
 let recognition = null;
 let isRecording = false;
 let mediaRecorder = null;
+let recordSafetyTimer = null;
 let recordedChunks = [];
 let myAudioURL = null;
 let micStream = null; // reused across recordings so we only ask permission once per session
@@ -2451,6 +4337,106 @@ function normalizeWord(w){
 /* ---- Ngân hàng mẹo phát âm ----
    Mỗi mục: [nhãn nhóm âm, lời khuyên tiếng Việt]. Nhãn dùng để tránh hiện
    3 mẹo cùng nói về một loại lỗi (vd. 3 từ đều lỗi "th" thì chỉ hiện 1 mẹo). */
+/* ---- Dữ liệu IPA & âm trọng tâm ----
+   Dùng riêng cho phần Pronunciation Focus.
+   ipa: phiên âm IPA
+   focus: âm cần chú ý
+   tip: hướng dẫn ngắn
+*/
+const PRONUNCIATION_DB = {
+
+  'think': {
+    ipa: '/θɪŋk/',
+    focus: '/θ/',
+    tip: 'Đặt đầu lưỡi nhẹ giữa hai hàm răng và đẩy hơi ra. Không đọc thành /t/.'
+  },
+
+  'thank': {
+    ipa: '/θæŋk/',
+    focus: '/θ/',
+    tip: 'Đưa đầu lưỡi nhẹ ra giữa hai răng rồi thổi hơi.'
+  },
+
+  'that': {
+    ipa: '/ðæt/',
+    focus: '/ð/',
+    tip: 'Đặt đầu lưỡi giữa hai răng và tạo rung nhẹ ở cổ họng.'
+  },
+
+  'this': {
+    ipa: '/ðɪs/',
+    focus: '/ð/',
+    tip: 'Âm /ð/ có rung nhẹ, không đọc thành /d/.'
+  },
+
+  'the': {
+    ipa: '/ðə/',
+    focus: '/ð/',
+    tip: 'Âm /ð/ rất nhẹ và ngắn ở đầu từ.'
+  },
+
+  'three': {
+    ipa: '/θriː/',
+    focus: '/θ/',
+    tip: 'Đặt đầu lưỡi giữa hai răng rồi thổi hơi; sau đó chuyển nhanh sang /r/.'
+  },
+
+  'really': {
+    ipa: '/ˈriːəli/',
+    focus: '/r/',
+    tip: 'Cong lưỡi nhẹ ra sau, không rung lưỡi như âm r tiếng Việt.'
+  },
+
+  'school': {
+    ipa: '/skuːl/',
+    focus: '/sk/',
+    tip: 'Nối /s/ với /k/ liền nhau, không chèn nguyên âm ở giữa.'
+  },
+
+  'street': {
+    ipa: '/striːt/',
+    focus: '/str/',
+    tip: 'Giữ cụm /str/ liền mạch, không tách thành nhiều âm tiết.'
+  },
+
+  'sports': {
+    ipa: '/spɔːrts/',
+    focus: '/sp/',
+    tip: 'Nối /s/ với /p/ ngay lập tức, không thêm nguyên âm ở giữa.'
+  },
+
+  'spring': {
+    ipa: '/sprɪŋ/',
+    focus: '/spr/',
+    tip: 'Đọc liền cụm /spr/, không tách /s/, /p/, /r/ thành từng phần.'
+  },
+
+  'important': {
+    ipa: '/ɪmˈpɔːrtənt/',
+    focus: '/ˈpɔːr/',
+    tip: 'Trọng âm rơi vào âm tiết thứ hai: im-POR-tant.'
+  },
+
+  'games': {
+    ipa: '/ɡeɪmz/',
+    focus: '/z/',
+    tip: 'Giữ âm /z/ nhẹ ở cuối từ, không bỏ âm cuối.'
+  },
+
+  'movies': {
+    ipa: '/ˈmuːviz/',
+    focus: '/z/',
+    tip: 'Kết thúc bằng âm /z/ nhẹ.'
+  },
+
+  'books': {
+    ipa: '/bʊks/',
+    focus: '/ks/',
+    tip: 'Giữ rõ cụm âm cuối /ks/.'
+  }
+
+};
+
 const TIPS_DB = {
   // ---- âm "th" (🔤) ----
   'thank':      ['🔤','“Thank”: đặt đầu lưỡi giữa hai hàm răng, đẩy hơi ra nhẹ cho âm “th” vô thanh (θ) — đừng đọc thành “tank”.'],
@@ -2611,34 +4597,353 @@ function resetPracticeUI(){
   if(mediaRecorder && mediaRecorder.state !== 'inactive'){ try{ mediaRecorder.stop(); }catch(e){} }
 }
 
+function escapeHTML(str){
+  return str.replace(/[&<>"']/g, function(ch){
+    return {
+      '&':'&amp;',
+      '<':'&lt;',
+      '>':'&gt;',
+      '"':'&quot;',
+      "'":'&#039;'
+    }[ch];
+  });
+}
+function renderComparison(targetWords, matched){
+  comparisonText.innerHTML = targetWords.map((word, i) => {
+    const cls = matched[i] ? 'comparison-match' : 'comparison-miss';
+
+    return '<span class="comparison-word ' + cls + '">' +
+      escapeHTML(word) +
+      '</span>';
+  }).join(' ');
+}
+
+function splitIntoChunks(text){
+
+  const words = text.trim().split(/\s+/).filter(Boolean);
+
+  if(words.length <= 3){
+    return [text.trim()];
+  }
+
+  const chunks = [];
+  let current = [];
+
+  words.forEach((word, index) => {
+
+    current.push(word);
+
+    const clean = word.toLowerCase().replace(/[.,!?]/g,'');
+
+    const shouldBreak =
+      current.length >= 3 &&
+      (
+        /[.,!?]$/.test(word) ||
+        ['and','but','because','so','then','at','in','on','with','for','to'].includes(clean) ||
+        current.length >= 5
+      );
+
+    if(shouldBreak){
+      chunks.push(current.join(' '));
+      current = [];
+    }
+  });
+
+  if(current.length){
+    chunks.push(current.join(' '));
+  }
+
+  return chunks;
+}
+
+function normalizeChunks(chunks){
+
+  const result = [];
+
+  chunks.forEach(chunk => {
+
+    const words = chunk.split(/\s+/).filter(Boolean);
+
+    if(
+      words.length <= 1 &&
+      result.length > 0
+    ){
+      result[result.length - 1] += ' ' + chunk;
+    } else {
+      result.push(chunk);
+    }
+
+  });
+
+  return result;
+}
+
+function renderChunkPractice(text){
+
+  const rawChunks = splitIntoChunks(text);
+  const chunks = normalizeChunks(rawChunks);
+
+  if(chunks.length <= 1){
+    chunkPractice.style.display = 'none';
+    chunksList.innerHTML = '';
+    return;
+  }
+
+  chunksList.innerHTML = chunks.map((chunk, index) => {
+
+    const safeChunk = escapeHTML(chunk);
+
+    return `
+      <div class="chunk-item">
+
+        <div class="chunk-number">
+          ${index + 1}
+        </div>
+
+        <div class="chunk-content">
+
+          <div class="chunk-text">
+            ${safeChunk}
+          </div>
+
+          <div class="chunk-actions">
+
+            <button
+              class="chunk-btn chunk-speak"
+              data-chunk="${safeChunk}">
+              🔊 Nghe
+            </button>
+
+            <button
+              class="chunk-btn chunk-record"
+              data-chunk="${safeChunk}">
+              🎙️ Nói
+            </button>
+
+          </div>
+
+          <div
+            class="chunk-result"
+            id="chunkResult${index}">
+          </div>
+
+        </div>
+
+      </div>
+    `;
+
+  }).join('');
+
+  chunkPractice.style.display = 'block';
+
+  chunksList.querySelectorAll('.chunk-speak').forEach(btn => {
+
+    btn.addEventListener('click', () => {
+      ensureCtx();
+      sfx.tap();
+
+      const text = btn.dataset.chunk;
+      speak(text);
+    });
+
+  });
+
+  chunksList.querySelectorAll('.chunk-record').forEach((btn, index) => {
+
+    btn.addEventListener('click', () => {
+      ensureCtx();
+      sfx.tap();
+
+      startChunkRecording(
+        btn.dataset.chunk,
+        index
+      );
+    });
+
+  });
+}
+
+function renderPronunciationFocus(targetWords, matched){
+
+  const focusWords = [];
+
+  for(let i = 0; i < targetWords.length; i++){
+
+    // Nếu từ đã khớp thì chưa cần ưu tiên luyện
+    if(matched[i]) continue;
+
+    const cleanWord = targetWords[i]
+      .toLowerCase()
+      .replace(/[.,!?;:'"()]/g, '');
+
+    const entry = PRONUNCIATION_DB[cleanWord];
+
+    if(entry){
+
+      focusWords.push({
+        word: targetWords[i].replace(/[.,!?;:'"()]/g, ''),
+        ...entry
+      });
+
+    }
+
+    // Chỉ hiển thị tối đa 3 từ
+    if(focusWords.length >= 3) break;
+  }
+
+
+  // Không tìm thấy từ nào trong database
+ if(focusWords.length === 0){
+
+  pronunciationFocus.style.display = 'none';
+  pronunciationFocusContent.innerHTML = '';
+
+  return;
+}
+
+
+  pronunciationFocusContent.innerHTML = focusWords.map((item, index) => {
+
+    const safeWord = escapeHTML(item.word);
+    const safeIPA = escapeHTML(item.ipa);
+    const safeFocus = escapeHTML(item.focus);
+    const safeTip = escapeHTML(item.tip);
+
+    return `
+      <div class="pronunciation-item">
+
+        <div class="pronunciation-item-top">
+
+          <div>
+            <div class="pronunciation-word">
+              ${safeWord}
+            </div>
+
+            <div class="pronunciation-ipa">
+              ${safeIPA}
+            </div>
+          </div>
+
+          <button
+            class="pronunciation-listen"
+            data-pronunciation="${safeWord}">
+            🔊
+          </button>
+
+        </div>
+
+        <div class="pronunciation-focus-sound">
+          🎯 Âm trọng tâm:
+          <strong>${safeFocus}</strong>
+        </div>
+
+        <div class="pronunciation-tip">
+          💡 ${safeTip}
+        </div>
+
+        <button
+          class="pronunciation-practice-btn"
+          data-pronunciation="${safeWord}">
+          👄 Luyện từ này
+        </button>
+
+        <div
+          class="pronunciation-result"
+          id="pronunciationResult${index}">
+        </div>
+
+      </div>
+    `;
+
+  }).join('');
+
+
+  pronunciationFocus.style.display = 'block';
+
+
+  // 🔊 Nghe từng từ
+  pronunciationFocusContent
+    .querySelectorAll('.pronunciation-listen')
+    .forEach(button => {
+
+      button.addEventListener('click', () => {
+
+        ensureCtx();
+        sfx.tap();
+
+        speak(button.dataset.pronunciation);
+
+      });
+
+    });
+
+
+  // 👄 Luyện từng từ
+  pronunciationFocusContent
+    .querySelectorAll('.pronunciation-practice-btn')
+    .forEach((button, index) => {
+
+      button.addEventListener('click', () => {
+
+        ensureCtx();
+        sfx.tap();
+
+        startChunkRecording(
+          button.dataset.pronunciation,
+          index
+        );
+
+      });
+
+    });
+
+}
+
 function scoreAndRender(heardTextRaw){
   const target = dialogue[idx][1];
   const targetWords = target.split(/\s+/).filter(Boolean);
   const heardWords = heardTextRaw.split(/\s+/).filter(Boolean);
 
   const { matched, lcsLength } = alignWords(targetWords, heardWords);
-  const pct = targetWords.length ? Math.round((lcsLength / targetWords.length) * 100) : 0;
+  const pct = targetWords.length ? Math.round((lcsLength / targetWords.length) * 100) : 0; 
+  recordPracticeScore(pct);
+  recordPracticeScoreForSet(pct, currentSetId);
   const missedCount = targetWords.length - lcsLength;
   const extraCount = Math.max(0, heardWords.length - lcsLength);
 
-  heardText.innerHTML = targetWords.map((w,i)=>{
-    const cls = matched[i] ? 'match' : 'miss';
-    return '<span class="w ' + cls + '">' + w + '</span>';
-  }).join(' ');
+ heardText.innerHTML = escapeHTML(heardTextRaw);
+ renderComparison(targetWords, matched);
+ renderPronunciationFocus(targetWords, matched);
 
   // ---- các chỉ số chi tiết ----
   statRow.innerHTML =
     '<div class="stat-pill">✅ ' + lcsLength + '/' + targetWords.length + ' từ đúng</div>' +
     '<div class="stat-pill">🗣️ Nói ' + heardWords.length + ' từ</div>' +
     (missedCount > 0 ? '<div class="stat-pill">🔎 ' + missedCount + ' từ cần chỉnh</div>' : '') +
-    (extraCount > 1 ? '<div class="stat-pill">➕ ' + extraCount + ' âm thừa</div>' : '');
+    (extraCount > 0 ? '<div class="stat-pill">➕ ' + extraCount + ' từ thừa</div>' : '');
 
-  // ---- huy hiệu điểm số ----
+  // ---- huy hiệu ĐỘ KHỚP CÂU ----
   scoreBadge.classList.remove('score-great','score-ok','score-retry');
-  let msg = '';
-  if(pct >= 85){ scoreBadge.classList.add('score-great'); msg = pct + '% — Xuất sắc! 🌟'; sfx.great(); }
-  else if(pct >= 55){ scoreBadge.classList.add('score-ok'); msg = pct + '% — Khá tốt! 💪'; sfx.ok(); }
-  else { scoreBadge.classList.add('score-retry'); msg = pct + '% — Cố lên, thử lại nhé! 🐣'; sfx.retry(); }
+
+let msg = '';
+
+if(pct >= 85){
+  scoreBadge.classList.add('score-great');
+  msg = pct + '% — Độ khớp câu: Xuất sắc! 🌟';
+  sfx.great();
+}
+else if(pct >= 55){
+  scoreBadge.classList.add('score-ok');
+  msg = pct + '% — Độ khớp câu: Khá tốt! 💪';
+  sfx.ok();
+}
+else {
+  scoreBadge.classList.add('score-retry');
+  msg = pct + '% — Độ khớp câu: Thử lại nhé! 🐣';
+  sfx.retry();
+}
+
+scoreBadge.textContent = msg;
   scoreBadge.textContent = msg;
   scoreBadge.classList.remove('pop'); void scoreBadge.offsetWidth; scoreBadge.classList.add('pop');
 
@@ -2694,6 +4999,129 @@ function scoreAndRender(heardTextRaw){
   resultBox.classList.add('show');
 }
 
+let chunkRecognition = null;
+let chunkRecording = false;
+
+function startChunkRecording(targetText, chunkIndex){
+
+  if(!('SpeechRecognition' in window) &&
+     !('webkitSpeechRecognition' in window)){
+
+    const result = document.getElementById('chunkResult' + chunkIndex);
+
+    if(result){
+      result.textContent =
+        '⚠️ Trình duyệt này không hỗ trợ nhận diện giọng nói.';
+    }
+
+    return;
+  }
+
+  if(chunkRecording){
+    return;
+  }
+
+  const SpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+  chunkRecognition = new SpeechRecognition();
+
+  chunkRecognition.lang = 'en-US';
+  chunkRecognition.interimResults = false;
+  chunkRecognition.continuous = false;
+  chunkRecognition.maxAlternatives = 1;
+
+  chunkRecording = true;
+
+  const result =
+    document.getElementById('chunkResult' + chunkIndex);
+
+  if(result){
+    result.textContent = '🎙️ Đang nghe...';
+  }
+
+  chunkRecognition.onresult = (event) => {
+
+    const heard =
+      event.results[0][0].transcript.trim();
+
+    const targetWords =
+      targetText.split(/\s+/).filter(Boolean);
+
+    const heardWords =
+      heard.split(/\s+/).filter(Boolean);
+
+    const {
+      lcsLength
+    } = alignWords(targetWords, heardWords);
+
+    const pct =
+      targetWords.length
+        ? Math.round(
+            (lcsLength / targetWords.length) * 100
+          )
+        : 0;
+
+    if(result){
+
+      if(pct >= 85){
+
+        result.innerHTML =
+          '✅ Rất tốt! ' + pct + '%';
+
+      } else if(pct >= 55){
+
+        result.innerHTML =
+          '🟡 Khá tốt — thử lại để rõ hơn. ' +
+          pct + '%';
+
+      } else {
+
+        result.innerHTML =
+          '🔴 Hãy nghe lại và thử thêm lần nữa. ' +
+          pct + '%';
+
+      }
+
+      result.innerHTML +=
+        '<br><span>🎤 Máy nghe: ' +
+        escapeHTML(heard) +
+        '</span>';
+
+    }
+
+  };
+
+  chunkRecognition.onerror = (event) => {
+
+    if(result){
+
+      if(event.error === 'not-allowed'){
+        result.textContent =
+          '⚠️ Hãy cho phép trình duyệt sử dụng micro.';
+      } else {
+        result.textContent =
+          '⚠️ Không nhận diện được. Hãy thử lại.';
+      }
+
+    }
+
+    chunkRecording = false;
+  };
+
+  chunkRecognition.onend = () => {
+    chunkRecording = false;
+    chunkRecognition = null;
+  };
+
+  try{
+    chunkRecognition.start();
+  }catch(err){
+    chunkRecording = false;
+  }
+}
+
 async function startRecording(){
   if(!speechSupported) return;
   ensureCtx();
@@ -2706,8 +5134,15 @@ async function startRecording(){
 
   recognition = new SpeechRecognitionCtor();
   recognition.lang = 'en-US';
+  recognition.continuous = true;
   recognition.interimResults = false;
   recognition.maxAlternatives = 1;
+
+  // continuous mode means the browser won't auto-stop after a short pause,
+  // so give the learner a generous window to say a full sentence, then stop
+  // automatically as a safety net (in case they forget to tap the mic again).
+  clearTimeout(recordSafetyTimer);
+  recordSafetyTimer = setTimeout(()=>{ stopRecording(); }, 20000);
 
   let finalTranscript = '';
 
@@ -2719,13 +5154,20 @@ async function startRecording(){
     }
   };
   recognition.onerror = (event)=>{
-    micLabel.textContent = event.error === 'not-allowed'
-      ? 'Trình duyệt đang chặn quyền micro 🙈 hãy cho phép rồi thử lại nhé'
-      : 'Ồ, mình chưa nghe rõ lắm. Thử lại nhé 🎙️';
+    if(event.error === 'not-allowed'){
+      micLabel.textContent = 'Trình duyệt đang chặn quyền micro 🙈 hãy cho phép rồi thử lại nhé';
+    } else if(event.error === 'network'){
+      micLabel.textContent = 'Không có mạng để nhận diện giọng nói 📶 hãy kiểm tra kết nối rồi thử lại';
+    } else if(event.error === 'audio-capture'){
+      micLabel.textContent = 'Không tìm thấy micro khả dụng 🎙️ hãy kiểm tra thiết bị rồi thử lại';
+    } else {
+      micLabel.textContent = 'Ồ, mình chưa nghe rõ lắm. Thử lại nhé 🎙️';
+    }
     if(mediaRecorder && mediaRecorder.state !== 'inactive'){ try{ mediaRecorder.stop(); }catch(e){} }
   };
   recognition.onend = ()=>{
     isRecording = false;
+    clearTimeout(recordSafetyTimer);
     micBtn.classList.remove('recording');
     setMicIdle();
     sfx.recordStop();
@@ -2741,7 +5183,7 @@ async function startRecording(){
     }
   };
 
-  if(mediaSupported){
+  if(mediaSupported && !isAndroid){
     try{
       // Reuse the previously granted stream if it's still live, so the
       // browser only has to ask for microphone permission once per session
@@ -2784,6 +5226,10 @@ micBtn.addEventListener('click', (e)=>{
     startRecording();
   }
 });
+
+if(isAndroid){
+  playMineBtn.style.display = 'none';
+}
 
 playMineBtn.addEventListener('click', (e)=>{
   e.stopPropagation();
