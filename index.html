@@ -26,7 +26,11 @@
     --shadow-sm: 0 8px 18px -8px rgba(74,55,40,0.2);
   }
   *{box-sizing:border-box;}
-  html,body{
+  html{
+    margin:0; padding:0;
+    overflow-x:hidden;
+  }
+  body{
     margin:0; padding:0; min-height:100%;
     font-family:'Quicksand', sans-serif;
     background: var(--cream);
@@ -1930,6 +1934,59 @@
   }
 
 }
+
+/* ===== Pear & Egg v2 learner dashboard ===== */
+.pe-dashboard{
+  width:100%;
+  margin:12px 0 18px;
+  padding:14px;
+  border:2px solid #F0E4D2;
+  border-radius:22px;
+  background:linear-gradient(135deg,#fffdf8,#fff7ed);
+  box-shadow:var(--shadow-sm);
+}
+.pe-dashboard-top{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  margin-bottom:11px;
+}
+.pe-dashboard-title{
+  font-family:'Baloo 2',sans-serif;font-weight:800;font-size:16px;color:var(--ink);
+}
+.pe-level-badge{
+  padding:5px 10px;border-radius:999px;background:#F3E9D9;
+  font-size:11px;font-weight:800;color:var(--ink);
+}
+.pe-dashboard-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:8px;
+}
+.pe-mini-stat{
+  min-width:0;padding:10px 7px;border-radius:15px;background:#fff;
+  border:1px solid #F1E5D5;text-align:center;
+}
+.pe-mini-icon{font-size:18px;line-height:1.1}
+.pe-mini-value{font-family:'Baloo 2',sans-serif;font-size:18px;font-weight:800;color:var(--ink);margin-top:2px}
+.pe-mini-label{font-size:9.5px;font-weight:700;color:var(--ink-soft);line-height:1.15}
+.pe-goal{
+  margin-top:10px;padding:9px 10px;border-radius:13px;background:#F8F0E5;
+  font-size:11px;font-weight:700;color:var(--ink-soft);
+}
+.pe-goal-track{height:7px;border-radius:999px;background:#EADDCB;overflow:hidden;margin-top:7px}
+.pe-goal-fill{height:100%;width:0;background:var(--pear);border-radius:999px;transition:width .45s ease}
+.pe-achievements{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+.pe-achievement{
+  padding:5px 8px;border-radius:999px;font-size:10px;font-weight:800;
+  background:#F3E9D9;color:var(--ink-soft);
+}
+.pe-achievement.unlocked{background:#EAF5D8;color:#49662A}
+.pe-dashboard-actions{display:flex;justify-content:flex-end;margin-top:8px}
+.pe-reset{
+  border:0;background:transparent;color:#9A7A62;font-size:10px;font-weight:700;
+  cursor:pointer;text-decoration:underline;padding:4px 2px;
+}
+@media(max-width:600px){
+  .pe-dashboard-grid{grid-template-columns:repeat(2,1fr)}
+}
+
 </style>
 </head>
 <body>
@@ -2003,6 +2060,49 @@
   </div>
 
 </div>
+
+<!-- Pear & Egg v2: learner dashboard -->
+<div class="pe-dashboard" id="peDashboard">
+  <div class="pe-dashboard-top">
+    <div class="pe-dashboard-title">🌱 Hồ sơ luyện tập</div>
+    <div class="pe-level-badge" id="peLevelBadge">Level 1 · New learner</div>
+  </div>
+
+  <div class="pe-dashboard-grid">
+    <div class="pe-mini-stat">
+      <div class="pe-mini-icon">⭐</div>
+      <div class="pe-mini-value" id="peXP">0</div>
+      <div class="pe-mini-label">XP</div>
+    </div>
+    <div class="pe-mini-stat">
+      <div class="pe-mini-icon">🔥</div>
+      <div class="pe-mini-value" id="peStreak">0</div>
+      <div class="pe-mini-label">Ngày liên tiếp</div>
+    </div>
+    <div class="pe-mini-stat">
+      <div class="pe-mini-icon">🎯</div>
+      <div class="pe-mini-value" id="peSessionsToday">0/5</div>
+      <div class="pe-mini-label">Lượt hôm nay</div>
+    </div>
+    <div class="pe-mini-stat">
+      <div class="pe-mini-icon">🏅</div>
+      <div class="pe-mini-value" id="peBest">0%</div>
+      <div class="pe-mini-label">Kỷ lục</div>
+    </div>
+  </div>
+
+  <div class="pe-goal">
+    <div id="peGoalText">🎯 Mục tiêu hôm nay: luyện 5 lần</div>
+    <div class="pe-goal-track"><div class="pe-goal-fill" id="peGoalFill"></div></div>
+  </div>
+
+  <div class="pe-achievements" id="peAchievements"></div>
+
+  <div class="pe-dashboard-actions">
+    <button class="pe-reset" id="peResetData" type="button">Xóa dữ liệu tiến trình trên thiết bị này</button>
+  </div>
+</div>
+
   <!-- 🌱 FIRST STEPS -->
 <div class="learning-level" id="levelBeginner">
 
@@ -2720,6 +2820,198 @@ const DIALOGUE_SETS = [
     ]
   },
   {
+    id: 'short14',
+    level: 'elementary',
+    length: 'short',
+    emoji: '👫',
+    title: 'Bạn bè & tình bạn',
+    desc: 'Nói về người bạn thân, cách các bạn quen nhau và điều gì làm nên một người bạn tốt.',
+    lines: [
+      ["Pear","Who is your best friend?","Bạn thân nhất của cậu là ai?"],
+      ["Egg","My best friend is Tom. We have been friends for about five years.","Bạn thân nhất của mình là Tom. Tụi mình đã là bạn được khoảng năm năm rồi."],
+      ["Pear","How did you meet him?","Cậu quen cậu ấy như thế nào?"],
+      ["Egg","We met at school. We were in the same class.","Tụi mình quen nhau ở trường. Tụi mình học cùng lớp."],
+      ["Pear","What do you usually do together?","Hai đứa thường làm gì cùng nhau?"],
+      ["Egg","We usually study, play games, and go to cafés together.","Tụi mình thường học bài, chơi game và đi cà phê cùng nhau."],
+      ["Pear","What do you like about him?","Cậu thích điều gì ở cậu ấy?"],
+      ["Egg","He is friendly, funny, and always helps me when I have a problem.","Cậu ấy thân thiện, hài hước và luôn giúp mình khi mình gặp khó khăn."],
+      ["Pear","Do you often talk to each other?","Hai đứa có thường xuyên nói chuyện với nhau không?"],
+      ["Egg","Yes. We talk almost every day.","Có chứ. Tụi mình nói chuyện gần như mỗi ngày."],
+      ["Pear","What do you usually talk about?","Hai đứa thường nói về chuyện gì?"],
+      ["Egg","We talk about school, movies, games, music, and our daily lives.","Tụi mình nói về trường học, phim ảnh, trò chơi, âm nhạc và cuộc sống hằng ngày."],
+      ["Pear","Do you ever have arguments?","Hai đứa có bao giờ cãi nhau không?"],
+      ["Egg","Yes, sometimes we disagree about small things.","Có chứ, thỉnh thoảng tụi mình bất đồng về những chuyện nhỏ nhặt."],
+      ["Pear","What do you do when you have an argument?","Cậu làm gì khi hai đứa cãi nhau?"],
+      ["Egg","We usually talk about the problem and say sorry to each other.","Tụi mình thường nói chuyện về vấn đề đó và xin lỗi nhau."],
+      ["Pear","What makes someone a good friend?","Điều gì khiến ai đó trở thành một người bạn tốt?"],
+      ["Egg","I think a good friend should be kind, honest, and helpful.","Mình nghĩ một người bạn tốt nên tốt bụng, trung thực và sẵn lòng giúp đỡ."],
+      ["Pear","Do you prefer having many friends or a few close friends?","Cậu thích có nhiều bạn hay chỉ vài người bạn thân thiết?"],
+      ["Egg","I prefer having a few close friends because I can trust them more.","Mình thích có vài người bạn thân thiết hơn vì mình có thể tin tưởng họ nhiều hơn."]
+    ]
+  },
+  {
+    id: 'short15',
+    level: 'elementary',
+    length: 'short',
+    emoji: '📚',
+    title: 'Trường học & việc học',
+    desc: 'Chia sẻ về môn học yêu thích, cách tự học tiếng Anh và chuẩn bị cho kỳ thi.',
+    lines: [
+      ["Pear","Where do you study?","Cậu học ở đâu?"],
+      ["Egg","I study at a university.","Mình học ở trường đại học."],
+      ["Pear","What is your favorite subject?","Môn học cậu thích nhất là gì?"],
+      ["Egg","My favorite subject is English.","Môn mình thích nhất là tiếng Anh."],
+      ["Pear","Why do you like English?","Vì sao cậu thích tiếng Anh?"],
+      ["Egg","Because I like learning new words and talking to people in English.","Vì mình thích học từ mới và trò chuyện với mọi người bằng tiếng Anh."],
+      ["Pear","Is English difficult for you?","Tiếng Anh có khó với cậu không?"],
+      ["Egg","Sometimes. Grammar can be difficult, but I am trying to improve.","Đôi khi. Ngữ pháp có thể khó, nhưng mình đang cố gắng cải thiện."],
+      ["Pear","How do you usually study English?","Cậu thường học tiếng Anh như thế nào?"],
+      ["Egg","I learn new words, listen to English videos, and practice speaking.","Mình học từ mới, xem video tiếng Anh và luyện nói."],
+      ["Pear","How often do you practice speaking?","Cậu luyện nói thường xuyên như thế nào?"],
+      ["Egg","I try to practice every day, even if it's only for fifteen minutes.","Mình cố gắng luyện tập mỗi ngày, dù chỉ mười lăm phút."],
+      ["Pear","Do you like studying alone?","Cậu có thích học một mình không?"],
+      ["Egg","Yes, because I can concentrate better.","Có chứ, vì mình có thể tập trung tốt hơn."],
+      ["Pear","Do you study with your friends sometimes?","Thỉnh thoảng cậu có học cùng bạn bè không?"],
+      ["Egg","Yes. We sometimes study together before an exam.","Có chứ. Thỉnh thoảng tụi mình học cùng nhau trước kỳ thi."],
+      ["Pear","What do you do when you don't understand a lesson?","Cậu làm gì khi không hiểu bài?"],
+      ["Egg","I ask my teacher or my friends for help.","Mình hỏi giáo viên hoặc bạn bè để được giúp đỡ."],
+      ["Pear","Do you like exams?","Cậu có thích các kỳ thi không?"],
+      ["Egg","Not really. I usually feel nervous before an exam.","Không hẳn. Mình thường thấy lo lắng trước kỳ thi."],
+      ["Pear","What do you do before an important exam?","Cậu làm gì trước một kỳ thi quan trọng?"],
+      ["Egg","I review my lessons, prepare my things, and try to get enough sleep.","Mình ôn lại bài, chuẩn bị đồ dùng và cố gắng ngủ đủ giấc."]
+    ]
+  },
+  {
+    id: 'short16',
+    level: 'elementary',
+    length: 'short',
+    emoji: '🌅',
+    title: 'Một ngày của tôi',
+    desc: 'Kể về lịch trình một ngày bình thường, từ lúc thức dậy đến khi đi ngủ.',
+    lines: [
+      ["Pear","What time do you usually wake up?","Cậu thường thức dậy lúc mấy giờ?"],
+      ["Egg","I usually wake up at seven o'clock.","Mình thường thức dậy lúc bảy giờ."],
+      ["Pear","What do you do after you wake up?","Cậu làm gì sau khi thức dậy?"],
+      ["Egg","I wash my face, brush my teeth, and have breakfast.","Mình rửa mặt, đánh răng rồi ăn sáng."],
+      ["Pear","What do you usually have for breakfast?","Cậu thường ăn gì vào bữa sáng?"],
+      ["Egg","I usually have bread, eggs, or noodles.","Mình thường ăn bánh mì, trứng hoặc mì."],
+      ["Pear","What time do you go to school?","Cậu đi học lúc mấy giờ?"],
+      ["Egg","I usually leave home at about seven thirty.","Mình thường rời nhà vào khoảng bảy giờ rưỡi."],
+      ["Pear","What do you do at school?","Cậu làm gì ở trường?"],
+      ["Egg","I study, talk to my friends, and sometimes join school activities.","Mình học bài, nói chuyện với bạn bè và thỉnh thoảng tham gia hoạt động của trường."],
+      ["Pear","What time do you finish school?","Cậu tan học lúc mấy giờ?"],
+      ["Egg","I usually finish at about five o'clock.","Mình thường tan học vào khoảng năm giờ."],
+      ["Pear","What do you do when you get home?","Cậu làm gì khi về đến nhà?"],
+      ["Egg","I take a shower and have dinner.","Mình tắm rồi ăn tối."],
+      ["Pear","Do you study in the evening?","Buổi tối cậu có học bài không?"],
+      ["Egg","Yes. I usually do my homework for about two hours.","Có chứ. Mình thường làm bài tập khoảng hai tiếng."],
+      ["Pear","What do you do after studying?","Cậu làm gì sau khi học xong?"],
+      ["Egg","I usually listen to music or watch some videos.","Mình thường nghe nhạc hoặc xem vài video."],
+      ["Pear","What time do you go to bed?","Cậu đi ngủ lúc mấy giờ?"],
+      ["Egg","I usually go to bed at around eleven.","Mình thường đi ngủ vào khoảng mười một giờ."],
+      ["Pear","Do you like your daily routine?","Cậu có thích lịch trình hằng ngày của mình không?"],
+      ["Egg","Yes, but sometimes it is a little boring.","Có chứ, nhưng thỉnh thoảng nó hơi nhàm chán."],
+      ["Pear","What would you like to change?","Cậu muốn thay đổi điều gì?"],
+      ["Egg","I want to exercise more and spend less time on my phone.","Mình muốn tập thể dục nhiều hơn và dùng điện thoại ít lại."]
+    ]
+  },
+  {
+    id: 'short17',
+    level: 'elementary',
+    length: 'short',
+    emoji: '📱',
+    title: 'Điện thoại & mạng xã hội',
+    desc: 'Trò chuyện về thói quen dùng điện thoại, mạng xã hội yêu thích và cách cân bằng thời gian.',
+    lines: [
+      ["Pear","How often do you use your phone?","Cậu dùng điện thoại thường xuyên như thế nào?"],
+      ["Egg","I use my phone every day.","Mình dùng điện thoại mỗi ngày."],
+      ["Pear","What do you usually use it for?","Cậu thường dùng nó để làm gì?"],
+      ["Egg","I use it to talk to my friends, listen to music, watch videos, and study.","Mình dùng nó để nói chuyện với bạn bè, nghe nhạc, xem video và học bài."],
+      ["Pear","What social media apps do you use?","Cậu dùng những ứng dụng mạng xã hội nào?"],
+      ["Egg","I usually use Facebook, TikTok, and Instagram.","Mình thường dùng Facebook, TikTok và Instagram."],
+      ["Pear","Which one do you use the most?","Cậu dùng cái nào nhiều nhất?"],
+      ["Egg","I use TikTok the most.","Mình dùng TikTok nhiều nhất."],
+      ["Pear","Why do you like it?","Vì sao cậu thích nó?"],
+      ["Egg","There are many funny and interesting videos.","Có rất nhiều video vui nhộn và thú vị."],
+      ["Pear","How much time do you spend on your phone every day?","Mỗi ngày cậu dùng điện thoại bao lâu?"],
+      ["Egg","Maybe three or four hours a day.","Có lẽ khoảng ba đến bốn tiếng mỗi ngày."],
+      ["Pear","Do you think that's too much?","Cậu có nghĩ như vậy là quá nhiều không?"],
+      ["Egg","Yes, probably. Sometimes I use my phone too much.","Có lẽ vậy. Đôi khi mình dùng điện thoại quá nhiều."],
+      ["Pear","What do you do when you want to spend less time on your phone?","Cậu làm gì khi muốn dùng điện thoại ít lại?"],
+      ["Egg","I put my phone away and do something else.","Mình cất điện thoại đi và làm việc khác."],
+      ["Pear","What do you do instead?","Cậu làm gì thay vào đó?"],
+      ["Egg","I read books, listen to music, exercise, or talk to my family.","Mình đọc sách, nghe nhạc, tập thể dục hoặc nói chuyện với gia đình."],
+      ["Pear","Do you think phones are useful for studying?","Cậu có nghĩ điện thoại hữu ích cho việc học không?"],
+      ["Egg","Yes. I can search for information, learn English, and watch educational videos.","Có chứ. Mình có thể tra cứu thông tin, học tiếng Anh và xem video giáo dục."],
+      ["Pear","What is your favorite thing about your phone?","Điều cậu thích nhất ở điện thoại của mình là gì?"],
+      ["Egg","I like that I can communicate with people very easily.","Mình thích việc có thể liên lạc với mọi người rất dễ dàng."]
+    ]
+  },
+  {
+    id: 'short18',
+    level: 'elementary',
+    length: 'short',
+    emoji: '😊',
+    title: 'Cảm xúc & tâm trạng',
+    desc: 'Nói về những điều khiến bạn vui, buồn, lo lắng hay tức giận.',
+    lines: [
+      ["Pear","How are you feeling today?","Hôm nay cậu cảm thấy thế nào?"],
+      ["Egg","I'm feeling pretty good today.","Hôm nay mình cảm thấy khá ổn."],
+      ["Pear","What usually makes you happy?","Điều gì thường khiến cậu vui?"],
+      ["Egg","Spending time with my family and friends makes me happy.","Được ở bên gia đình và bạn bè khiến mình vui."],
+      ["Pear","What do you do when you feel sad?","Cậu làm gì khi cảm thấy buồn?"],
+      ["Egg","I usually listen to music or talk to someone I trust.","Mình thường nghe nhạc hoặc nói chuyện với người mình tin tưởng."],
+      ["Pear","What makes you feel nervous?","Điều gì khiến cậu cảm thấy lo lắng?"],
+      ["Egg","Exams and speaking in front of many people make me nervous.","Các kỳ thi và việc nói trước đông người khiến mình lo lắng."],
+      ["Pear","What do you do when you are nervous?","Cậu làm gì khi lo lắng?"],
+      ["Egg","I take a deep breath and try to stay calm.","Mình hít thở sâu và cố giữ bình tĩnh."],
+      ["Pear","Do you get angry easily?","Cậu có dễ nổi giận không?"],
+      ["Egg","Not really. I sometimes get angry, but I usually calm down quickly.","Không hẳn. Đôi khi mình nổi giận, nhưng mình thường bình tĩnh lại nhanh."],
+      ["Pear","What makes you angry?","Điều gì khiến cậu tức giận?"],
+      ["Egg","I don't like it when people lie to me or treat others badly.","Mình không thích khi người khác nói dối mình hoặc đối xử tệ với người khác."],
+      ["Pear","What makes you excited?","Điều gì khiến cậu hào hứng?"],
+      ["Egg","Traveling and trying new things make me excited.","Đi du lịch và thử những điều mới khiến mình hào hứng."],
+      ["Pear","When was the last time you felt very happy?","Lần gần nhất cậu cảm thấy rất vui là khi nào?"],
+      ["Egg","I felt very happy when I spent a whole day with my friends last weekend.","Mình cảm thấy rất vui khi dành cả ngày bên bạn bè vào cuối tuần trước."],
+      ["Pear","Do you often talk about your feelings?","Cậu có thường chia sẻ cảm xúc của mình không?"],
+      ["Egg","Not always. I usually talk about my feelings with my closest friends.","Không phải lúc nào cũng vậy. Mình thường chia sẻ cảm xúc với những người bạn thân thiết nhất."],
+      ["Pear","Who do you talk to when you have a problem?","Cậu nói chuyện với ai khi gặp vấn đề?"],
+      ["Egg","I usually talk to my best friend or my family.","Mình thường nói chuyện với bạn thân hoặc gia đình."]
+    ]
+  },
+  {
+    id: 'short19',
+    level: 'elementary',
+    length: 'short',
+    emoji: '🏃',
+    title: 'Sức khỏe & lối sống',
+    desc: 'Chia sẻ về chế độ ăn uống, tập thể dục, giấc ngủ và thói quen sống lành mạnh.',
+    lines: [
+      ["Pear","Do you have a healthy lifestyle?","Cậu có lối sống lành mạnh không?"],
+      ["Egg","I think my lifestyle is quite healthy, but I can still improve.","Mình nghĩ lối sống của mình khá lành mạnh, nhưng vẫn có thể cải thiện thêm."],
+      ["Pear","What do you usually eat?","Cậu thường ăn gì?"],
+      ["Egg","I usually eat rice, vegetables, meat, eggs, and fruit.","Mình thường ăn cơm, rau, thịt, trứng và trái cây."],
+      ["Pear","Do you eat fast food?","Cậu có ăn đồ ăn nhanh không?"],
+      ["Egg","Yes, sometimes, but I don't eat it very often.","Có chứ, thỉnh thoảng, nhưng mình không ăn thường xuyên."],
+      ["Pear","Do you exercise?","Cậu có tập thể dục không?"],
+      ["Egg","Yes. I usually walk, ride a bike, or play badminton.","Có chứ. Mình thường đi bộ, đạp xe hoặc chơi cầu lông."],
+      ["Pear","How often do you exercise?","Cậu tập thể dục thường xuyên như thế nào?"],
+      ["Egg","About two or three times a week.","Khoảng hai đến ba lần một tuần."],
+      ["Pear","How many hours do you sleep every night?","Mỗi đêm cậu ngủ bao nhiêu tiếng?"],
+      ["Egg","I usually sleep about seven or eight hours.","Mình thường ngủ khoảng bảy đến tám tiếng."],
+      ["Pear","Do you drink a lot of water?","Cậu có uống nhiều nước không?"],
+      ["Egg","I try to drink enough water every day.","Mình cố gắng uống đủ nước mỗi ngày."],
+      ["Pear","What do you do when you feel tired?","Cậu làm gì khi cảm thấy mệt?"],
+      ["Egg","I usually take a break, drink some water, and get some rest.","Mình thường nghỉ ngơi một lát, uống chút nước và nghỉ ngơi."],
+      ["Pear","Do you think sleep is important?","Cậu có nghĩ giấc ngủ quan trọng không?"],
+      ["Egg","Yes, definitely. Good sleep helps me feel better and study better.","Có chứ, chắc chắn rồi. Ngủ ngon giúp mình cảm thấy khỏe hơn và học tốt hơn."],
+      ["Pear","Is there anything about your lifestyle you want to change?","Có điều gì trong lối sống của cậu mà cậu muốn thay đổi không?"],
+      ["Egg","Yes. I want to exercise more and use my phone less at night.","Có chứ. Mình muốn tập thể dục nhiều hơn và dùng điện thoại ít lại vào buổi tối."],
+      ["Pear","What is one healthy habit you want to develop?","Một thói quen lành mạnh mà cậu muốn xây dựng là gì?"],
+      ["Egg","I want to go to bed earlier and wake up earlier.","Mình muốn đi ngủ sớm hơn và thức dậy sớm hơn."]
+    ]
+  },
+  {
     id: 'long1',
     level: 'intermediate',
     length: 'long',
@@ -3017,6 +3309,106 @@ const DIALOGUE_SETS = [
       ["Egg","We will. We just need to believe in ourselves and never give up.","Chúng mình sẽ làm được. Chúng mình chỉ cần tin vào bản thân và không bao giờ từ bỏ."],
       ["Pear","You're right. Let's start working for our dreams today!","Cậu nói đúng. Hãy bắt đầu nỗ lực vì ước mơ của chúng mình ngay từ hôm nay!"],
       ["Egg","Let's do it!","Bắt đầu thôi!"]
+    ]
+  },
+  {
+    id: 'long5',
+    level: 'intermediate',
+    length: 'long',
+    emoji: '📱',
+    title: 'Phỏng vấn 5 · Công nghệ và cuộc sống',
+    desc: 'Bàn về vai trò của công nghệ, mạng xã hội, học trực tuyến và cách giữ sự cân bằng.',
+    lines: [
+      ["Pear","Egg, how important is technology in your daily life?","Trứng ơi, công nghệ quan trọng như thế nào trong cuộc sống hằng ngày của cậu?"],
+      ["Egg","Technology is very important in my daily life. I use my phone and computer almost every day for studying, communicating with friends, watching videos, and relaxing. I think it makes many things easier and faster.","Công nghệ rất quan trọng trong cuộc sống hằng ngày của mình. Mình dùng điện thoại và máy tính gần như mỗi ngày để học tập, liên lạc với bạn bè, xem video và giải trí. Mình nghĩ nó giúp nhiều thứ trở nên dễ dàng và nhanh chóng hơn."],
+      ["Pear","What do you usually use your phone for?","Cậu thường dùng điện thoại để làm gì?"],
+      ["Egg","I mainly use it for communication and entertainment. I talk to my friends, check social media, listen to music, and watch videos. I also use it to look up information when I am studying.","Mình chủ yếu dùng nó để liên lạc và giải trí. Mình nói chuyện với bạn bè, xem mạng xã hội, nghe nhạc và xem video. Mình cũng dùng nó để tra cứu thông tin khi học bài."],
+      ["Pear","Do you think you spend too much time on your phone?","Cậu có nghĩ mình dành quá nhiều thời gian cho điện thoại không?"],
+      ["Egg","Sometimes, yes. I sometimes spend more time on my phone than I planned. I may start watching one short video, but then I keep watching more videos for an hour.","Đôi khi có. Thỉnh thoảng mình dùng điện thoại lâu hơn dự định. Mình có thể bắt đầu xem một video ngắn, nhưng rồi lại xem thêm cả tiếng đồng hồ."],
+      ["Pear","Why do you think it is difficult to stop using social media?","Vì sao cậu nghĩ khó có thể dừng dùng mạng xã hội?"],
+      ["Egg","I think social media is designed to keep people interested. There is always something new to watch or read. Also, I don't want to miss what my friends are doing.","Mình nghĩ mạng xã hội được thiết kế để giữ chân người dùng. Luôn có điều gì đó mới để xem hoặc đọc. Ngoài ra, mình không muốn bỏ lỡ những gì bạn bè đang làm."],
+      ["Pear","Do you think social media has more advantages or disadvantages?","Cậu có nghĩ mạng xã hội có nhiều lợi ích hơn hay tác hại nhiều hơn?"],
+      ["Egg","I think it has both. One advantage is that we can communicate with people very easily. We can also learn new things and find useful information. However, using it too much can waste our time and sometimes make us feel stressed.","Mình nghĩ nó có cả hai. Một lợi ích là chúng ta có thể liên lạc với mọi người rất dễ dàng. Chúng ta cũng có thể học những điều mới và tìm thông tin hữu ích. Tuy nhiên, dùng quá nhiều có thể lãng phí thời gian và đôi khi khiến chúng ta cảm thấy căng thẳng."],
+      ["Pear","How can social media make people feel stressed?","Mạng xã hội có thể khiến người ta căng thẳng như thế nào?"],
+      ["Egg","People often compare their lives with other people's lives online. They see photos of people traveling, buying expensive things, or having fun. This can make them feel that their own lives are not good enough, even though social media doesn't always show the real situation.","Người ta thường so sánh cuộc sống của mình với cuộc sống của người khác trên mạng. Họ thấy ảnh người khác đi du lịch, mua đồ đắt tiền hoặc vui chơi. Điều này có thể khiến họ cảm thấy cuộc sống của mình chưa đủ tốt, dù mạng xã hội không phải lúc nào cũng phản ánh đúng thực tế."],
+      ["Pear","That's true. Do you ever compare yourself with other people online?","Đúng vậy đấy. Cậu có bao giờ so sánh bản thân với người khác trên mạng không?"],
+      ["Egg","Yes, sometimes I do. When I see someone who is very successful, I may feel a little disappointed about myself. But I try to remember that everyone has a different journey.","Có, thỉnh thoảng mình cũng có. Khi thấy ai đó rất thành công, mình có thể cảm thấy hơi thất vọng về bản thân. Nhưng mình cố nhớ rằng mỗi người có một hành trình khác nhau."],
+      ["Pear","Do you think technology makes people closer or more distant?","Cậu có nghĩ công nghệ khiến con người gần nhau hơn hay xa cách hơn không?"],
+      ["Egg","I think it can do both. Technology helps us stay connected with people who live far away. However, if we spend too much time looking at our phones, we may pay less attention to the people around us.","Mình nghĩ nó có thể làm cả hai. Công nghệ giúp chúng ta giữ liên lạc với những người ở xa. Tuy nhiên, nếu dành quá nhiều thời gian nhìn vào điện thoại, chúng ta có thể ít chú ý đến những người xung quanh hơn."],
+      ["Pear","What do you think about studying online?","Cậu nghĩ gì về việc học trực tuyến?"],
+      ["Egg","I think studying online is very useful. We can learn from videos, online courses, and websites at any time. It is especially helpful when we want to learn something that isn't taught at school.","Mình nghĩ học trực tuyến rất hữu ích. Chúng ta có thể học từ video, khóa học trực tuyến và trang web bất cứ lúc nào. Nó đặc biệt hữu ích khi chúng ta muốn học điều gì đó không được dạy ở trường."],
+      ["Pear","Do you prefer studying online or in a classroom?","Cậu thích học trực tuyến hay học trên lớp hơn?"],
+      ["Egg","I prefer studying in a classroom because I can communicate directly with teachers and friends. However, I like online learning when I want to study at my own speed.","Mình thích học trên lớp hơn vì mình có thể trò chuyện trực tiếp với giáo viên và bạn bè. Tuy nhiên, mình thích học trực tuyến khi muốn học theo tốc độ của riêng mình."],
+      ["Pear","What piece of technology could you not live without?","Món đồ công nghệ nào cậu không thể sống thiếu?"],
+      ["Egg","Probably my phone. It is not only a way to communicate. I also use it as an alarm clock, camera, dictionary, music player, and study tool.","Có lẽ là điện thoại. Nó không chỉ là phương tiện liên lạc. Mình còn dùng nó làm đồng hồ báo thức, máy ảnh, từ điển, máy nghe nhạc và công cụ học tập."],
+      ["Pear","Do you think children should have smartphones?","Cậu có nghĩ trẻ em nên có điện thoại thông minh không?"],
+      ["Egg","I think they can have smartphones, but parents should set some rules. Children should not spend too much time online, and they should learn how to use technology safely.","Mình nghĩ các em có thể có điện thoại thông minh, nhưng cha mẹ nên đặt ra một số quy tắc. Trẻ em không nên dành quá nhiều thời gian trên mạng, và các em nên học cách sử dụng công nghệ an toàn."],
+      ["Pear","What would you do if you had to live without your phone for a week?","Cậu sẽ làm gì nếu phải sống thiếu điện thoại trong một tuần?"],
+      ["Egg","At first, I would probably feel very uncomfortable. I wouldn't know what to do when I was bored. But after a few days, I think I would get used to it and spend more time reading, exercising, or talking to people.","Lúc đầu, có lẽ mình sẽ cảm thấy rất khó chịu. Mình sẽ không biết làm gì khi thấy chán. Nhưng sau vài ngày, mình nghĩ mình sẽ quen dần và dành nhiều thời gian hơn để đọc sách, tập thể dục hoặc trò chuyện với mọi người."],
+      ["Pear","Would you like to live in a world with more advanced technology?","Cậu có muốn sống trong một thế giới có công nghệ tiên tiến hơn không?"],
+      ["Egg","Yes, but I think we need to use it carefully. New technology can make our lives better, but we shouldn't let it control our lives.","Có chứ, nhưng mình nghĩ chúng ta cần sử dụng nó một cách cẩn thận. Công nghệ mới có thể khiến cuộc sống của chúng ta tốt hơn, nhưng chúng ta không nên để nó kiểm soát cuộc sống của mình."],
+      ["Pear","So, what is the most important thing about using technology?","Vậy, điều quan trọng nhất khi sử dụng công nghệ là gì?"],
+      ["Egg","I think the most important thing is balance. Technology is a useful tool, but we should control how we use it instead of allowing it to control us.","Mình nghĩ điều quan trọng nhất là sự cân bằng. Công nghệ là một công cụ hữu ích, nhưng chúng ta nên kiểm soát cách mình sử dụng nó thay vì để nó kiểm soát chúng ta."],
+      ["Pear","That's a very good point. Do you think your relationship with technology will change in the future?","Đó là một điểm rất hay. Cậu có nghĩ mối quan hệ của cậu với công nghệ sẽ thay đổi trong tương lai không?"],
+      ["Egg","Probably. Technology will become more important in my work and daily life. I hope I can use it to become more productive instead of simply spending more time online.","Có lẽ vậy. Công nghệ sẽ trở nên quan trọng hơn trong công việc và cuộc sống hằng ngày của mình. Mình hy vọng có thể dùng nó để làm việc hiệu quả hơn thay vì chỉ dành thêm thời gian lướt mạng."],
+      ["Pear","I agree. Technology can be very useful if we know how to use it.","Mình đồng ý. Công nghệ có thể rất hữu ích nếu chúng ta biết cách sử dụng nó."],
+      ["Egg","Exactly. I don't think technology is good or bad by itself. It depends on how we use it.","Chính xác. Mình không nghĩ công nghệ tự nó tốt hay xấu. Nó phụ thuộc vào cách chúng ta sử dụng nó."]
+    ]
+  },
+  {
+    id: 'long6',
+    level: 'intermediate',
+    length: 'long',
+    emoji: '🧒',
+    title: 'Phỏng vấn 6 · Kỷ niệm tuổi thơ',
+    desc: 'Ôn lại tuổi thơ, những bài học từ trưởng thành và điều muốn giữ lại khi lớn lên.',
+    lines: [
+      ["Pear","Egg, what were you like when you were a child?","Trứng ơi, hồi nhỏ cậu là người như thế nào?"],
+      ["Egg","I was quite active and curious. I liked running around, playing with my friends, and asking a lot of questions. I didn't like staying at home for too long.","Mình khá năng động và tò mò. Mình thích chạy nhảy khắp nơi, chơi cùng bạn bè và hỏi rất nhiều câu hỏi. Mình không thích ở nhà quá lâu."],
+      ["Pear","What did you usually do after school?","Sau giờ học cậu thường làm gì?"],
+      ["Egg","I usually went home, had a snack, and then went outside to play with my friends. We played football, rode our bikes, or sometimes just talked and walked around the neighborhood.","Mình thường về nhà, ăn nhẹ rồi ra ngoài chơi với bạn bè. Tụi mình chơi đá bóng, đạp xe, hoặc đôi khi chỉ nói chuyện và đi dạo quanh khu phố."],
+      ["Pear","What was your favorite game?","Trò chơi cậu thích nhất là gì?"],
+      ["Egg","I really liked playing hide-and-seek. We usually played with a big group of children, so it was very exciting. Sometimes we played until our parents called us to go home.","Mình rất thích chơi trốn tìm. Tụi mình thường chơi với một nhóm đông trẻ con, nên rất vui. Đôi khi tụi mình chơi đến khi bố mẹ gọi về nhà."],
+      ["Pear","Did you have a favorite toy?","Cậu có món đồ chơi yêu thích nào không?"],
+      ["Egg","Yes. I had a small toy car that my parents gave me for my birthday. I played with it almost every day, and I even took it with me when I visited my grandparents.","Có chứ. Mình có một chiếc xe hơi đồ chơi nhỏ mà bố mẹ tặng cho sinh nhật của mình. Mình chơi với nó gần như mỗi ngày, thậm chí còn mang theo khi đến thăm ông bà."],
+      ["Pear","Do you still have that toy?","Cậu còn giữ món đồ chơi đó không?"],
+      ["Egg","Yes, I still have it somewhere in my room. It isn't in good condition anymore, but I don't want to throw it away because it reminds me of my childhood.","Có chứ, mình vẫn còn giữ nó đâu đó trong phòng. Nó không còn tốt như trước nữa, nhưng mình không muốn vứt đi vì nó gợi nhớ về tuổi thơ của mình."],
+      ["Pear","What is your happiest childhood memory?","Kỷ niệm tuổi thơ hạnh phúc nhất của cậu là gì?"],
+      ["Egg","I think it was when my family went on a trip together. We didn't go anywhere very expensive. We just visited a beautiful place, ate good food, and spent time together. I remember feeling very happy because everyone was relaxed.","Mình nghĩ đó là lúc cả nhà mình đi du lịch cùng nhau. Tụi mình không đi đâu quá đắt đỏ. Chỉ là ghé thăm một nơi đẹp, ăn ngon và dành thời gian bên nhau. Mình nhớ mình đã cảm thấy rất hạnh phúc vì mọi người đều thoải mái."],
+      ["Pear","Did you enjoy going to school when you were a child?","Hồi nhỏ cậu có thích đi học không?"],
+      ["Egg","Most of the time, yes. I liked meeting my friends, but I didn't always like studying. Some subjects were difficult, and I sometimes wanted to stay at home.","Hầu hết thời gian là có. Mình thích gặp bạn bè, nhưng không phải lúc nào cũng thích học bài. Một số môn khó, và đôi khi mình chỉ muốn ở nhà."],
+      ["Pear","Was there a teacher you really liked?","Có giáo viên nào cậu thực sự thích không?"],
+      ["Egg","Yes. There was a teacher who was very kind and patient. She always encouraged me when I made mistakes. Because of her, I became more confident in that subject.","Có chứ. Có một cô giáo rất tốt bụng và kiên nhẫn. Cô luôn động viên mình mỗi khi mình mắc lỗi. Nhờ cô mà mình trở nên tự tin hơn ở môn đó."],
+      ["Pear","Do you think teachers can have a big influence on children?","Cậu có nghĩ giáo viên có ảnh hưởng lớn đến trẻ em không?"],
+      ["Egg","Definitely. Children spend a lot of time at school, so teachers can influence how they think and learn. A good teacher can make students enjoy learning instead of seeing it as a boring responsibility.","Chắc chắn rồi. Trẻ em dành rất nhiều thời gian ở trường, nên giáo viên có thể ảnh hưởng đến cách các em suy nghĩ và học tập. Một giáo viên giỏi có thể khiến học sinh yêu thích việc học thay vì xem nó như một trách nhiệm nhàm chán."],
+      ["Pear","What did you want to be when you were a child?","Hồi nhỏ cậu muốn trở thành gì?"],
+      ["Egg","My dream changed many times. When I was very young, I wanted to be a police officer. Then I wanted to become a doctor because I thought doctors were very cool. Later, I started thinking about other careers.","Ước mơ của mình thay đổi nhiều lần. Lúc còn rất nhỏ, mình muốn làm cảnh sát. Sau đó mình muốn trở thành bác sĩ vì mình nghĩ bác sĩ rất ngầu. Sau này, mình bắt đầu nghĩ đến những nghề nghiệp khác."],
+      ["Pear","Why did your dream change?","Vì sao ước mơ của cậu lại thay đổi?"],
+      ["Egg","I think it changed because I learned more about different jobs. When I was young, I didn't really understand what different careers were like. As I grew older, I started thinking about my interests and abilities.","Mình nghĩ nó thay đổi vì mình biết thêm về những công việc khác nhau. Khi còn nhỏ, mình không thực sự hiểu các nghề nghiệp khác nhau như thế nào. Khi lớn hơn, mình bắt đầu suy nghĩ về sở thích và khả năng của mình."],
+      ["Pear","Do you think you have changed a lot since you were a child?","Cậu có nghĩ mình đã thay đổi nhiều so với hồi nhỏ không?"],
+      ["Egg","Yes, I have changed quite a lot. I used to be more active and didn't worry about many things. Now I think more about my future, studies, work, and responsibilities.","Có chứ, mình đã thay đổi khá nhiều. Trước đây mình năng động hơn và không lo lắng nhiều thứ. Giờ mình suy nghĩ nhiều hơn về tương lai, việc học, công việc và trách nhiệm."],
+      ["Pear","Do you miss your childhood?","Cậu có nhớ tuổi thơ của mình không?"],
+      ["Egg","Yes, sometimes I do. I miss having fewer responsibilities and being able to spend the whole day playing. Life seemed much simpler when I was a child.","Có chứ, thỉnh thoảng mình có nhớ. Mình nhớ việc có ít trách nhiệm hơn và có thể dành cả ngày để chơi. Cuộc sống dường như đơn giản hơn nhiều khi mình còn nhỏ."],
+      ["Pear","Is there anything from your childhood that you want to keep as an adult?","Có điều gì từ tuổi thơ mà cậu muốn giữ lại khi trưởng thành không?"],
+      ["Egg","I want to keep my curiosity. When I was a child, I was always interested in new things. I think being curious is important because it helps us continue learning.","Mình muốn giữ lại sự tò mò của mình. Khi còn nhỏ, mình luôn hứng thú với những điều mới. Mình nghĩ tò mò rất quan trọng vì nó giúp chúng ta tiếp tục học hỏi."],
+      ["Pear","What is one thing you understand better now than when you were a child?","Có điều gì mà giờ cậu hiểu rõ hơn so với hồi nhỏ không?"],
+      ["Egg","I understand the importance of family more now. When I was young, I sometimes didn't understand why my parents worried about me so much. Now I understand that they were trying to protect and support me.","Giờ mình hiểu rõ hơn tầm quan trọng của gia đình. Khi còn nhỏ, đôi khi mình không hiểu vì sao bố mẹ lo lắng cho mình nhiều đến vậy. Giờ mình hiểu rằng họ đang cố bảo vệ và hỗ trợ mình."],
+      ["Pear","Has growing up been difficult for you?","Việc trưởng thành có khó khăn với cậu không?"],
+      ["Egg","Sometimes. Growing up means having more freedom, but it also means having more responsibilities. We have to make our own decisions and accept the results of those decisions.","Đôi khi có. Trưởng thành nghĩa là có nhiều tự do hơn, nhưng cũng có nghĩa là có nhiều trách nhiệm hơn. Chúng ta phải tự đưa ra quyết định và chấp nhận kết quả của những quyết định đó."],
+      ["Pear","What is the biggest difference between being a child and being an adult?","Sự khác biệt lớn nhất giữa việc là trẻ con và người trưởng thành là gì?"],
+      ["Egg","I think the biggest difference is responsibility. Children can depend on their parents for many things, but adults have to take care of themselves and think about their future.","Mình nghĩ sự khác biệt lớn nhất là trách nhiệm. Trẻ em có thể dựa vào bố mẹ cho nhiều thứ, nhưng người trưởng thành phải tự lo cho bản thân và nghĩ về tương lai của mình."],
+      ["Pear","If you could go back to one day in your childhood, which day would you choose?","Nếu có thể quay về một ngày trong tuổi thơ, cậu sẽ chọn ngày nào?"],
+      ["Egg","I would choose a day when my whole family was together. We didn't do anything special, but everyone was happy and relaxed. I would like to experience that feeling one more time.","Mình sẽ chọn một ngày mà cả gia đình mình ở bên nhau. Tụi mình không làm gì đặc biệt cả, nhưng mọi người đều vui vẻ và thoải mái. Mình muốn trải nghiệm lại cảm giác đó một lần nữa."],
+      ["Pear","If you could give your younger self one piece of advice, what would you say?","Nếu có thể cho bản thân hồi nhỏ một lời khuyên, cậu sẽ nói gì?"],
+      ["Egg","I would tell myself not to be afraid of making mistakes. When I was younger, I sometimes worried too much about what other people thought. Now I understand that mistakes are a normal part of learning.","Mình sẽ nói với bản thân đừng sợ mắc lỗi. Khi còn nhỏ, đôi khi mình lo lắng quá nhiều về việc người khác nghĩ gì. Giờ mình hiểu rằng mắc lỗi là một phần bình thường của việc học hỏi."],
+      ["Pear","Do you think your childhood has influenced the person you are today?","Cậu có nghĩ tuổi thơ đã ảnh hưởng đến con người cậu hôm nay không?"],
+      ["Egg","Yes, definitely. My family, teachers, friends, and experiences when I was young all helped shape my personality. I think our childhood doesn't completely decide who we become, but it can have a strong influence on us.","Có chứ, chắc chắn rồi. Gia đình, thầy cô, bạn bè và những trải nghiệm khi mình còn nhỏ đều góp phần hình thành tính cách của mình. Mình nghĩ tuổi thơ không hoàn toàn quyết định chúng ta trở thành người như thế nào, nhưng nó có ảnh hưởng mạnh mẽ đến chúng ta."],
+      ["Pear","What kind of person do you want to become in the future?","Cậu muốn trở thành người như thế nào trong tương lai?"],
+      ["Egg","I want to become someone who is independent, kind, and responsible. I also want to keep learning and stay close to the people who are important to me.","Mình muốn trở thành người độc lập, tốt bụng và có trách nhiệm. Mình cũng muốn tiếp tục học hỏi và luôn gần gũi với những người quan trọng với mình."],
+      ["Pear","That's a nice goal. Do you think your future self will be very different from who you are now?","Đó là một mục tiêu hay đấy. Cậu có nghĩ bản thân trong tương lai sẽ rất khác so với hiện tại không?"],
+      ["Egg","Probably. I will have different experiences, responsibilities, and goals. But I hope I will still keep the good parts of my personality and the values I learned when I was young.","Có lẽ vậy. Mình sẽ có những trải nghiệm, trách nhiệm và mục tiêu khác. Nhưng mình hy vọng mình vẫn giữ được những phần tốt đẹp trong tính cách và những giá trị mình học được khi còn trẻ."],
+      ["Pear","I think that's a great way to think about growing up.","Mình nghĩ đó là một cách nhìn tuyệt vời về việc trưởng thành."],
+      ["Egg","Thank you. I think growing up is not about becoming a completely different person. It's about learning from our experiences and becoming a better version of ourselves.","Cảm ơn cậu. Mình nghĩ trưởng thành không phải là trở thành một người hoàn toàn khác. Đó là học hỏi từ những trải nghiệm của chúng ta và trở thành phiên bản tốt hơn của chính mình."]
     ]
   }
 ];
@@ -3927,6 +4319,27 @@ function unlockAudioForIOS(){
 document.addEventListener('touchend', unlockAudioForIOS, {passive:true});
 document.addEventListener('click', unlockAudioForIOS);
 
+/* ---- Android edge-swipe fix (touch only, never affects desktop mouse wheel) ----
+   Blocks the browser's rubber-band overscroll ONLY when a finger drags past
+   the very top or bottom of the page, since that's what some Android
+   devices misread as a system "go home" gesture. Mouse wheel scrolling is
+   untouched because it never fires touch events. ---- */
+let __touchStartY = 0;
+document.addEventListener('touchstart', (e)=>{
+  if(e.touches && e.touches.length) __touchStartY = e.touches[0].clientY;
+}, {passive:true});
+document.addEventListener('touchmove', (e)=>{
+  if(!e.touches || !e.touches.length) return;
+  const touchY = e.touches[0].clientY;
+  const draggingDown = touchY > __touchStartY; // finger moving toward bottom of screen = page scrolls up toward top
+  const scrollTop = window.scrollY || document.documentElement.scrollTop;
+  const atTop = scrollTop <= 0;
+  const atBottom = (scrollTop + window.innerHeight) >= (document.documentElement.scrollHeight - 1);
+  if((atTop && draggingDown) || (atBottom && !draggingDown)){
+    e.preventDefault();
+  }
+}, {passive:false});
+
 /* ---- Some iOS builds populate the voice list asynchronously after the
    page loads, so the very first speak() call can go out with no voice
    selected and produce no sound. Cache the list once it's ready and pick
@@ -4618,36 +5031,75 @@ function renderComparison(targetWords, matched){
   }).join(' ');
 }
 
+// ---- Phrase-chunking for "Luyện từng cụm" ----
+// Chunks should break at natural pause points (punctuation) and BEFORE
+// connector words (and/but/because/at/for/to...) rather than after them,
+// so each chunk reads as a self-contained, grammatical phrase instead of
+// a dangling fragment like "...movies and" or "...games at".
+const CHUNK_MIN = 2;       // avoid tiny 1-word chunks
+const CHUNK_SOFT_MAX = 6;  // prefer breaking around this length
+const CHUNK_HARD_MAX = 8;  // force a break if a chunk grows past this
+
+// Words that should start a NEW chunk (subordinators, coordinators, relatives)
+const CHUNK_BREAK_BEFORE_STRONG = new Set([
+  'and','but','or','so','because','although','though','while','when','if',
+  'where','since','unless','until','before','after'
+]);
+// Prepositions: only used to break once a chunk is already fairly long,
+// so short prepositional phrases ("at 7 a.m.") aren't chopped needlessly.
+const CHUNK_BREAK_BEFORE_PREP = new Set([
+  'at','in','on','with','for','to','from','about','into','over','under',
+  'between','during','without','through','of','by'
+]);
+
 function splitIntoChunks(text){
 
   const words = text.trim().split(/\s+/).filter(Boolean);
 
-  if(words.length <= 3){
+  if(words.length <= 4){
     return [text.trim()];
   }
 
   const chunks = [];
   let current = [];
 
-  words.forEach((word, index) => {
+  for(let i = 0; i < words.length; i++){
 
-    current.push(word);
+    current.push(words[i]);
+    const isLast = i === words.length - 1;
+    if(isLast) continue;
 
-    const clean = word.toLowerCase().replace(/[.,!?]/g,'');
+    const word = words[i];
+    const nextClean = words[i+1].toLowerCase().replace(/[.,!?;:]/g,'');
+    const endsSentenceOrPause = /[,;:.!?]$/.test(word);
+    const len = current.length;
 
-    const shouldBreak =
-      current.length >= 3 &&
-      (
-        /[.,!?]$/.test(word) ||
-        ['and','but','because','so','then','at','in','on','with','for','to'].includes(clean) ||
-        current.length >= 5
-      );
+    let shouldBreak = false;
+
+    if(len >= CHUNK_HARD_MAX){
+      shouldBreak = true;
+    } else if(len >= CHUNK_MIN){
+      if(endsSentenceOrPause){
+        shouldBreak = true;
+      } else if(CHUNK_BREAK_BEFORE_STRONG.has(nextClean)){
+        shouldBreak = true;
+      } else if(len >= CHUNK_SOFT_MAX && CHUNK_BREAK_BEFORE_PREP.has(nextClean)){
+        shouldBreak = true;
+      }
+    }
+
+    // Don't strand a too-short remainder at the very end of the sentence —
+    // fold it into the current chunk instead of creating a lonely 1-word tail.
+    const remaining = words.length - (i + 1);
+    if(shouldBreak && remaining > 0 && remaining < CHUNK_MIN){
+      shouldBreak = false;
+    }
 
     if(shouldBreak){
       chunks.push(current.join(' '));
       current = [];
     }
-  });
+  }
 
   if(current.length){
     chunks.push(current.join(' '));
@@ -4658,6 +5110,8 @@ function splitIntoChunks(text){
 
 function normalizeChunks(chunks){
 
+  if(chunks.length <= 1) return chunks;
+
   const result = [];
 
   chunks.forEach(chunk => {
@@ -4665,7 +5119,7 @@ function normalizeChunks(chunks){
     const words = chunk.split(/\s+/).filter(Boolean);
 
     if(
-      words.length <= 1 &&
+      words.length < CHUNK_MIN &&
       result.length > 0
     ){
       result[result.length - 1] += ' ' + chunk;
@@ -5252,6 +5706,145 @@ tryAgainBtn.addEventListener('click', (e)=>{
 [prevBtn, nextBtn, speakBtn, sfxToggle, homeBtn, restartBtn, chooseAnotherBtn, viToggle].forEach(b => addPressFX(b, 5));
 addPressFX(micBtn, 8);
 [playMineBtn, playTargetBtn, tryAgainBtn].forEach(b => addPressFX(b, 5));
+
+
+/* ===== Pear & Egg v2: XP / streak / daily goal ===== */
+const PE_LEARNER_KEY = 'pearEggLearnerV2';
+const PE_DAILY_GOAL = 5;
+
+function peToday(){
+  const d = new Date();
+  return d.getFullYear() + '-' +
+    String(d.getMonth()+1).padStart(2,'0') + '-' +
+    String(d.getDate()).padStart(2,'0');
+}
+
+function peDateDiff(a,b){
+  const x = new Date(a + 'T00:00:00');
+  const y = new Date(b + 'T00:00:00');
+  return Math.round((y-x)/86400000);
+}
+
+function peGetLearner(){
+  try{
+    const raw = localStorage.getItem(PE_LEARNER_KEY);
+    const d = raw ? JSON.parse(raw) : {};
+    return {
+      xp: Number.isFinite(d.xp) ? d.xp : 0,
+      streak: Number.isFinite(d.streak) ? d.streak : 0,
+      lastDay: d.lastDay || '',
+      sessions: d.sessions && typeof d.sessions === 'object' ? d.sessions : {}
+    };
+  }catch(e){
+    return {xp:0,streak:0,lastDay:'',sessions:{}};
+  }
+}
+
+function peSaveLearner(d){
+  try{
+    const keys = Object.keys(d.sessions || {}).sort().slice(-45);
+    const trimmed = {};
+    keys.forEach(k => trimmed[k] = d.sessions[k]);
+    d.sessions = trimmed;
+    localStorage.setItem(PE_LEARNER_KEY, JSON.stringify(d));
+  }catch(e){}
+}
+
+function peAddPractice(score){
+  const d = peGetLearner();
+  const today = peToday();
+  const gap = d.lastDay ? peDateDiff(d.lastDay,today) : null;
+
+  if(gap === 1) d.streak += 1;
+  else if(gap !== 0) d.streak = 1;
+
+  d.lastDay = today;
+  d.sessions[today] = (d.sessions[today] || 0) + 1;
+
+  // XP rewards quality, but even a retry gives progress.
+  const reward = score >= 85 ? 30 : score >= 55 ? 20 : 10;
+  d.xp += reward;
+
+  peSaveLearner(d);
+  peRenderDashboard();
+}
+
+function peRenderDashboard(){
+  const d = peGetLearner();
+  const todayCount = d.sessions[peToday()] || 0;
+  const level = Math.floor(d.xp / 250) + 1;
+  const names = [
+    'New learner','Getting started','Steady speaker','Confident speaker',
+    'Fluent explorer','Speaking star'
+  ];
+  const levelName = names[Math.min(names.length-1, level-1)];
+
+  const xp = document.getElementById('peXP');
+  const streak = document.getElementById('peStreak');
+  const today = document.getElementById('peSessionsToday');
+  const badge = document.getElementById('peLevelBadge');
+  const goal = document.getElementById('peGoalFill');
+  const goalText = document.getElementById('peGoalText');
+  const best = document.getElementById('peBest');
+
+  if(xp) xp.textContent = d.xp;
+  if(streak) streak.textContent = d.streak;
+  if(today) today.textContent = Math.min(todayCount,PE_DAILY_GOAL) + '/' + PE_DAILY_GOAL;
+  if(badge) badge.textContent = 'Level ' + level + ' · ' + levelName;
+  if(goal) goal.style.width = Math.min(100,(todayCount/PE_DAILY_GOAL)*100) + '%';
+  if(goalText){
+    goalText.textContent = todayCount >= PE_DAILY_GOAL
+      ? '🎉 Mục tiêu hôm nay đã hoàn thành! Mai quay lại nhé.'
+      : '🎯 Mục tiêu hôm nay: còn ' + (PE_DAILY_GOAL-todayCount) + ' lượt luyện';
+  }
+
+  const stats = getPracticeStats();
+  const scores = stats.scores || [];
+  if(best) best.textContent = scores.length ? Math.max(...scores) + '%' : '0%';
+
+  const ach = document.getElementById('peAchievements');
+  if(ach){
+    const items = [
+      ['🌱', 'Bắt đầu', scores.length >= 1],
+      ['🔥', '3 ngày', d.streak >= 3],
+      ['🎯', '5 lượt/ngày', todayCount >= 5],
+      ['🏆', '85%+', scores.some(s => s >= 85)],
+      ['💎', '500 XP', d.xp >= 500]
+    ];
+    ach.innerHTML = items.map(x =>
+      '<span class="pe-achievement ' + (x[2]?'unlocked':'') + '">' +
+      x[0] + ' ' + x[1] + '</span>'
+    ).join('');
+  }
+}
+
+function peResetAll(){
+  if(!confirm('Xóa toàn bộ XP, streak, điểm và tiến trình học trên thiết bị này?')) return;
+  [
+    PE_LEARNER_KEY,
+    PRACTICE_STATS_KEY,
+    PRACTICE_SET_STATS_KEY,
+    STUDY_PROGRESS_KEY,
+    IN_PROGRESS_KEY
+  ].forEach(k => { try{ localStorage.removeItem(k); }catch(e){} });
+  peRenderDashboard();
+  updatePracticeStats();
+  updateAllDialogueStats();
+  updateStudyProgress();
+  updateLevelProgress();
+  alert('Đã xóa dữ liệu tiến trình trên thiết bị này.');
+}
+
+const peResetBtn = document.getElementById('peResetData');
+if(peResetBtn) peResetBtn.addEventListener('click', peResetAll);
+
+const peOriginalRecordPracticeScore = recordPracticeScore;
+recordPracticeScore = function(score){
+  peOriginalRecordPracticeScore(score);
+  peAddPractice(Math.round(score));
+};
+
+peRenderDashboard();
 
 </script>
 
