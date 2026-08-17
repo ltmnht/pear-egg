@@ -354,12 +354,6 @@
   .speaker-badge.pear{ background:var(--pear); color:#2F4A1B; }
   .speaker-badge.egg{ background:var(--egg); color:#6B4E10; }
 
-  #playView{
-  width:100%;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-}
   .line-text{
     font-family:'Baloo 2', sans-serif;
     font-size:clamp(20px, 4.4vw, 28px);
@@ -731,8 +725,6 @@
     font-size:11px;
     box-shadow:0 2px 4px rgba(0,0,0,0.2);
   }
-  .menu-card{ position:relative; }
-
   .menu-section-label{
     align-self:flex-start;
     font-family:'Baloo 2', sans-serif;
@@ -764,6 +756,7 @@
     align-items:stretch;
   }
   .menu-card{
+    position:relative;
     background:var(--card);
     border-radius:20px;
     box-shadow: var(--shadow-sm);
@@ -978,6 +971,41 @@
   .score-great{ background:var(--good); }
   .score-ok{ background:var(--egg-dark); color:#5A3F0C; }
   .score-retry{ background:var(--bad); }
+
+  .score-breakdown{
+    width:100%;
+    max-width:620px;
+    margin:10px auto 0;
+  }
+  .score-overall{
+    text-align:center;
+    font-family:'Baloo 2', sans-serif;
+    font-size:14px;
+    color:var(--ink);
+    margin-bottom:8px;
+  }
+  .score-breakdown-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    justify-content:center;
+  }
+  .score-metric{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background:var(--card);
+    border:2px solid #F0E4D2;
+    border-radius:14px;
+    padding:6px 12px;
+    font-size:12px;
+  }
+  .score-metric-icon{ font-size:14px; }
+  .score-metric-label{ color:var(--ink-soft); font-weight:700; }
+  .score-metric-val{ font-weight:800; color:var(--ink); }
+  .score-metric-muted{ color:var(--ink-soft); font-size:11px; }
+  .score-metric-muted .score-metric-label{ font-weight:600; }
+
   .score-note{
   width:100%;
   max-width:620px;
@@ -1064,6 +1092,17 @@
     gap:10px;
     flex-wrap:wrap;
     justify-content:center;
+  }
+  .playback-note{
+    margin-top:10px;
+    padding:8px 14px;
+    border-radius:14px;
+    background:#FFF3DA;
+    border:1.5px solid #FCE0A0;
+    color:var(--ink-soft);
+    font-size:12px;
+    line-height:1.5;
+    text-align:center;
   }
   .mini-btn{
     font-family:'Quicksand', sans-serif;
@@ -1164,11 +1203,100 @@
     text-decoration:underline;
   }
 
+  /* ---------- Custom confirm dialog (replaces native confirm()/alert(),
+       which are unreliable inside sandboxed artifact previews) ---------- */
+  .pe-confirm-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(74,55,40,0.45);
+    z-index:210;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  }
+  .pe-confirm-overlay.show{ display:flex; }
+  .pe-confirm-modal{
+    background:var(--card);
+    border-radius:24px;
+    box-shadow: 0 20px 40px -12px rgba(74,55,40,0.4);
+    padding:26px 24px 22px;
+    max-width:340px;
+    width:100%;
+    text-align:center;
+    animation: resumePop 0.28s cubic-bezier(.34,1.56,.64,1);
+  }
+  .pe-confirm-emoji{ font-size:36px; margin-bottom:6px; }
+  .pe-confirm-title{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:17px;
+    color:var(--bad);
+    margin-bottom:6px;
+  }
+  .pe-confirm-text{
+    font-size:13.5px;
+    color:var(--ink);
+    font-weight:600;
+    line-height:1.5;
+    margin-bottom:6px;
+  }
+  .pe-confirm-sure{
+    font-family:'Baloo 2', sans-serif;
+    font-size:14.5px;
+    font-weight:700;
+    color:var(--ink);
+    margin-bottom:18px;
+  }
+  .pe-confirm-actions{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .pe-confirm-actions .mini-btn{ padding:11px 16px; font-size:13.5px; width:100%; }
+
+  /* ---------- Small toast for confirmations (replaces alert()) ---------- */
+  .pe-toast{
+    position:fixed;
+    left:50%;
+    bottom:26px;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--ink);
+    color:#fff;
+    font-family:'Quicksand', sans-serif;
+    font-weight:700;
+    font-size:13px;
+    padding:12px 20px;
+    border-radius:999px;
+    box-shadow:0 12px 26px -10px rgba(0,0,0,0.4);
+    z-index:220;
+    opacity:0;
+    pointer-events:none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    max-width:88vw;
+    text-align:center;
+  }
+  .pe-toast.show{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+  }
+
   .support-warning{
     font-size:12px;
     color:var(--bad);
     text-align:center;
     max-width:380px;
+  }
+  .ios-notice{
+    font-size:11.5px;
+    color:var(--ink-soft);
+    text-align:center;
+    max-width:380px;
+    background:#FFF6E9;
+    border:1.5px solid #F0E0BF;
+    border-radius:12px;
+    padding:8px 12px;
+    line-height:1.5;
   }
 
   /* ---------- Done screen ---------- */
@@ -1252,17 +1380,51 @@
   margin-right: 5px;
   padding: 2px 5px;
   border-radius: 6px;
+  cursor: pointer;
 }
+.comparison-word:hover{ filter: brightness(0.96); }
+.comparison-word.word-open{ outline: 2px solid rgba(0,0,0,0.15); }
+.comparison-icon{ font-size: 10px; margin-right: 2px; vertical-align: 1px; }
 
-.comparison-match{
+.comparison-exact{
   color: #2f7d32;
   background: rgba(76,175,80,.12);
+}
+
+.comparison-partial{
+  color: #9a6b00;
+  background: rgba(255,193,7,.16);
 }
 
 .comparison-miss{
   color: #c62828;
   background: rgba(244,67,54,.12);
   text-decoration: line-through;
+}
+
+.word-detail{
+  display: block;
+  width: 100%;
+  margin: 4px 0 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.85);
+  border: 1px solid rgba(0,0,0,.08);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+.word-detail-line{ margin-bottom: 4px; }
+.word-detail-line:last-of-type{ margin-bottom: 6px; }
+.word-detail-listen{
+  background:#F5EEE0;
+  border:none;
+  border-radius:999px;
+  padding:5px 12px;
+  font-family:'Quicksand', sans-serif;
+  font-weight:700;
+  font-size:11.5px;
+  cursor:pointer;
 }
 
 .pronunciation-focus{
@@ -2285,6 +2447,21 @@
     </div>
   </div>
 
+  <div class="pe-confirm-overlay" id="peConfirmOverlay">
+    <div class="pe-confirm-modal">
+      <div class="pe-confirm-emoji">⚠️</div>
+      <div class="pe-confirm-title">Cảnh báo</div>
+      <div class="pe-confirm-text">Thao tác này sẽ xóa toàn bộ XP, streak, điểm và tiến trình học trên thiết bị này. Hành động này không thể hoàn tác.</div>
+      <div class="pe-confirm-sure">Bạn chắc chứ? 🤔</div>
+      <div class="pe-confirm-actions">
+        <button class="mini-btn mini-blush" id="peConfirmYesBtn">🗑️ Có, xóa dữ liệu</button>
+        <button class="mini-btn" id="peConfirmNoBtn">Hủy</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="pe-toast" id="peToast"></div>
+
   <div class="practice-screen" id="practiceScreen" style="display:none; width:100%; flex-direction:column; align-items:center;">
 
   <div class="progress-wrap" id="progressWrap"></div>
@@ -2353,17 +2530,15 @@
         <span id="micIcon">🎙️</span>
       </button>
       <div class="mic-label" id="micLabel">Chạm vào mic rồi lặp lại câu phía trên</div>
+      <div class="ios-notice" id="iosNotice" style="display:none;">
+        📱 Trên iPhone/Safari, tính năng nhận diện giọng nói đôi khi không ổn định (có thể không bắt được giọng ở vài lượt). Nếu gặp lỗi, hãy thử lại hoặc dùng Chrome trên máy tính để có kết quả tốt nhất.
+      </div>
 
       <div class="result-box" id="resultBox">
         <div class="score-badge" id="scoreBadge">—</div>
+        <div class="score-breakdown" id="scoreBreakdown"></div>
 
         <div class="stat-row" id="statRow"></div>
-
-        <div class="score-note">
-  ℹ️ Điểm này dựa trên mức độ khớp giữa câu bạn nói và câu mẫu
-  theo kết quả nhận diện giọng nói của trình duyệt.
-  Điểm không đánh giá chính xác từng âm phát âm.
-</div>
 
         <div>
           <div class="transcript-label">MÁY NGHE ĐƯỢC</div>
@@ -2398,16 +2573,17 @@
           <ul class="tips-list" id="tipsList"></ul>
         </div>
 
-        <div class="playback-row">
+        <div class="playback-row" id="playbackRow">
           <button class="mini-btn mini-sky" id="playMineBtn">▶️ Nghe lại giọng của tôi</button>
           <button class="mini-btn mini-blush" id="playTargetBtn">🔊 Nghe bản chuẩn</button>
           <button class="mini-btn mini-pear" id="tryAgainBtn">🔁 Thử lại</button>
         </div>
+        <div class="playback-note" id="playbackNote" style="display:none;"></div>
         <audio class="hidden-audio" id="myAudio"></audio>
       </div>
 
       <div class="support-warning" id="supportWarning" style="display:none;">
-        Trình duyệt của bạn chưa hỗ trợ nhận diện giọng nói để chấm phát âm. Hãy thử dùng Chrome trên máy tính hoặc Android nhé. 🙏
+        Trình duyệt của bạn chưa hỗ trợ nhận diện giọng nói để chấm phát âm (tính năng này cần Chrome, Edge, hoặc Safari bản mới). Hãy thử dùng Chrome trên máy tính hoặc Android nhé. 🙏
       </div>
     </div>
   </div>
@@ -3995,6 +4171,7 @@ const micIcon = document.getElementById('micIcon');
 const micLabel = document.getElementById('micLabel');
 const resultBox = document.getElementById('resultBox');
 const scoreBadge = document.getElementById('scoreBadge');
+const scoreBreakdown = document.getElementById('scoreBreakdown');
 const statRow = document.getElementById('statRow');
 const heardText = document.getElementById('heardText');
 const comparisonText = document.getElementById('comparisonText');
@@ -4538,7 +4715,7 @@ function setLineTextAnimated(text){
 
   lineText.innerHTML = words.map((w, i)=>{
     const delay = (i * 0.03).toFixed(3);
-    return '<span class="word" style="animation-delay:' + delay + 's">' + w + '</span>';
+    return '<span class="word" style="animation-delay:' + delay + 's">' + escapeHTML(w) + '</span>';
   }).join(' ');
 
   karaokeSpans = Array.from(lineText.querySelectorAll('.word'));
@@ -4736,6 +4913,20 @@ let recordSafetyTimer = null;
 let recordedChunks = [];
 let myAudioURL = null;
 let micStream = null; // reused across recordings so we only ask permission once per session
+
+// iOS Safari technically implements webkitSpeechRecognition in most modern
+// versions, but it's known to be flaky in practice (silently returns no
+// results, needs an active network connection, sometimes stops working
+// after the first use in a session). We don't hide the feature — it does
+// work — but we give iOS users a heads-up instead of letting a failure look
+// like a bug in the app.
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+const iosNotice = document.getElementById('iosNotice');
+if(speechSupported && isIOS && iosNotice){
+  iosNotice.style.display = 'block';
+}
 
 if(!speechSupported){
   micBtn.style.display = 'none';
@@ -4977,10 +5168,12 @@ function alignWords(targetWords, heardWords){
     }
   }
   const matched = new Array(n).fill(false);
+  const heardUsed = new Array(m).fill(false);
   let i=n, j=m;
   while(i>0 && j>0){
     if(normalizeWord(targetWords[i-1]) === normalizeWord(heardWords[j-1])){
       matched[i-1] = true;
+      heardUsed[j-1] = true;
       i--; j--;
     } else if(dp[i-1][j] >= dp[i][j-1]){
       i--;
@@ -4988,8 +5181,63 @@ function alignWords(targetWords, heardWords){
       j--;
     }
   }
-  return { matched, lcsLength: dp[n][m] };
+  return { matched, lcsLength: dp[n][m], heardUsed };
 }
+
+// ---- Levenshtein edit-distance similarity (0..1), used only to flag
+// "close but not exact" words — this is plain text-string similarity
+// between the target word and something the recognizer heard, NOT an
+// audio/phoneme analysis. We're careful to label it honestly wherever
+// it's shown (see classifyWords / renderComparison), so it never gets
+// presented to the learner as a real pronunciation measurement.
+function levenshteinSimilarity(a, b){
+  a = a.toLowerCase(); b = b.toLowerCase();
+  if(a === b) return 1;
+  if(!a.length || !b.length) return 0;
+  const dp = Array.from({length:a.length+1}, (_,i)=> [i].concat(new Array(b.length).fill(0)));
+  for(let j=0;j<=b.length;j++) dp[0][j] = j;
+  for(let i=1;i<=a.length;i++){
+    for(let j=1;j<=b.length;j++){
+      if(a[i-1] === b[j-1]) dp[i][j] = dp[i-1][j-1];
+      else dp[i][j] = 1 + Math.min(dp[i-1][j-1], dp[i-1][j], dp[i][j-1]);
+    }
+  }
+  const dist = dp[a.length][b.length];
+  const maxLen = Math.max(a.length, b.length);
+  return 1 - (dist / maxLen);
+}
+
+// ---- Classify every target word into exact / partial / miss. ----
+// exact  = the word appears in the heard transcript in the right slot
+// partial = it's missing from the exact match, but the recognizer heard
+//           something textually close nearby (could be a mispronunciation
+//           OR just an ASR mis-hearing — we can't tell those apart without
+//           real audio-phoneme analysis, so we label it "gần giống" rather
+//           than claiming it's a pronunciation error)
+// miss    = nothing close to it was heard at all
+function classifyWords(targetWords, heardWords){
+  const { matched, heardUsed } = alignWords(targetWords, heardWords);
+  const availableHeard = heardWords.map((w,i)=> ({ word: w, idx: i, used: heardUsed[i] }));
+  return targetWords.map((word, i)=>{
+    const cleanTarget = word.replace(/[.,!?;:'"()]/g,'');
+    if(matched[i]){
+      return { word, tier:'exact', heardWord: null, similarity: null };
+    }
+    // look for the closest unused heard word as a "close but not exact" candidate
+    let best = null, bestSim = 0;
+    availableHeard.forEach(h=>{
+      if(h.used) return;
+      const sim = levenshteinSimilarity(normalizeWord(cleanTarget), normalizeWord(h.word.replace(/[.,!?;:'"()]/g,'')));
+      if(sim > bestSim){ bestSim = sim; best = h; }
+    });
+    if(best && bestSim >= 0.5){
+      best.used = true; // don't let two target words claim the same heard word
+      return { word, tier:'partial', heardWord: best.word, similarity: Math.round(bestSim*100) };
+    }
+    return { word, tier:'miss', heardWord: null, similarity: null };
+  });
+}
+
 
 function setMicIdle(){
   micIcon.textContent = '🎙️';
@@ -5008,6 +5256,7 @@ function resetPracticeUI(){
   isRecording = false;
   if(recognition){ try{ recognition.abort(); }catch(e){} }
   if(mediaRecorder && mediaRecorder.state !== 'inactive'){ try{ mediaRecorder.stop(); }catch(e){} }
+  openWordDetailEl = null;
 }
 
 function escapeHTML(str){
@@ -5021,14 +5270,68 @@ function escapeHTML(str){
     }[ch];
   });
 }
-function renderComparison(targetWords, matched){
-  comparisonText.innerHTML = targetWords.map((word, i) => {
-    const cls = matched[i] ? 'comparison-match' : 'comparison-miss';
-
-    return '<span class="comparison-word ' + cls + '">' +
-      escapeHTML(word) +
+function renderComparison(targetWords, wordClassification){
+  comparisonText.innerHTML = wordClassification.map((item, i) => {
+    const tierClass = item.tier === 'exact' ? 'comparison-exact'
+                     : item.tier === 'partial' ? 'comparison-partial'
+                     : 'comparison-miss';
+    const icon = item.tier === 'exact' ? '🟢' : item.tier === 'partial' ? '🟡' : '🔴';
+    return '<span class="comparison-word ' + tierClass + '" data-wi="' + i + '" role="button" tabindex="0">' +
+      '<span class="comparison-icon">' + icon + '</span>' +
+      escapeHTML(item.word) +
       '</span>';
   }).join(' ');
+
+  comparisonText.querySelectorAll('.comparison-word').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      ensureCtx(); sfx.tap();
+      toggleWordDetail(el, wordClassification[parseInt(el.dataset.wi,10)]);
+    });
+  });
+}
+
+// Shows/hides a small honest detail row under a tapped word: what tier it
+// got and, for partial matches, what the recognizer actually heard instead
+// (a text-similarity %, not a phoneme/pronunciation score — we say so).
+let openWordDetailEl = null;
+function toggleWordDetail(el, item){
+  if(openWordDetailEl && openWordDetailEl !== el){
+    const prevDetail = openWordDetailEl.nextElementSibling;
+    if(prevDetail && prevDetail.classList.contains('word-detail')) prevDetail.remove();
+    openWordDetailEl.classList.remove('word-open');
+  }
+  const existing = el.nextElementSibling;
+  if(existing && existing.classList.contains('word-detail')){
+    existing.remove();
+    el.classList.remove('word-open');
+    openWordDetailEl = null;
+    return;
+  }
+  const cleanWord = item.word.toLowerCase().replace(/[.,!?;:'"()]/g,'');
+  const dbEntry = PRONUNCIATION_DB[cleanWord];
+  let html = '<div class="word-detail">';
+  if(item.tier === 'exact'){
+    html += '<div class="word-detail-line">🟢 Máy nhận diện đúng từ này trong câu bạn nói.</div>';
+  } else if(item.tier === 'partial'){
+    html += '<div class="word-detail-line">🟡 Không khớp chính xác — máy nghe thành "<b>' + escapeHTML(item.heardWord) + '</b>" (giống ' + item.similarity + '% về mặt chữ viết, không phải điểm phát âm).</div>';
+  } else {
+    html += '<div class="word-detail-line">🔴 Máy không nghe được từ này trong câu bạn nói — thử nói to và rõ hơn ở đoạn này nhé.</div>';
+  }
+  if(dbEntry){
+    html += '<div class="word-detail-line">🔤 IPA: <b>' + escapeHTML(dbEntry.ipa) + '</b> · 🎯 Âm trọng tâm: <b>' + escapeHTML(dbEntry.focus) + '</b></div>';
+    html += '<div class="word-detail-line">💡 ' + escapeHTML(dbEntry.tip) + '</div>';
+  }
+  html += '<button class="word-detail-listen" type="button">🔊 Nghe từ này</button>';
+  html += '</div>';
+  el.insertAdjacentHTML('afterend', html);
+  el.classList.add('word-open');
+  const detailEl = el.nextElementSibling;
+  detailEl.querySelector('.word-detail-listen').addEventListener('click', (e)=>{
+    e.stopPropagation();
+    ensureCtx(); sfx.tap();
+    speak(cleanWord);
+  });
+  openWordDetailEl = el;
 }
 
 // ---- Phrase-chunking for "Luyện từng cụm" ----
@@ -5217,14 +5520,14 @@ function renderChunkPractice(text){
   });
 }
 
-function renderPronunciationFocus(targetWords, matched){
+function renderPronunciationFocus(targetWords, wordClassification){
 
   const focusWords = [];
 
   for(let i = 0; i < targetWords.length; i++){
 
-    // Nếu từ đã khớp thì chưa cần ưu tiên luyện
-    if(matched[i]) continue;
+    // Nếu từ đã khớp chính xác thì chưa cần ưu tiên luyện
+    if(wordClassification[i].tier === 'exact') continue;
 
     const cleanWord = targetWords[i]
       .toLowerCase()
@@ -5353,21 +5656,43 @@ function renderPronunciationFocus(targetWords, matched){
 
 }
 
-function scoreAndRender(heardTextRaw){
+function scoreAndRender(heardTextRaw, timing){
   const target = dialogue[idx][1];
   const targetWords = target.split(/\s+/).filter(Boolean);
   const heardWords = heardTextRaw.split(/\s+/).filter(Boolean);
 
-  const { matched, lcsLength } = alignWords(targetWords, heardWords);
-  const pct = targetWords.length ? Math.round((lcsLength / targetWords.length) * 100) : 0; 
+  const wordClassification = classifyWords(targetWords, heardWords);
+  const lcsLength = wordClassification.filter(w=>w.tier==='exact').length;
+  const pct = targetWords.length ? Math.round((lcsLength / targetWords.length) * 100) : 0;
   recordPracticeScore(pct);
   recordPracticeScoreForSet(pct, currentSetId);
   const missedCount = targetWords.length - lcsLength;
   const extraCount = Math.max(0, heardWords.length - lcsLength);
 
+  // ---- Pace & Flow: real signals from the speech-recognition engine's own
+  // timing (when it detected speech starting/stopping, and how many times
+  // it detected a fresh burst of speech within this one recording), NOT
+  // audio-phoneme analysis. These are rough, best-effort proxies for
+  // "did they speak at a natural pace / without lots of hesitation" — we
+  // label them clearly so they're never mistaken for real pronunciation
+  // scoring, which needs a dedicated speech-assessment API (see below).
+  let paceScore = null, flowScore = null;
+  if(timing && timing.speechMs && targetWords.length){
+    const expectedMs = targetWords.length * 350; // ~170 wpm natural conversational pace
+    const ratio = timing.speechMs / expectedMs;
+    const dev = Math.abs(ratio - 1);
+    paceScore = Math.max(30, Math.min(100, Math.round(100 - dev*120)));
+    const segments = timing.speechSegments || 1;
+    flowScore = segments <= 1 ? 100 : Math.max(30, 100 - (segments-1)*15);
+  }
+  const hasFluencySignals = paceScore !== null && flowScore !== null;
+  const overall = hasFluencySignals
+    ? Math.round(pct*0.6 + paceScore*0.25 + flowScore*0.15)
+    : pct;
+
  heardText.innerHTML = escapeHTML(heardTextRaw);
- renderComparison(targetWords, matched);
- renderPronunciationFocus(targetWords, matched);
+ renderComparison(targetWords, wordClassification);
+ renderPronunciationFocus(targetWords, wordClassification);
 
   // ---- các chỉ số chi tiết ----
   statRow.innerHTML =
@@ -5376,29 +5701,40 @@ function scoreAndRender(heardTextRaw){
     (missedCount > 0 ? '<div class="stat-pill">🔎 ' + missedCount + ' từ cần chỉnh</div>' : '') +
     (extraCount > 0 ? '<div class="stat-pill">➕ ' + extraCount + ' từ thừa</div>' : '');
 
-  // ---- huy hiệu ĐỘ KHỚP CÂU ----
+  // ---- bảng điểm chi tiết: Accuracy / Pace / Flow / Overall ----
+  scoreBreakdown.innerHTML =
+    '<div class="score-overall">Overall: <b>' + overall + '/100</b></div>' +
+    '<div class="score-breakdown-row">' +
+      '<div class="score-metric"><span class="score-metric-icon">📝</span><span class="score-metric-label">Sentence Accuracy</span><span class="score-metric-val">' + pct + '%</span></div>' +
+      (hasFluencySignals ?
+        '<div class="score-metric"><span class="score-metric-icon">🌊</span><span class="score-metric-label">Tốc độ nói</span><span class="score-metric-val">' + paceScore + '%</span></div>' +
+        '<div class="score-metric"><span class="score-metric-icon">🎵</span><span class="score-metric-label">Nói trơn tru</span><span class="score-metric-val">' + flowScore + '%</span></div>'
+        : '<div class="score-metric score-metric-muted"><span class="score-metric-icon">🌊🎵</span><span class="score-metric-label">Chưa đo được tốc độ và độ trơn tru lần này</span></div>'
+      ) +
+    '</div>';
+
+  // ---- huy hiệu ĐỘ KHỚP CÂU (Sentence Accuracy) ----
   scoreBadge.classList.remove('score-great','score-ok','score-retry');
 
 let msg = '';
 
 if(pct >= 85){
   scoreBadge.classList.add('score-great');
-  msg = pct + '% — Độ khớp câu: Xuất sắc! 🌟';
+  msg = '📝 Sentence Accuracy: ' + pct + '% — Xuất sắc! 🌟';
   sfx.great();
 }
 else if(pct >= 55){
   scoreBadge.classList.add('score-ok');
-  msg = pct + '% — Độ khớp câu: Khá tốt! 💪';
+  msg = '📝 Sentence Accuracy: ' + pct + '% — Khá tốt! 💪';
   sfx.ok();
 }
 else {
   scoreBadge.classList.add('score-retry');
-  msg = pct + '% — Độ khớp câu: Thử lại nhé! 🐣';
+  msg = '📝 Sentence Accuracy: ' + pct + '% — Thử lại nhé! 🐣';
   sfx.retry();
 }
 
 scoreBadge.textContent = msg;
-  scoreBadge.textContent = msg;
   scoreBadge.classList.remove('pop'); void scoreBadge.offsetWidth; scoreBadge.classList.add('pop');
 
   // ---- lời khuyên & nhận xét chi tiết ----
@@ -5421,7 +5757,7 @@ scoreBadge.textContent = msg;
   }
 
   // 3) liệt kê rõ những từ cần luyện thêm (tối đa 6 từ để không quá dài)
-  const missedWords = targetWords.filter((w,i)=> !matched[i]).map(w => w.replace(/[.,!?]/g,''));
+  const missedWords = wordClassification.filter(w=> w.tier !== 'exact').map(w => w.word.replace(/[.,!?]/g,''));
   if(missedWords.length > 0){
     const shown = missedWords.slice(0, 6);
     const extra = missedWords.length - shown.length;
@@ -5431,7 +5767,7 @@ scoreBadge.textContent = msg;
   // 4) mẹo phát âm cụ thể cho từng từ bị sai, ưu tiên đa dạng loại âm (không lặp cùng 1 nhóm)
   let specificTipCount = 0;
   for(let i=0; i<targetWords.length && specificTipCount < 3; i++){
-    if(matched[i]) continue;
+    if(wordClassification[i].tier === 'exact') continue;
     const key = normalizeWord(targetWords[i]);
     const entry = TIPS_DB[key];
     if(entry && !seenTags.has(entry[0])){
@@ -5545,6 +5881,14 @@ function startChunkRecording(targetText, chunkIndex){
 
     }
 
+    // Chunk practice attempts count toward the same overall stats, XP,
+    // and streak as full-sentence practice — previously only full-sentence
+    // scores were recorded here, so chunk practice didn't show up anywhere.
+    recordPracticeScore(pct);
+    if(currentSetId){
+      recordPracticeScoreForSet(pct, currentSetId);
+    }
+
   };
 
   chunkRecognition.onerror = (event) => {
@@ -5599,6 +5943,7 @@ async function startRecording(){
   recordSafetyTimer = setTimeout(()=>{ stopRecording(); }, 20000);
 
   let finalTranscript = '';
+  let speechStartTs = null, speechEndTs = null, speechSegments = 0;
 
   recognition.onresult = (event)=>{
     for(let i = event.resultIndex; i < event.results.length; i++){
@@ -5606,6 +5951,18 @@ async function startRecording(){
         finalTranscript += event.results[i][0].transcript + ' ';
       }
     }
+  };
+  // These two fire based on the browser's own voice-activity detection —
+  // available without opening a second microphone stream, so they're safe
+  // to use even on Android (see the getUserMedia notes above). Support
+  // varies by browser; if they never fire we just skip Pace/Flow scoring
+  // rather than guessing.
+  recognition.onspeechstart = ()=>{
+    speechSegments++;
+    if(speechStartTs === null) speechStartTs = Date.now();
+  };
+  recognition.onspeechend = ()=>{
+    speechEndTs = Date.now();
   };
   recognition.onerror = (event)=>{
     if(event.error === 'not-allowed'){
@@ -5631,7 +5988,10 @@ async function startRecording(){
     if(mediaRecorder && mediaRecorder.state !== 'inactive'){ try{ mediaRecorder.stop(); }catch(e){} }
     if(finalTranscript.trim()){
       micLabel.textContent = 'Chạm vào mic rồi lặp lại câu phía trên';
-      scoreAndRender(finalTranscript.trim());
+      const timing = (speechStartTs !== null && speechEndTs !== null && speechEndTs > speechStartTs)
+        ? { speechMs: speechEndTs - speechStartTs, speechSegments: speechSegments }
+        : null;
+      scoreAndRender(finalTranscript.trim(), timing);
     } else if(micLabel.textContent === 'Đang nghe... nói ngay đi nào 🎧'){
       micLabel.textContent = 'Chưa bắt được giọng bạn — chạm mic để thử lại nhé 🎙️';
     }
@@ -5646,10 +6006,24 @@ async function startRecording(){
         micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
       }
       recordedChunks = [];
-      mediaRecorder = new MediaRecorder(micStream);
+      // Explicitly pick a MIME type MediaRecorder can actually encode with
+      // on this browser (Safari/iOS only supports audio/mp4, Chrome/Android
+      // supports audio/webm) instead of letting the browser choose silently
+      // — that way we know for certain what format the bytes are really in.
+      let recorderMimeType = '';
+      if(window.MediaRecorder && MediaRecorder.isTypeSupported){
+        const candidates = ['audio/mp4','audio/aac','audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus'];
+        recorderMimeType = candidates.find(t => MediaRecorder.isTypeSupported(t)) || '';
+      }
+      mediaRecorder = recorderMimeType
+        ? new MediaRecorder(micStream, { mimeType: recorderMimeType })
+        : new MediaRecorder(micStream);
       mediaRecorder.ondataavailable = (e)=>{ if(e.data.size > 0) recordedChunks.push(e.data); };
       mediaRecorder.onstop = ()=>{
-        const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+        // Label the Blob with the format MediaRecorder actually used
+        // (mediaRecorder.mimeType), NOT a hardcoded guess — a mismatched
+        // label is exactly what silently broke playback on iOS Safari.
+        const blob = new Blob(recordedChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
         if(myAudioURL) URL.revokeObjectURL(myAudioURL);
         myAudioURL = URL.createObjectURL(blob);
         myAudio.src = myAudioURL;
@@ -5683,6 +6057,11 @@ micBtn.addEventListener('click', (e)=>{
 
 if(isAndroid){
   playMineBtn.style.display = 'none';
+  const playbackNote = document.getElementById('playbackNote');
+  if(playbackNote){
+    playbackNote.textContent = '🎧 Trên Android, việc nghe lại đúng giọng ghi âm của bạn chưa khả dụng do giới hạn hệ thống (dùng chung micro với tính năng nhận diện giọng nói) — nhưng chấm điểm phát âm vẫn hoạt động bình thường.';
+    playbackNote.style.display = 'block';
+  }
 }
 
 playMineBtn.addEventListener('click', (e)=>{
@@ -5818,21 +6197,55 @@ function peRenderDashboard(){
   }
 }
 
+/* ---- Custom confirm dialog + toast (replace native confirm()/alert(),
+     which browsers/sandboxed previews often block or silently no-op) ---- */
+const peConfirmOverlay = document.getElementById('peConfirmOverlay');
+const peConfirmYesBtn = document.getElementById('peConfirmYesBtn');
+const peConfirmNoBtn = document.getElementById('peConfirmNoBtn');
+const peToastEl = document.getElementById('peToast');
+let peToastTimer = null;
+
+function peShowToast(msg){
+  if(!peToastEl) return;
+  peToastEl.textContent = msg;
+  peToastEl.classList.add('show');
+  if(peToastTimer) clearTimeout(peToastTimer);
+  peToastTimer = setTimeout(()=> peToastEl.classList.remove('show'), 2600);
+}
+
+function peShowConfirm(onConfirm){
+  if(!peConfirmOverlay){ onConfirm(); return; }
+  peConfirmOverlay.classList.add('show');
+  const cleanup = ()=>{
+    peConfirmOverlay.classList.remove('show');
+    peConfirmYesBtn.removeEventListener('click', onYes);
+    peConfirmNoBtn.removeEventListener('click', onNo);
+    peConfirmOverlay.removeEventListener('click', onBackdrop);
+  };
+  const onYes = ()=>{ cleanup(); onConfirm(); };
+  const onNo = ()=>{ cleanup(); };
+  const onBackdrop = (e)=>{ if(e.target === peConfirmOverlay) cleanup(); };
+  peConfirmYesBtn.addEventListener('click', onYes);
+  peConfirmNoBtn.addEventListener('click', onNo);
+  peConfirmOverlay.addEventListener('click', onBackdrop);
+}
+
 function peResetAll(){
-  if(!confirm('Xóa toàn bộ XP, streak, điểm và tiến trình học trên thiết bị này?')) return;
-  [
-    PE_LEARNER_KEY,
-    PRACTICE_STATS_KEY,
-    PRACTICE_SET_STATS_KEY,
-    STUDY_PROGRESS_KEY,
-    IN_PROGRESS_KEY
-  ].forEach(k => { try{ localStorage.removeItem(k); }catch(e){} });
-  peRenderDashboard();
-  updatePracticeStats();
-  updateAllDialogueStats();
-  updateStudyProgress();
-  updateLevelProgress();
-  alert('Đã xóa dữ liệu tiến trình trên thiết bị này.');
+  peShowConfirm(()=>{
+    [
+      PE_LEARNER_KEY,
+      PRACTICE_STATS_KEY,
+      PRACTICE_SET_STATS_KEY,
+      STUDY_PROGRESS_KEY,
+      IN_PROGRESS_KEY
+    ].forEach(k => { try{ localStorage.removeItem(k); }catch(e){} });
+    peRenderDashboard();
+    updatePracticeStats();
+    updateAllDialogueStats();
+    updateStudyProgress();
+    updateLevelProgress();
+    peShowToast('✅ Đã xóa dữ liệu tiến trình trên thiết bị này.');
+  });
 }
 
 const peResetBtn = document.getElementById('peResetData');
