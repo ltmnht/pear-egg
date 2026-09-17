@@ -6749,8 +6749,34 @@ if(!speechSupported){
   supportWarning.style.display = 'block';
 }
 
+// ---- Số & chữ số: máy nhận diện giọng nói (đặc biệt trên điện thoại)
+// thường tự động đổi "one", "two", "three"... người dùng ĐỌC thành CHỮ SỐ
+// "1", "2", "3"... trong bản ghi trả về. Nếu không quy về cùng một dạng thì
+// so khớp văn bản sẽ luôn coi "1" khác "one" -> tính sai là đọc trật, dù
+// người dùng đọc đúng. Hàm dưới đây đổi chữ số (0-100) thành chữ tương ứng
+// để hai bên luôn được so sánh trên cùng một "ngôn ngữ".
+const NUMBER_WORDS_ONES = ['zero','one','two','three','four','five','six','seven','eight','nine','ten',
+  'eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];
+const NUMBER_WORDS_TENS = ['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
+function digitsToWords(n){
+  if(n < 20) return NUMBER_WORDS_ONES[n];
+  if(n < 100){
+    const t = Math.floor(n/10), o = n % 10;
+    return NUMBER_WORDS_TENS[t] + (o ? '-' + NUMBER_WORDS_ONES[o] : '');
+  }
+  if(n === 100) return 'one hundred';
+  return String(n); // ngoài phạm vi bài học thường gặp, giữ nguyên
+}
+
 function normalizeWord(w){
-  return w.toLowerCase().replace(/[.,!?'’]/g, '');
+  let s = w.toLowerCase().replace(/[.,!?'’]/g, '');
+  // Nếu máy trả về thuần chữ số (vd "7"), quy đổi sang chữ (vd "seven")
+  // để so khớp được với câu mẫu viết bằng chữ.
+  if(/^\d+$/.test(s)){
+    const n = parseInt(s, 10);
+    if(n >= 0 && n <= 100) s = digitsToWords(n);
+  }
+  return s;
 }
 
 /* ---- Ngân hàng mẹo phát âm ----
@@ -7931,6 +7957,11 @@ async function startRecording(){
 
   let finalTranscript = '';
   let speechStartTs = null, speechEndTs = null, speechSegments = 0;
+  // Mốc thời gian bắt đầu ghi âm (luôn có, không phụ thuộc trình duyệt) —
+  // dùng làm phương án dự phòng bên dưới khi onspeechstart/onspeechend
+  // không bắn ra (rất hay gặp trên Safari/iOS và một số trình duyệt di
+  // động khác), để Fluency/Pace không bị bỏ trắng liên tục trên điện thoại.
+  const recordStartTs = Date.now();
 
   recognition.onresult = (event)=>{
     for(let i = event.resultIndex; i < event.results.length; i++){
@@ -7949,6 +7980,15 @@ async function startRecording(){
     if(speechStartTs === null) speechStartTs = Date.now();
   };
   recognition.onspeechend = ()=>{
+    speechEndTs = Date.now();
+  };
+  // onaudiostart/onaudioend bắn ra khi micro bắt đầu/kết thúc nhận tín hiệu
+  // âm thanh — được hỗ trợ rộng hơn onspeechstart/onspeechend trên di động,
+  // nên dùng làm phương án dự phòng để không bỏ lỡ mốc thời gian bắt đầu.
+  recognition.onaudiostart = ()=>{
+    if(speechStartTs === null) speechStartTs = Date.now();
+  };
+  recognition.onaudioend = ()=>{
     speechEndTs = Date.now();
   };
   recognition.onerror = (event)=>{
@@ -7977,9 +8017,20 @@ async function startRecording(){
     if(mediaRecorder && mediaRecorder.state !== 'inactive'){ try{ mediaRecorder.stop(); }catch(e){} }
     if(finalTranscript.trim()){
       micLabel.textContent = 'Chạm vào mic rồi lặp lại câu phía trên';
-      const timing = (speechStartTs !== null && speechEndTs !== null && speechEndTs > speechStartTs)
+      let timing = (speechStartTs !== null && speechEndTs !== null && speechEndTs > speechStartTs)
         ? { speechMs: speechEndTs - speechStartTs, speechSegments: speechSegments }
         : null;
+      // Phương án dự phòng cuối cùng: nếu trình duyệt (thường là trên điện
+      // thoại) không bắn bất kỳ sự kiện onspeechstart/onspeechend/
+      // onaudiostart/onaudioend nào, vẫn có bản ghi hợp lệ (finalTranscript)
+      // -> dùng luôn tổng thời gian ghi âm (từ lúc bấm mic tới lúc dừng)
+      // thay vì bỏ trắng Fluency/Pace mỗi lần trên điện thoại.
+      if(!timing){
+        const fallbackMs = Date.now() - recordStartTs;
+        if(fallbackMs > 0){
+          timing = { speechMs: fallbackMs, speechSegments: speechSegments || 1 };
+        }
+      }
       scoreAndRender(finalTranscript.trim(), timing);
     } else if(micLabel.textContent === 'Đang nghe... nói ngay đi nào 🎧'){
       micLabel.textContent = 'Chưa bắt được giọng bạn — chạm mic để thử lại nhé 🎙️';
